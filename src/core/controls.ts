@@ -1,4 +1,4 @@
-import { magnitude } from '@/helpers';
+import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 
 const enum XboxControllerButton {
   A,
@@ -26,22 +26,17 @@ class Controls {
   isRight = false;
   isConfirm = false;
   isEscape = false;
-  inputDirection: DOMPoint;
+  inputDirection: EnhancedDOMPoint;
 
   keyMap: Map<string, boolean> = new Map();
-  previousState = { isUp: this.isUp, isDown: this.isDown, isConfirm: this.isConfirm, isEscape: this.isEscape };
 
   constructor() {
     document.addEventListener('keydown', event => this.toggleKey(event, true));
     document.addEventListener('keyup', event => this.toggleKey(event, false));
-    this.inputDirection = new DOMPoint();
+    this.inputDirection = new EnhancedDOMPoint();
   }
 
   queryController() {
-    this.previousState.isUp = this.isUp;
-    this.previousState.isDown = this.isDown;
-    this.previousState.isConfirm = this.isConfirm;
-    this.previousState.isEscape = this.isEscape;
     const gamepad = navigator.getGamepads()[0];
     const isButtonPressed = (button: XboxControllerButton) => gamepad?.buttons[button].pressed;
 
@@ -53,7 +48,7 @@ class Controls {
     this.inputDirection.y = (upVal + downVal) || gamepad?.axes[1] || 0;
 
     const deadzone = 0.1;
-    if (magnitude(this.inputDirection) < deadzone) {
+    if (this.inputDirection.magnitude < deadzone) {
       this.inputDirection.x = 0;
       this.inputDirection.y = 0;
     }

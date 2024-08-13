@@ -1,12 +1,7 @@
 import { State } from '@/core/state';
-import { drawEngine } from '@/core/draw-engine';
 import { controls } from '@/core/controls';
-import { gameStateMachine } from '@/game-state-machine';
-import { menuState } from '@/game-states/menu.state';
-import { renderWebGl } from '@/web-gl/renderer';
-import { clamp } from '@/helpers';
 
-class GameState implements State {
+export class GameState implements State {
   ballImage = new Image();
   ballSize = 100;
   ballPosition = new DOMPoint(100, 100);
@@ -27,15 +22,6 @@ class GameState implements State {
     this.ballVelocity.x += controls.inputDirection.x;
     this.ballVelocity.y += controls.inputDirection.y;
 
-    // Check collisions with edges of map
-    if (this.ballPosition.x + this.ballSize > drawEngine.canvasWidth || this.ballPosition.x <= 0) {
-      this.ballVelocity.x *= -1;
-    }
-
-    if (this.ballPosition.y + this.ballSize > drawEngine.canvasHeight || this.ballPosition.y <= 0) {
-      this.ballVelocity.y *= -1;
-    }
-
     this.ballPosition.x += this.ballVelocity.x;
     this.ballPosition.y += this.ballVelocity.y;
 
@@ -44,21 +30,8 @@ class GameState implements State {
     this.ballVelocity.y *= 0.99;
 
     // Clamp top speed
-    this.ballVelocity = clamp(this.ballVelocity, 25);
+    // this.ballVelocity = clamp(this.ballVelocity, 25);
 
-    drawEngine.context.drawImage(
-      this.ballImage,
-      this.ballPosition.x,
-      this.ballPosition.y,
-      this.ballSize,
-      this.ballSize
-    );
-    renderWebGl(this.ballPosition, this.ballVelocity);
-
-    if (controls.isEscape) {
-      gameStateMachine.setState(menuState);
-    }
+    // render(this.ballPosition, this.ballVelocity);
   }
 }
-
-export const gameState = new GameState();
