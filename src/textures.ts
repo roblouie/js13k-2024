@@ -30,7 +30,11 @@ export async function initTextures() {
   materials.keyLock = new Material({ texture: textureLoader.load_(await keyLock())});
   materials.banner = new Material({ texture: textureLoader.load_(await banner()) });
   materials.bannerIcon = new Material({ texture: textureLoader.load_(await bannerIcon() )});
-  materials.water = new Material({ texture: textureLoader.load_(await drawWater())})
+  materials.water = new Material({ texture: textureLoader.load_(...(await drawWater()))});
+  materials.marbleFloor = new Material({ texture: textureLoader.load_(await marbleFloor())});
+  materials.parquetFloor = new Material({ texture: textureLoader.load_(await parquetFloor())});
+  materials.texturedWallpaper = new Material({ texture: textureLoader.load_(await texturedWallpaper())});
+  materials.patternedWallpaper = new Material({ texture: textureLoader.load_(await patternedWallpaper())});
 
   const testSlicer = drawSkyboxHor();
   const horSlices = [await testSlicer(), await testSlicer(), await testSlicer(), await testSlicer()];
@@ -44,6 +48,78 @@ export async function initTextures() {
   ];
 
   textureLoader.bindTextures();
+}
+
+function patternedWallpaper() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+    <filter id="filter">
+        <feTurbulence baseFrequency=".004 .1"/>
+        <feColorMatrix values="0 0 0 1 0
+                               0 .3 0 0 0
+                               0 0 0 0 0
+                               0 0 0 0 1"/>
+    </filter>
+    <pattern id="pattern" width="1" height="1" patternTransform="skewY(60)">
+        <rect width="100%" height="100%" filter="url(#filter)"/>
+    </pattern>
+    <g id="g">
+        <rect id="r" width="25.1%" height="100%" fill="url(#pattern)"/>
+        <use href="#r" x="49.9%"/>
+    </g>
+    <use href="#g" x="-100%" transform="scale(-1 1)"/>
+</svg>`)
+}
+
+function texturedWallpaper() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <pattern id="pattern" width="3" height="2" patternUnits="userSpaceOnUse">
+        <circle r="4" fill="#875"/>
+        <rect width="1" height="1"/>
+    </pattern>
+    <filter id="filter">  
+      <feTurbulence baseFrequency=".02 .002" numOctaves="3"/>
+      <feDisplacementMap in="SourceGraphic" scale="9"/>
+    </filter>
+    <rect x="-10%" y="-10%" width="120%" height="120%" fill="url(#pattern)" filter="url(#filter)"/>
+</svg>`)
+}
+
+function parquetFloor() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <pattern id="pattern" width="256" height="256" patternUnits="userSpaceOnUse">
+        <path id="p" d="M.5.5v127h42V.5h1v127h42V.5h1v127h42V.5" fill="#da6"/>
+        <use href="#p" x="128" y="128"/>
+    </pattern>
+    <filter id="filter">
+        <feTurbulence type="fractalNoise" baseFrequency=".1 .01" numOctaves="3"/>
+        <feComposite in="SourceGraphic" operator="in"/>
+        <feBlend in="SourceGraphic" mode="difference"/>
+    </filter>
+    <g id="o">
+        <circle r="71%"/>
+        <circle id="c" r="71%" fill="url(#pattern)" filter="url(#filter)"/>
+        <use href="#c" transform="rotate(90)"/>
+    </g>
+    <use href="#o" x="50%" y="50%"/>
+</svg>`)
+}
+
+function marbleFloor() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <pattern id="pattern" width="256" height="256" patternUnits="userSpaceOnUse">
+        <circle r="290" fill="red"/>
+        <path d="M0 0H128V256H256V128H0z"/>
+    </pattern>
+    <filter id="filter">
+        <feTurbulence baseFrequency=".04" numOctaves="4"/>
+        <feBlend in="SourceGraphic" mode="lighten"/>
+        <feColorMatrix values="1 -1 0 0 0
+                               1 -1 0 0 0
+                               1 -1 0 0 0
+                               0 0 0 0 1"/>
+    </filter>
+    <rect width="100%" height="100%" fill="url(#pattern)" filter="url(#filter)"/>
+</svg>`)
 }
 
 function drawWaterDarkBlue() {
@@ -70,6 +146,65 @@ function drawWaterDarkBlue() {
 `)
 }
 
+async function attemptAnimated() {
+  const image = await toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" style="background-color:blue">
+    <linearGradient id="g3">
+        <stop offset="0" stop-color="black"/>
+        <stop offset="0.1" stop-color="white"/>
+        <stop offset="0.9" stop-color="white"/>
+        <stop offset="1" stop-color="black"/>
+    </linearGradient>
+    <linearGradient id="g2" gradientTransform="rotate(90)">
+        <stop offset="0" stop-color="black"/>
+        <stop offset="0.1" stop-color="white"/>
+        <stop offset="0.9" stop-color="white"/>
+        <stop offset="1" stop-color="black"/>
+    </linearGradient>
+    <mask id="m2">
+        <rect fill="url(#g3)" height="100%" width="100%" x="0" y="0"/>
+    </mask>
+    <mask id="m1">
+        <rect fill="url(#g2)" height="100%" width="100%" x="0" y="0"/>
+    </mask>
+    <g mask="url(#m2)">
+    <filter id="filter" x="0" y="0" width="100%" height="100%">
+        <feTurbulence baseFrequency=".007" numOctaves="3" seed="1">
+            <animate
+                    attributeName="baseFrequency"
+                    values=".007;0.008;0.007"
+                    dur="20s"
+                    repeatCount="indefinite" />
+        </feTurbulence>
+        <feComponentTransfer>
+            <feFuncA type="gamma" amplitude="-0.9" exponent=".1" offset="1.2">
+                <animate
+                        attributeName="offset"
+                        values="1.2;1.25;1.2"
+                        dur="4s"
+                        repeatCount="indefinite" />
+            </feFuncA>
+        </feComponentTransfer>
+        <feColorMatrix values="0 0 0 1 -1
+                           0 0 0 1 -0.4
+                           1 0 0 1 0
+                           0 0 0 0 1"/>
+        <feBlend in="SourceGraphic" mode="color"/>
+    </filter>
+
+    <rect width="100%" height="100%" fill="blue" filter="url(#filter)" mask="url(#m1)"/>
+    </g>
+</svg>
+`)
+
+  document.body.appendChild(image);
+
+  function test() {
+  }
+
+  return [image, test];
+
+}
+
 function drawWaterLightAqua() {
   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
     <filter id="filter" x="0" y="0" width="100%" height="100%">
@@ -90,7 +225,7 @@ function drawWaterLightAqua() {
 }
 
 function drawWater() {
-  return drawWaterDarkBlue()
+  return attemptAnimated()
 }
 
 function drawWaterDarkerAqua() {

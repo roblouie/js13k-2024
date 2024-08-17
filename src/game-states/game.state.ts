@@ -1,37 +1,41 @@
 import { State } from '@/core/state';
 import { controls } from '@/core/controls';
+import { FirstPersonPlayer } from '@/core/first-person-player';
+import { Scene } from '@/engine/renderer/scene';
+import { Face } from '@/engine/physics/face';
+import { Camera } from '@/engine/renderer/camera';
+import { materials } from '@/textures';
+import { PlaneGeometry } from '@/engine/plane-geometry';
+import { Mesh } from '@/engine/renderer/mesh';
+import { meshToFaces } from '@/engine/physics/parse-faces';
+import { build2dGrid } from '@/engine/physics/surface-collision';
+import { render } from '@/engine/renderer/renderer';
 
 export class GameState implements State {
-  ballImage = new Image();
-  ballSize = 100;
-  ballPosition = new DOMPoint(100, 100);
-  ballVelocity = new DOMPoint(10, 10);
+  player: FirstPersonPlayer;
+  scene: Scene;
+  gridFaces: Set<Face>[] = [];
 
   constructor() {
-    this.ballImage.src = 'ball.png';
+    this.scene = new Scene();
+    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500));
   }
 
-  // Make sure ball starts at the same spot when game is entered
   onEnter() {
-    this.ballPosition = new DOMPoint(100, 100);
-    this.ballVelocity = new DOMPoint(10, 10);
+    const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255).spreadTextureCoords(5, 5), materials.patternedWallpaper);
+    this.scene.add_(floor);
+    this.gridFaces = build2dGrid(meshToFaces([floor]));
+    tmpl.innerHTML = '';
+    tmpl.addEventListener('click', () => {
+      console.log('clicked');
+      tmpl.requestPointerLock();
+    });
+    this.player.cameraRotation.set(0, 90, 0);
   }
 
   onUpdate() {
-    // Update velocity from controller
-    this.ballVelocity.x += controls.inputDirection.x;
-    this.ballVelocity.y += controls.inputDirection.y;
-
-    this.ballPosition.x += this.ballVelocity.x;
-    this.ballPosition.y += this.ballVelocity.y;
-
-    // Apply Drag
-    this.ballVelocity.x *= 0.99;
-    this.ballVelocity.y *= 0.99;
-
-    // Clamp top speed
-    // this.ballVelocity = clamp(this.ballVelocity, 25);
-
-    // render(this.ballPosition, this.ballVelocity);
+    this.player.update(this.gridFaces);
+    this.scene.updateWorldMatrix();
+    render(this.player.camera, this.scene);
   }
 }

@@ -1,67 +1,42 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 
-const enum XboxControllerButton {
-  A,
-  B,
-  X,
-  Y,
-  LeftBumper,
-  RightBumper,
-  LeftTrigger,
-  RightTrigger,
-  Select,
-  Start,
-  L3,
-  R3,
-  DpadUp,
-  DpadDown,
-  DpadLeft,
-  DpadRight,
-}
-
 class Controls {
-  isUp = false;
-  isDown = false;
-  isLeft = false;
-  isRight = false;
-  isConfirm = false;
-  isEscape = false;
+  isConfirm? = false;
   inputDirection: EnhancedDOMPoint;
+  private mouseMovement = new EnhancedDOMPoint();
+  private onMouseMoveCallback?: (mouseMovement: EnhancedDOMPoint) => void;
 
   keyMap: Map<string, boolean> = new Map();
 
   constructor() {
     document.addEventListener('keydown', event => this.toggleKey(event, true));
     document.addEventListener('keyup', event => this.toggleKey(event, false));
+    document.addEventListener('mousedown', () => this.toggleKey({ code: 'KeyE' }, true));
+    document.addEventListener('mouseup', () => this.toggleKey({ code: 'KeyE' }, false));
+
+    document.addEventListener('mousemove', event => {
+      this.mouseMovement.x = event.movementX;
+      this.mouseMovement.y = event.movementY;
+      this.onMouseMoveCallback?.(this.mouseMovement);
+    });
     this.inputDirection = new EnhancedDOMPoint();
   }
 
-  queryController() {
-    const gamepad = navigator.getGamepads()[0];
-    const isButtonPressed = (button: XboxControllerButton) => gamepad?.buttons[button].pressed;
-
-    const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft') || isButtonPressed(XboxControllerButton.DpadLeft)) ? -1 : 0;
-    const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight') || isButtonPressed(XboxControllerButton.DpadRight)) ? 1 : 0;
-    const upVal = (this.keyMap.get('KeyW') || this.keyMap.get('ArrowUp') || isButtonPressed(XboxControllerButton.DpadUp)) ? -1 : 0;
-    const downVal = (this.keyMap.get('KeyS') || this.keyMap.get('ArrowDown') || isButtonPressed(XboxControllerButton.DpadDown)) ? 1 : 0;
-    this.inputDirection.x = (leftVal + rightVal) || gamepad?.axes[0] || 0;
-    this.inputDirection.y = (upVal + downVal) || gamepad?.axes[1] || 0;
-
-    const deadzone = 0.1;
-    if (this.inputDirection.magnitude < deadzone) {
-      this.inputDirection.x = 0;
-      this.inputDirection.y = 0;
-    }
-
-    this.isUp = this.inputDirection.y < 0;
-    this.isDown = this.inputDirection.y > 0;
-    this.isLeft = this.inputDirection.x < 0;
-    this.isRight = this.inputDirection.x > 0;
-    this.isConfirm = Boolean(this.keyMap.get('Enter') || isButtonPressed(XboxControllerButton.A) || isButtonPressed(XboxControllerButton.Start));
-    this.isEscape = Boolean(this.keyMap.get('Escape') || isButtonPressed(XboxControllerButton.Select));
+  onMouseMove(callback: (mouseMovement: EnhancedDOMPoint) => void) {
+    this.onMouseMoveCallback = callback;
   }
 
-  private toggleKey(event: KeyboardEvent, isPressed: boolean) {
+  queryController() {
+    const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft')) ? -1 : 0;
+    const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight')) ? 1 : 0;
+    const upVal = (this.keyMap.get('KeyW') || this.keyMap.get('ArrowUp')) ? -1 : 0;
+    const downVal = (this.keyMap.get('KeyS') || this.keyMap.get('ArrowDown')) ? 1 : 0;
+    this.inputDirection.x = (leftVal + rightVal);
+    this.inputDirection.y = (upVal + downVal);
+    this.isConfirm = this.keyMap.get('KeyE');
+  }
+
+  private toggleKey(event: { code: string }, isPressed: boolean) {
     this.keyMap.set(event.code, isPressed);
   }
 }

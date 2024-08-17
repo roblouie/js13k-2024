@@ -24,7 +24,7 @@ export class MenuState implements State {
   async onEnter() {
     const heightmap = await newNoiseLandscape(256, 6, 0.04, 3, 'fractalNoise', 80);
     const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255, heightmap).spreadTextureCoords(), materials.grass);
-    const water = new Mesh(new PlaneGeometry(1024, 1024, 10, 10).translate_(0, 20).done_().spreadTextureCoords(100, 100), materials.water)
+    const water = new Mesh(new PlaneGeometry(1024, 1024, 10, 10).translate_(0, 20).done_().spreadTextureCoords(160, 160), materials.water)
     this.scene.add_(floor, water);
 
     this.scene.skybox = new Skybox(...skyboxes.test);

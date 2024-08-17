@@ -26,3 +26,8 @@ svg {
 #Fullscreen:hover,#Start:hover {
     fill: red;
 }
+
+#tmpl img {
+    position: absolute;
+    top: -512px;
+}

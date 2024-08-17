@@ -34,12 +34,12 @@ export class FirstPersonPlayer {
     this.camera = camera;
 
     const rotationSpeed = 0.002;
-    // controls.onMouseMove(mouseMovement => {
-    //   this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
-    //   this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
-    //   this.cameraRotation.x = clamp(this.cameraRotation.x, -Math.PI / 2, Math.PI / 2);
-    //   this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
-    // });
+    controls.onMouseMove(mouseMovement => {
+      this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
+      this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
+      this.cameraRotation.x = clamp(this.cameraRotation.x, -Math.PI / 2, Math.PI / 2);
+      this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
+    });
   }
 
   private isFootstepsStopped = true;
