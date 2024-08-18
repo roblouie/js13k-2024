@@ -20,7 +20,7 @@ export function buildElevator() {
       .merge(new MoldableCubeGeometry(4, 9, 1).translate_(4.5, 6, -5.2)).spreadTextureCoords().done_().computeNormals()
     , materials.lighterWoodTest);
 
-  const elevatorFloor = new Mesh(new MoldableCubeGeometry(15, 1.5, 10).spreadTextureCoords(6, 6), materials.tinyTiles);
+  const elevatorFloor = new Mesh(new MoldableCubeGeometry(15, 1.5, 10).spreadTextureCoords(5, 5), materials.tinyTiles);
   const elevatorRoof = new Mesh(new MoldableCubeGeometry(15, 1.5, 10).translate_(0, 12).done_().spreadTextureCoords(), materials.ceilingTiles)
 
   return [elevatorBody, elevatorFloor, elevatorWoodTest, elevatorRail, elevatorRoof];

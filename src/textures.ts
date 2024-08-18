@@ -20,14 +20,11 @@ export async function initTextures() {
   materials.stone = new Material({texture: textureLoader.load_(await bricksRocksPlanksWood(true, false))});
   materials.wood = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(false, false))});
   materials.planks = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(false, true))});
-  materials.castleWriting = new Material({ texture: textureLoader.load_(await castleSign()), isTransparent: true, emissive: [0.5, 0.5, 0.5, 0.5] });
-  materials.handprint = new Material({ texture: textureLoader.load_(await handprint()), isTransparent: true, emissive: [0.5, 0.5, 0.5, 0.5] });
   materials.face = new Material({ texture: textureLoader.load_(await face())});
   materials.bloodCircle = new Material({ texture: textureLoader.load_(await drawBloodCircle()), isTransparent: true });
   materials.gold = new Material({ texture: textureLoader.load_(await metals(0)), emissive: [0.7, 0.7, 0.7, 0.7] });
   materials.silver = new Material({ texture: textureLoader.load_(await metals(1)) });
   materials.iron = new Material({ texture: textureLoader.load_(await metals(2)) });
-  materials.keyLock = new Material({ texture: textureLoader.load_(await keyLock())});
   materials.banner = new Material({ texture: textureLoader.load_(await banner()) });
   materials.bannerIcon = new Material({ texture: textureLoader.load_(await bannerIcon() )});
   materials.water = new Material({ texture: textureLoader.load_(...(await drawWater()))});
@@ -343,13 +340,9 @@ function drawWaterDarkerAqua() {
 </svg>`)
 }
 
-function castleSign() {
-  return toImage(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg">${drawBloodText(10, '30%', 'font-size: 120px; transform: scaleY(1.5); font-family: sans-serif' , 'KEEP', 30)}</svg>`);
-}
 
-function handprint() {
-  return toImage(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg">${drawBloodText(10, '30%', 'font-size: 120px; transform: scaleY(1.5); font-family: sans-serif' , '🖐️', 50)}</svg>`);
-}
+
+
 
 function stars() {
   return `<filter x="0" y="0" width="100%" height="100%" id="s"><feTurbulence baseFrequency="0.2" stitchTiles="stitch" /><feColorMatrix values="0, 0, 0, 9, -5.5, 0, 0, 0, 9, -5.5, 0, 0, 0, 9, -5.5, 0, 0, 0, 0, 1"/></filter>`;
@@ -498,29 +491,6 @@ export function face() {
   return toImage(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg"><filter id="filter" x="-0.01%" primitiveUnits="objectBoundingBox" width="100%" height="100%"><feTurbulence seed="7" type="fractalNoise" baseFrequency="0.005" numOctaves="5" result="n"/><feComposite in="SourceAlpha" operator="in"/><feDisplacementMap in2="n" scale="0.9"/></filter><rect x="0" y="-14" width="100%" height="100%" id="l" filter="url(#filter)"/><rect fill="#fff" width="100%" height="100%"/><use href="#l" x="22%" y="42" transform="scale(2.2, 1.2)"></use><use href="#l" x="-22%" y="42" transform="rotate(.1) scale(-2.2 1.2)"></use><rect fill="#777" x="220" y="230" width="50" height="50"/></svg>`);
 }
 
-const matrices = [
-  [
-    0.4, 0.5, 0.4, 0, 0.3,
-    0.2, 0.6, 0.2, 0, 0.3,
-    0, 0, 0.1, 0, 0,
-    1, 0, 0, 0, 1,
-  ],
-
-  [
-    0.1, 0.1, 0.1, 0, -0.05,
-    0.1, 0.1, 0.1, 0, -0.05,
-    0.1, 0.1, 0.1, 0, -0.05,
-    0, 0, 0, 0, 1,
-  ],
-
-  [
-    0.07, 0.05, 0.06, 0, -0.1,
-    0.07, 0.05, 0.06, 0, -0.1,
-    0.07, 0.05, 0.06, 0, -0.1,
-    0, 0, 0, 0, 1,
-  ]
-];
-
 export function metals(goldSilverIron: number, isHeightmap = false) {
   const method = isHeightmap ? toHeightmap : toImage;
   return method(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
@@ -539,10 +509,6 @@ export function metals(goldSilverIron: number, isHeightmap = false) {
 
 export function testHeightmap() {
   return metals(1, true);
-}
-
-function keyLock() {
-  return toImage(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg"><filter id="b"><feTurbulence baseFrequency="0.1, 0.004" numOctaves="1" type="fractalNoise"/><feColorMatrix values="${matrices[0]}"/></filter><rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/><ellipse rx="100" ry="100" cx="256" cy="170" fill="#000"/><rect x="216" y="260" width="80" height="160"/></svg>`);
 }
 
 
