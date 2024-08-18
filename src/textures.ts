@@ -30,8 +30,31 @@ export async function initTextures() {
   materials.tinyTiles = new Material({ texture: textureLoader.load_(await tinyTiles())});
   materials.lighterWoodTest = new Material({ texture: textureLoader.load_(await lighterWoodTest())});
   materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
+  materials.elevatorPanel = new Material({ texture: textureLoader.load_(await elevatorPanel())});
 
   textureLoader.bindTextures();
+}
+
+async function elevatorPanel() {
+  const positions = [30, 50, 70];
+  let percentY = 70;
+  const button = (x: number, y: number, num: number) => {
+    return `
+    <ellipse cx="${x}%" cy="${y}%" rx="40" ry="40" fill="${num < 13 ? '#777' : '#ffa'}" stroke="black" stroke-width="4"></ellipse>
+    <text x="${x}%" dx="${num > 9 ? -30 : -14}" y="${y}%" dy="18" style="font-weight: bold; font-size: 60px;">${num}</text>
+    `;
+  };
+  let content = button(50, 90, 1);
+  for (let i = 0; i < 12; i++) {
+    const row = i % 3;
+    if (i > 0 && row === 0) {
+      percentY -= 20;
+    }
+    const percentX = positions[row];
+    content += button(percentX, percentY, i + 2);
+  }
+
+  return metals(content);
 }
 
 function potentialPlasterWall() {
@@ -362,7 +385,7 @@ export function face() {
   return toImage(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg"><filter id="filter" x="-0.01%" primitiveUnits="objectBoundingBox" width="100%" height="100%"><feTurbulence seed="7" type="fractalNoise" baseFrequency="0.005" numOctaves="5" result="n"/><feComposite in="SourceAlpha" operator="in"/><feDisplacementMap in2="n" scale="0.9"/></filter><rect x="0" y="-14" width="100%" height="100%" id="l" filter="url(#filter)"/><rect fill="#fff" width="100%" height="100%"/><use href="#l" x="22%" y="42" transform="scale(2.2, 1.2)"></use><use href="#l" x="-22%" y="42" transform="rotate(.1) scale(-2.2 1.2)"></use><rect fill="#777" x="220" y="230" width="50" height="50"/></svg>`);
 }
 
-export function metals(goldSilverIron: number, isHeightmap = false) {
+export function metals(content: string, isHeightmap = false) {
   const method = isHeightmap ? toHeightmap : toImage;
   return method(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
 <filter id="b">
@@ -375,6 +398,7 @@ export function metals(goldSilverIron: number, isHeightmap = false) {
 0,0,0,1"/>
 </filter>
 <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
+${ content ? content : '' }
 </svg>`, 1);
 }
 
