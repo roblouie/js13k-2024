@@ -29,7 +29,7 @@ export class FirstPersonPlayer {
   isOnDirt = true;
 
   constructor(camera: Camera) {
-    this.feetCenter.set(44, 46, -36);
+    this.feetCenter.set(0, 10, -0);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
 

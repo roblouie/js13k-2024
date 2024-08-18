@@ -31,7 +31,7 @@ export async function initTextures() {
   materials.banner = new Material({ texture: textureLoader.load_(await banner()) });
   materials.bannerIcon = new Material({ texture: textureLoader.load_(await bannerIcon() )});
   materials.water = new Material({ texture: textureLoader.load_(...(await drawWater()))});
-  materials.marbleFloor = new Material({ texture: textureLoader.load_(await marbleFloor())});
+  materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
   materials.parquetFloor = new Material({ texture: textureLoader.load_(await parquetFloor())});
   materials.texturedWallpaper = new Material({ texture: textureLoader.load_(await texturedWallpaper())});
   materials.patternedWallpaper = new Material({ texture: textureLoader.load_(await patternedWallpaper())});
@@ -105,21 +105,39 @@ function parquetFloor() {
 }
 
 function marbleFloor() {
+  // new marble floor??
   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
     <pattern id="pattern" width="256" height="256" patternUnits="userSpaceOnUse">
-        <circle r="290" fill="red"/>
+        <circle r="290" fill="white"/>
         <path d="M0 0H128V256H256V128H0z"/>
     </pattern>
     <filter id="filter">
-        <feTurbulence baseFrequency=".04" numOctaves="4"/>
-        <feBlend in="SourceGraphic" mode="lighten"/>
+        <feTurbulence baseFrequency=".04" numOctaves="5"/>
         <feColorMatrix values="1 -1 0 0 0
                                1 -1 0 0 0
                                1 -1 0 0 0
-                               0 0 0 0 1"/>
+                               0 0 0 0 0.3"/>
+        <feBlend in="SourceGraphic" mode="soft-light"/>
+        
     </filter>
     <rect width="100%" height="100%" fill="url(#pattern)" filter="url(#filter)"/>
 </svg>`)
+
+//   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+//     <pattern id="pattern" width="256" height="256" patternUnits="userSpaceOnUse">
+//         <circle r="290" fill="red"/>
+//         <path d="M0 0H128V256H256V128H0z"/>
+//     </pattern>
+//     <filter id="filter">
+//         <feTurbulence baseFrequency=".04" numOctaves="4"/>
+//         <feBlend in="SourceGraphic" mode="lighten"/>
+//         <feColorMatrix values="1 -1 0 0 0
+//                                1 -1 0 0 0
+//                                1 -1 0 0 0
+//                                0 0 0 0 1"/>
+//     </filter>
+//     <rect width="100%" height="100%" fill="url(#pattern)" filter="url(#filter)"/>
+// </svg>`)
 }
 
 function drawWaterDarkBlue() {
@@ -423,7 +441,18 @@ const matrices = [
 
 export function metals(goldSilverIron: number, isHeightmap = false) {
   const method = isHeightmap ? toHeightmap : toImage;
-  return method(`<svg width="${isHeightmap ? 32 : textureSize}" height="${isHeightmap ? 32 : textureSize}" xmlns="http://www.w3.org/2000/svg"><filter id="b"><feTurbulence baseFrequency="${goldSilverIron < 2 ? [0.1, 0.004] : 1.2}" numOctaves="${goldSilverIron < 2 ? 1 : 5}" type="fractalNoise" /><feColorMatrix values="${matrices[goldSilverIron]}"/></filter><rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/></svg>`, 1);
+  return method(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+<filter id="b">
+<feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
+<feColorMatrix values="
+0.2, 0.2, 0.2, 0,
+-0.01, 0.2, 0.2, 0.2,
+0, -0.01, 0.2 ,0.2,
+0.2,0,-0.01,0.2,
+0,0,0,1"/>
+</filter>
+<rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
+</svg>`, 1);
 }
 
 export function testHeightmap() {
