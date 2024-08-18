@@ -35,6 +35,9 @@ export async function initTextures() {
   materials.parquetFloor = new Material({ texture: textureLoader.load_(await parquetFloor())});
   materials.texturedWallpaper = new Material({ texture: textureLoader.load_(await texturedWallpaper())});
   materials.patternedWallpaper = new Material({ texture: textureLoader.load_(await patternedWallpaper())});
+  materials.tinyTiles = new Material({ texture: textureLoader.load_(await tinyTiles())});
+  materials.lighterWoodTest = new Material({ texture: textureLoader.load_(await lighterWoodTest())});
+  materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
 
   const testSlicer = drawSkyboxHor();
   const horSlices = [await testSlicer(), await testSlicer(), await testSlicer(), await testSlicer()];
@@ -48,6 +51,82 @@ export async function initTextures() {
   ];
 
   textureLoader.bindTextures();
+}
+
+function potentialPlasterWall() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+    <filter id="filter">
+        <feTurbulence type="fractalNoise" baseFrequency=".01" numOctaves="5"/>
+        <feComponentTransfer result="n">
+            <feFuncA type="gamma" exponent="4"/>
+        </feComponentTransfer>
+        <feDiffuseLighting lighting-color="#ddd" surfaceScale="2" result="d">
+            <feDistantLight azimuth="90" elevation="45"/>
+        </feDiffuseLighting>
+        
+        <feBlend in2="d"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#filter)"/>
+</svg>`)
+}
+
+function lighterWoodTest() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <filter x="0" y="0" width="100%" height="100%" id="rw">
+        <feTurbulence type="fractalNoise" baseFrequency="0.1,0.007" numOctaves="7" stitchTiles="stitch"/>
+        <feComposite in="s" operator="arithmetic" k2="0.5" k3="0.5"/>
+        <feComponentTransfer>
+            <feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4, .2, .4"/>
+        </feComponentTransfer>
+        <feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="1.5" lighting-color="#a88d5e">
+            <feDistantLight azimuth="110" elevation="50"/>
+        </feDiffuseLighting>
+    </filter>
+    <rect height="100%" width="100%" x="0" y="0" fill="" filter="url(#rw)"/>
+</svg>`)
+}
+
+function ceilingTiles() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+ <pattern id="p2" width="512" height="256" patternUnits="userSpaceOnUse">
+         <rect x="8" y="7" width="502" height="248" />
+    </pattern>
+    <filter id="filter">
+        <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="8"/>
+                                <feComposite in="SourceGraphic" operator="arithmetic" k2="0.5" k3="0.5"/>
+
+        <feComponentTransfer result="n">
+            <feFuncA type="gamma" exponent="4"/>
+        </feComponentTransfer>
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#fff" surfaceScale="-1" result="d">
+            <feDistantLight azimuth="40" elevation="55"/>
+        </feDiffuseLighting>
+        
+
+    </filter>
+    <rect width="100%" height="100%" filter="url(#filter)" fill="url(#p2)"/>
+</svg>`)
+}
+
+function tinyTiles() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <pattern id="p" width="30" height="30" patternUnits="userSpaceOnUse">
+       <rect x="5" y="5" width="20" height="20" />
+    </pattern>
+    <filter x="0" y="0" width="100%" height="100%" id="rw">
+        <feDropShadow dx="1" dy="1" result="s"/>
+       
+        <feComposite in="s" operator="arithmetic" k2="0.5" k3="0.5"/>
+        <feComponentTransfer>
+            <feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4, .2, .4"/>
+        </feComponentTransfer>
+        <feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="2.5" lighting-color="#9f8">
+            <feDistantLight azimuth="180" elevation="34"/>
+        </feDiffuseLighting>
+    </filter>
+    <rect height="100%" width="100%" x="0" y="0" fill="url(#p)" filter="url(#rw)"/>
+</svg>
+`);
 }
 
 function patternedWallpaper() {
@@ -397,6 +476,9 @@ function rockWoodFilter(isRock = true) {
 }
 
 function bricksRocksPlanksWood(isRock = true, isPattern = true) {
+  if (isRock === false && isPattern === false) {
+    console.log(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg">${isPattern ? getPattern( isRock ? 160 : 75, isRock ? 256 : 1) : ''}${rockWoodFilter(isRock)}<rect height="100%" width="100%" x="0" y="0" fill="${isPattern ? 'url(#p)' : ''}" filter="url(#rw)"/></svg>`)
+  }
   return toImage(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg">${isPattern ? getPattern( isRock ? 160 : 75, isRock ? 256 : 1) : ''}${rockWoodFilter(isRock)}<rect height="100%" width="100%" x="0" y="0" fill="${isPattern ? 'url(#p)' : ''}" filter="url(#rw)"/></svg>`);
 }
 

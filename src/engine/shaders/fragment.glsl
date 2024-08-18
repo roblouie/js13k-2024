@@ -17,9 +17,9 @@ uniform mediump sampler2DShadow shadowMap;
 
 out vec4 outColor;
 
-vec3 light_direction = vec3(-1, 1.5, -1);
+vec3 light_direction = vec3(0.1, -0.1, 1);
 
-float ambientLight = 0.3f;
+float ambientLight = 0.8f;
 float maxLit = 1.0f;
 
 vec2 adjacentPixels[5] = vec2[](
@@ -45,7 +45,7 @@ void main() {
     float litPercent = max(dot(normalizedLightPosition, correctedNormals) * visibility, ambientLight);
 
 
-    vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : (litPercent * vec3(1.0, 1.0, 1.0));
+    vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : (litPercent * vec3(1.2, 1.2, 1.2));
 
     vec4 vColor = vec4(litColor.rgb, 1.0);
 

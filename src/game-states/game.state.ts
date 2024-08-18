@@ -24,9 +24,9 @@ export class GameState implements State {
 
   onEnter() {
     const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255).spreadTextureCoords(5, 5), materials.patternedWallpaper);
-    const [elevatorBody, elevatorFloor] = buildElevator();
-    this.scene.add_(floor, elevatorBody, elevatorFloor);
-    this.gridFaces = build2dGrid(meshToFaces([floor, elevatorBody]));
+    const elevatorParts = buildElevator();
+    this.scene.add_(floor, ...elevatorParts);
+    this.gridFaces = build2dGrid(meshToFaces([floor, ...elevatorParts]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
       console.log('clicked');
