@@ -77,7 +77,6 @@ function testSphereTriangle(s: { center: EnhancedDOMPoint, radius: number }, wal
   const squaredDistanceFromPointOnTriangle = v.dot(v);
   const isColliding = squaredDistanceFromPointOnTriangle <= s.radius * s.radius;
   if (isColliding) {
-
     const penetrationNormal = v.normalize_();
     const penetrationDepth = s.radius - Math.sqrt(squaredDistanceFromPointOnTriangle);
     return {

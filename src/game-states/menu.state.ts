@@ -5,7 +5,6 @@ import { newNoiseLandscape } from '@/engine/new-new-noise';
 import { Mesh } from '@/engine/renderer/mesh';
 import { PlaneGeometry } from '@/engine/plane-geometry';
 import { materials, skyboxes } from '@/textures';
-import { Skybox } from '@/engine/skybox';
 import { render } from '@/engine/renderer/renderer';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 
@@ -27,9 +26,7 @@ export class MenuState implements State {
     const water = new Mesh(new PlaneGeometry(1024, 1024, 10, 10).translate_(0, 20).done_().spreadTextureCoords(160, 160), materials.water)
     this.scene.add_(floor, water);
 
-    this.scene.skybox = new Skybox(...skyboxes.test);
     this.scene.updateWorldMatrix();
-    this.scene.skybox.bindGeometry();
 
     tmpl.innerHTML = '';
   }

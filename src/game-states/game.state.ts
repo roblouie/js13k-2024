@@ -10,7 +10,7 @@ import { Mesh } from '@/engine/renderer/mesh';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { build2dGrid } from '@/engine/physics/surface-collision';
 import { render } from '@/engine/renderer/renderer';
-import { buildElevator, elevatorBody, elevatorFloor } from '@/modeling/elevator';
+import { buildElevator } from '@/modeling/elevator';
 
 export class GameState implements State {
   player: FirstPersonPlayer;

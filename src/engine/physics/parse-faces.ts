@@ -10,14 +10,7 @@ function indexToFaceVertexPoint(index: number, positionData: Float32Array, matri
 }
 
 
-let mostNegativeX = Infinity;
-let mostPositiveX = -Infinity;
-let mostNegativeZ = Infinity;
-let mostPositiveZ = -Infinity;
-
-export function meshToFaces(meshes: Mesh[], transformMatrix?: DOMMatrix) {
-
-
+export function meshToFaces(meshes: Mesh[]) {
   return meshes.flatMap(mesh => {
     const indices = mesh.geometry.getIndices();
 
@@ -28,33 +21,15 @@ export function meshToFaces(meshes: Mesh[], transformMatrix?: DOMMatrix) {
       const secondIndex = indices[i + 1] * 3;
       const thirdIndex = indices[i + 2] * 3;
 
-      const point0 = indexToFaceVertexPoint(firstIndex, positions.data, transformMatrix ?? mesh.worldMatrix);
-      const point1 = indexToFaceVertexPoint(secondIndex, positions.data, transformMatrix ?? mesh.worldMatrix);
-      const point2 = indexToFaceVertexPoint(thirdIndex, positions.data, transformMatrix ?? mesh.worldMatrix);
+      const point0 = indexToFaceVertexPoint(firstIndex, positions.data, mesh.worldMatrix);
+      const point1 = indexToFaceVertexPoint(secondIndex, positions.data, mesh.worldMatrix);
+      const point2 = indexToFaceVertexPoint(thirdIndex, positions.data, mesh.worldMatrix);
 
       const trianglePoints = [
         point0,
         point1,
         point2,
       ];
-
-      trianglePoints.forEach(p => {
-        if (p.x < mostNegativeX) {
-          mostNegativeX = p.x;
-        }
-
-        if (p.x > mostPositiveX) {
-          mostPositiveX = p.x;
-        }
-
-        if (p.z < mostNegativeZ) {
-          mostNegativeZ = p.z;
-        }
-
-        if (p.z > mostPositiveZ) {
-          mostPositiveZ = p.z;
-        }
-      });
 
       triangles.push(trianglePoints);
     }

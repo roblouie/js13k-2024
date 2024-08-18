@@ -1,13 +1,12 @@
 import {
   depth_fragment_glsl,
   depth_vertex_glsl,
-  fragment_glsl, shadowMap, skybox_fragment_glsl, skybox_vertex_glsl, uSampler, vertex_glsl
+  fragment_glsl, shadowMap, uSampler, vertex_glsl
 } from '@/engine/shaders/shaders';
 
 export class LilGl {
   gl: WebGL2RenderingContext;
   program: WebGLProgram;
-  skyboxProgram: WebGLProgram;
   depthProgram: WebGLProgram;
 
  constructor() {
@@ -16,9 +15,6 @@ export class LilGl {
    const vertex = this.createShader(this.gl.VERTEX_SHADER, vertex_glsl);
    const fragment = this.createShader(this.gl.FRAGMENT_SHADER, fragment_glsl);
    this.program = this.createProgram(vertex, fragment);
-   const skyboxVertex = this.createShader(this.gl.VERTEX_SHADER, skybox_vertex_glsl);
-   const skyboxFragment = this.createShader(this.gl.FRAGMENT_SHADER, skybox_fragment_glsl);
-   this.skyboxProgram = this.createProgram(skyboxVertex, skyboxFragment);
    const depthVertex = this.createShader(this.gl.VERTEX_SHADER, depth_vertex_glsl);
    const depthFragment = this.createShader(this.gl.FRAGMENT_SHADER, depth_fragment_glsl);
    this.depthProgram = this.createProgram(depthVertex, depthFragment);
