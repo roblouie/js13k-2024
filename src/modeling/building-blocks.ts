@@ -1,7 +1,7 @@
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { doTimes } from '@/engine/helpers';
 
-export const DoorWith = 4;
+export const DoubleDoorWidth = 8;
 export const WallHeight = 12;
 export const DoorHeight = 9;
 export const DoorTopSegment = WallHeight - DoorHeight;

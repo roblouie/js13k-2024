@@ -11,6 +11,8 @@ import { meshToFaces } from '@/engine/physics/parse-faces';
 import { build2dGrid } from '@/engine/physics/surface-collision';
 import { render } from '@/engine/renderer/renderer';
 import { buildElevator } from '@/modeling/elevator';
+import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
+import { buildRoom } from '@/modeling/room';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -23,10 +25,13 @@ export class GameState implements State {
   }
 
   onEnter() {
-    const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255).spreadTextureCoords(5, 5), materials.patternedWallpaper);
+    const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255).spreadTextureCoords(5, 5), materials.redCarpet);
+    const ceiling = new Mesh(new MoldableCubeGeometry(1024, 1, 1024).translate_(0, 12).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
+    const room = buildRoom()
+
     const elevatorParts = buildElevator();
-    this.scene.add_(floor, ...elevatorParts);
-    this.gridFaces = build2dGrid(meshToFaces([floor, ...elevatorParts]));
+    this.scene.add_(floor, ...elevatorParts, ceiling, ...room);
+    this.gridFaces = build2dGrid(meshToFaces([floor, ...elevatorParts, ...room]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
       console.log('clicked');

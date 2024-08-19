@@ -31,6 +31,8 @@ export async function initTextures() {
   materials.lighterWoodTest = new Material({ texture: textureLoader.load_(await lighterWoodTest())});
   materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
   materials.elevatorPanel = new Material({ texture: textureLoader.load_(await elevatorPanel())});
+  materials.redCarpet = new Material({ texture: textureLoader.load_(await redCarpet())});
+  materials.potentialPlasterWall = new Material({ texture: textureLoader.load_(await potentialPlasterWall())});
 
   textureLoader.bindTextures();
 }
@@ -69,6 +71,19 @@ function potentialPlasterWall() {
         </feDiffuseLighting>
         
         <feBlend in2="d"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#filter)"/>
+</svg>`)
+}
+
+function redCarpet() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+    <filter id="filter">
+        <feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2"/>
+        
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#800" surfaceScale="1" result="d">
+            <feDistantLight azimuth="90" elevation="55"/>
+        </feDiffuseLighting>
     </filter>
     <rect width="100%" height="100%" filter="url(#filter)"/>
 </svg>`)
