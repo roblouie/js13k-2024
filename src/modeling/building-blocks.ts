@@ -10,7 +10,7 @@ export const DoorTopSegment = WallHeight - DoorHeight;
 
 export const mergeCubes = (cubes: MoldableCubeGeometry[]) => cubes.reduce((acc, curr) => acc.merge(curr));
 
-export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, texturesPerSide?: Texture[]): [MoldableCubeGeometry, number] {
+export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide?: Texture[]): [MoldableCubeGeometry, number] {
   let geo: MoldableCubeGeometry;
   let totalWidth = 0;
   let runningSide = 0;
@@ -22,7 +22,7 @@ export function buildSegmentedWall(segmentWidths: number[], segmentHeight: numbe
     if (top > 0) {
       const topGeo = new MoldableCubeGeometry(currentWidth, top, depth,1,1,1,6)
         .translate_(runningSide + (index === 0 ? 0 : currentWidth / 2), segmentHeight - top / 2)
-        .spreadTextureCoords();
+        .spreadTextureCoords(textureScale, textureScale);
 
       if (texturesPerSide) {
         // @ts-ignore
@@ -39,7 +39,7 @@ export function buildSegmentedWall(segmentWidths: number[], segmentHeight: numbe
     if (bottomSegments[index] > 0) {
       const bottomGeo = new MoldableCubeGeometry(currentWidth, bottomSegments[index], depth, 1, 1, 1, 6)
         .translate_(runningSide + (index === 0 ? 0 : currentWidth / 2), segmentHeight - bottomSegments[index] / 2)
-        .spreadTextureCoords();
+        .spreadTextureCoords(textureScale, textureScale);
 
       if (texturesPerSide) {
         // @ts-ignore

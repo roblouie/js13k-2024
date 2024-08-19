@@ -30,7 +30,7 @@ export class GameState implements State {
     const room = buildRoom()
 
     // const elevatorParts = buildElevator();
-    this.scene.add_(floor, ceiling, ...room);
+    this.scene.add_(ceiling, floor, ...room);
     this.gridFaces = build2dGrid(meshToFaces([floor, ...room]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {

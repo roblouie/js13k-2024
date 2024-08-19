@@ -34,6 +34,19 @@ export class MoldableCubeGeometry {
     return [...topTexture, ...bottomTexture, ...leftTexture, ...rightTexture,  ...backTexture, ...frontTexture];
   }
 
+  texturePerSide(left: Texture, right: Texture, top: Texture, bottom: Texture, back: Texture, front: Texture) {
+    const allSides = [
+        ...getTextureForSide(this.depthSegments, this.heightSegments, left),
+        ...getTextureForSide(this.depthSegments, this.heightSegments, right),
+        ...getTextureForSide(this.widthSegments, this.depthSegments, top),
+        ...getTextureForSide(this.widthSegments, this.depthSegments, bottom),
+        ...getTextureForSide(this.widthSegments, this.heightSegments, back),
+        ...getTextureForSide(this.widthSegments, this.heightSegments, front),
+    ];
+    this.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(allSides), 1);
+    return this;
+  }
+
   constructor(width_ = 1, height_ = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1, sidesToDraw = 6) {
     this.widthSegments = widthSegments;
     this.depthSegments = depthSegments;

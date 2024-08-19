@@ -33,8 +33,35 @@ export async function initTextures() {
   materials.elevatorPanel = new Material({ texture: textureLoader.load_(await elevatorPanel())});
   materials.redCarpet = new Material({ texture: textureLoader.load_(await redCarpet())});
   materials.potentialPlasterWall = new Material({ texture: textureLoader.load_(await potentialPlasterWall())});
+  materials.wallpaper = new Material({ texture: textureLoader.load_(await wallpaper())});
+  materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await greenPlasterWall())});
 
   textureLoader.bindTextures();
+}
+
+function wallpaper() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+<pattern id="pattern" width="128" height="128" patternUnits="userSpaceOnUse">
+    <rect x="0" y="0" width="128" height="128" fill="#97a58f"/>
+   <text x="64" y="64" style="font-size: 64px;" stroke="#738c6a" fill="#738c6a">❀</text>
+   <text x="0" y="128" style="font-size: 50px;" stroke="#738c6a" fill="#738c6a">✦</text>
+   
+  </pattern>
+  
+  <filter id="filter">
+        <feTurbulence baseFrequency=".4" stitchTiles="stitch"/>
+        
+    <feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="1" lighting-color="#97a58f">
+            <feDistantLight azimuth="120" elevation="50"/>
+        </feDiffuseLighting>
+        <feBlend in="SourceGraphic" mode="difference"/>
+       
+
+    </filter>
+    <rect x="0" y="0" width="100%" height="100%"  filter="url(#filter)" fill="url(#pattern)"></rect>
+  
+</svg>
+`)
 }
 
 async function elevatorPanel() {
@@ -57,6 +84,23 @@ async function elevatorPanel() {
   }
 
   return metals(content);
+}
+
+function greenPlasterWall() {
+  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+    <filter id="filter">
+        <feTurbulence type="fractalNoise" baseFrequency=".01" numOctaves="5"/>
+        <feComponentTransfer result="n">
+            <feFuncA type="gamma" exponent="4"/>
+        </feComponentTransfer>
+        <feDiffuseLighting lighting-color="#97a58f" surfaceScale="2" result="d">
+            <feDistantLight azimuth="90" elevation="45"/>
+        </feDiffuseLighting>
+        
+        <feBlend in2="d"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#filter)"/>
+</svg>`)
 }
 
 function potentialPlasterWall() {
