@@ -15,13 +15,6 @@ import { AttributeLocation } from '@/engine/renderer/renderer';
 const NormalDoorWidth = 5;
 
 export function buildRoom() {
-  const allPlaster = [
-    materials.greenPlasterWall.texture!,
-    materials.greenPlasterWall.texture!,
-    materials.greenPlasterWall.texture!,
-    materials.greenPlasterWall.texture!,
-    materials.greenPlasterWall.texture!,
-    materials.greenPlasterWall.texture!,];
 
   const testWall = buildSegmentedWall([3, NormalDoorWidth, 13], 12, [12, 3, 12], [0, 0, 0], 1,
   4, [
@@ -31,9 +24,27 @@ export function buildRoom() {
     materials.greenPlasterWall.texture!,
     materials.greenPlasterWall.texture!,
     materials.wallpaper.texture!,]);
-  const testWall2 = buildSegmentedWall([21], 12, [12], [], 1, 4, allPlaster);
-  const testWall3 = buildSegmentedWall([34], 12, [12], [], 1, 4, allPlaster);
-  const testWall4 = buildSegmentedWall([34], 12, [12], [], 1, 4, allPlaster);
+  const testWall2 = buildSegmentedWall([21], 12, [12], [], 1, 4, [
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.greenPlasterWall.texture!,]);
+  const testWall3 = buildSegmentedWall([34], 12, [12], [], 1, 4, [
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.greenPlasterWall.texture!,]);
+  const testWall4 = buildSegmentedWall([34], 12, [12], [], 1, 4, [
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.wallpaper.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.wallpaper.texture!,]);
 
   const [bathroomDoorWall] = buildSegmentedWall([4, NormalDoorWidth, 4], 12, [12, DoorTopSegment, 12], [], 1, 4, [
     materials.greenPlasterWall.texture!,
@@ -90,10 +101,15 @@ export function buildRoom() {
   const trim = new Mesh(
     createBox([outerTrimLeft, 34], [outerTrimRight, 32], [outerTrimBack, 21], outerTrimFront)
       .merge(bathroomDoorTrim[0].rotate_(0, Math.PI).translate_(-10))
-      .merge(bathroomWallTrim.translate_(-4, 0.5, -5.25)).done_()
+      .merge(bathroomWallTrim.translate_(-4, 0.5, -5.25))
+      .merge(outerLargeTrimPiece()).done_()
     , materials.potentialPlasterWall);
 
   return [roomBody, bedPlaceholder,counterPlaceholder, toiletPlaceholder, bathPlaceholder, trim];
 }
 
+function outerLargeTrimPiece() {
+  return new MoldableCubeGeometry(1, 4, 3).translate_(-16.6, 3, 9)
+    .merge(new MoldableCubeGeometry(1, 4, 12).translate_(-16.6, 3, -4));
+}
 
