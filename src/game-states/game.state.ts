@@ -13,19 +13,20 @@ import { render } from '@/engine/renderer/renderer';
 import { buildElevator } from '@/modeling/elevator';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { buildRoom } from '@/modeling/room';
+import { FreeCam } from '@/core/free-cam';
 
 export class GameState implements State {
-  player: FirstPersonPlayer;
+  player: FirstPersonPlayer | FreeCam;
   scene: Scene;
   gridFaces: Set<Face>[] = [];
 
   constructor() {
     this.scene = new Scene();
-    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500));
+    this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
   }
 
   onEnter() {
-    const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255).spreadTextureCoords(5, 5), materials.redCarpet);
+    const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255).spreadTextureCoords(5, 5).translate_(0).done_(), materials.redCarpet);
     const ceiling = new Mesh(new MoldableCubeGeometry(1024, 1, 1024).translate_(0, 12).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
     const room = buildRoom()
 

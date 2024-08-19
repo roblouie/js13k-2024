@@ -38,7 +38,7 @@ export function buildSegmentedWall(segmentWidths: number[], segmentHeight: numbe
 
     if (bottomSegments[index] > 0) {
       const bottomGeo = new MoldableCubeGeometry(currentWidth, bottomSegments[index], depth, 1, 1, 1, 6)
-        .translate_(runningSide + (index === 0 ? 0 : currentWidth / 2), segmentHeight - bottomSegments[index] / 2)
+        .translate_(runningSide + (index === 0 ? 0 : currentWidth / 2), bottomSegments[index] / 2)
         .spreadTextureCoords(textureScale, textureScale);
 
       if (texturesPerSide) {
