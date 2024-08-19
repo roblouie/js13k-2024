@@ -29,9 +29,9 @@ export class GameState implements State {
     const ceiling = new Mesh(new MoldableCubeGeometry(1024, 1, 1024).translate_(0, 12).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
     const room = buildRoom()
 
-    const elevatorParts = buildElevator();
-    this.scene.add_(floor, ...elevatorParts, ceiling, ...room);
-    this.gridFaces = build2dGrid(meshToFaces([floor, ...elevatorParts, ...room]));
+    // const elevatorParts = buildElevator();
+    this.scene.add_(floor, ceiling, ...room);
+    this.gridFaces = build2dGrid(meshToFaces([floor, ...room]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
       console.log('clicked');

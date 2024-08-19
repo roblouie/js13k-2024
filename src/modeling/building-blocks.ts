@@ -1,5 +1,7 @@
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { doTimes } from '@/engine/helpers';
+import { AttributeLocation } from '@/engine/renderer/renderer';
+import { Texture } from '@/engine/renderer/texture';
 
 export const DoubleDoorWidth = 8;
 export const WallHeight = 12;
@@ -8,7 +10,7 @@ export const DoorTopSegment = WallHeight - DoorHeight;
 
 export const mergeCubes = (cubes: MoldableCubeGeometry[]) => cubes.reduce((acc, curr) => acc.merge(curr));
 
-export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], startingX = 0,startingY = 0, depth = 1, segmentTop = false, segmentBottom = false): [MoldableCubeGeometry, number] {
+export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, texturesPerSide?: Texture[]): [MoldableCubeGeometry, number] {
   let geo: MoldableCubeGeometry;
   let totalWidth = 0;
   let runningSide = 0;
@@ -18,20 +20,35 @@ export function buildSegmentedWall(segmentWidths: number[], segmentHeight: numbe
     const currentWidth = segmentWidths[index];
 
     if (top > 0) {
-      const topGeo = new MoldableCubeGeometry(currentWidth, top, depth,segmentTop ? 6 : 1,1,1,6);
+      const topGeo = new MoldableCubeGeometry(currentWidth, top, depth,1,1,1,6)
+        .translate_(runningSide + (index === 0 ? 0 : currentWidth / 2), segmentHeight - top / 2)
+        .spreadTextureCoords();
+
+      if (texturesPerSide) {
+        // @ts-ignore
+        const textIndexes = MoldableCubeGeometry.TexturePerSide(1, 1, 1, ...texturesPerSide);
+        topGeo.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(textIndexes), 1)
+      }
       if (!geo) {
-        geo = topGeo.translate_(startingX + runningSide + (index === 0 ? 0 : currentWidth / 2), segmentHeight - topSegments[index] / 2 + startingY).spreadTextureCoords();
+        geo = topGeo;
       } else {
-        geo.merge(topGeo.translate_(startingX + runningSide + (currentWidth / 2), segmentHeight - top / 2 + startingY).spreadTextureCoords());
+        geo.merge(topGeo);
       }
     }
 
     if (bottomSegments[index] > 0) {
-      const bottomGeo = new MoldableCubeGeometry(currentWidth, bottomSegments[index], depth, segmentBottom ? 6 : 1, 1, 1, 6);
+      const bottomGeo = new MoldableCubeGeometry(currentWidth, bottomSegments[index], depth, 1, 1, 1, 6)
+        .translate_(runningSide + (index === 0 ? 0 : currentWidth / 2), segmentHeight - bottomSegments[index] / 2)
+        .spreadTextureCoords();
+
+      if (texturesPerSide) {
+        // @ts-ignore
+        const textIndexes = MoldableCubeGeometry.TexturePerSide(1, 1, 1, ...texturesPerSide);
+        bottomGeo.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(textIndexes), 1)      }
       if (!geo) {
-        geo = bottomGeo.translate_(startingX + runningSide + (index === 0 ? 0 : currentWidth / 2), segmentHeight - topSegments[index] / 2 + startingY).spreadTextureCoords();
+        geo = bottomGeo;
       } else {
-        geo.merge(bottomGeo.translate_(startingX + runningSide + (currentWidth / 2), bottomSegments[index] / 2 + startingY).spreadTextureCoords());
+        geo.merge(bottomGeo);
       }
     }
     runningSide+= (index === 0 ? currentWidth / 2 : currentWidth);
