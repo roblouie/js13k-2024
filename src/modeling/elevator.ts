@@ -1,9 +1,7 @@
-import { buildSegmentedWall, createBox, DoubleDoorWidth, SegmentedWall } from '@/modeling/building-blocks';
-import { Material } from '@/engine/renderer/material';
+import { buildSegmentedWall, createBox, DoubleDoorWidth } from '@/modeling/building-blocks';
 import { Mesh } from '@/engine/renderer/mesh';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { materials } from '@/textures';
-import { AttributeLocation } from '@/engine/renderer/renderer';
 
 export const ElevatorDepth = 16;
 

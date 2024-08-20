@@ -56,15 +56,22 @@ export function makeHotel() {
         .rotate_(0, Math.PI / 2)
         .translate_(-49.5, 0, 59)
     )
-    .merge(makeBracing(0, 0))
-    .merge(makeBracing(0, RoomDepth - 0.5))
-    .merge(makeBracing(0, RoomDepth + HallwayWidth))
-    .merge(makeBracing(0, RoomDepth * 2 + HallwayWidth - 0.5))
-    .merge(makeBracing(0, RoomDepth * 2 + HallwayWidth * 2))
-    .merge(makeBracing(0, RoomDepth * 3 + HallwayWidth * 2 - 0.5))
+    .merge(makeAllBracing())
 
     .computeNormals()
     .done_();
+}
+
+function makeAllBracing() {
+  const corridors = [-44, 0, 44].map(val => {
+    return makeBracing(val, 0)
+      .merge(makeBracing(val, RoomDepth - 0.75))
+      .merge(makeBracing(val, RoomDepth + HallwayWidth))
+      .merge(makeBracing(val, RoomDepth * 2 + HallwayWidth - 0.75))
+      .merge(makeBracing(val, RoomDepth * 2 + HallwayWidth * 2))
+      .merge(makeBracing(val, RoomDepth * 3 + HallwayWidth * 2 - 0.75))
+  });
+  return corridors[0].merge(corridors[1]).merge(corridors[2]);
 }
 
 function makeBracing(xOffset: number, zOffset: number) {
@@ -77,6 +84,6 @@ function makeBracing(xOffset: number, zOffset: number) {
     materials.potentialPlasterWall.texture!,
   ];
 
-  return buildSegmentedWall([1, HallwayWidth - 1, 1], 12, [12, 1.5, 12], [], 1.5, 4, wood)[0]
-    .translate_(xOffset, 0, HallwayWidth + 1.75 + zOffset);
+  return buildSegmentedWall([0.75, HallwayWidth - 0.5, 0.75], 12, [12, 1, 12], [], 1.25, 4, wood)[0]
+    .translate_(xOffset, 0, HallwayWidth + 1.875 + zOffset);
 }
