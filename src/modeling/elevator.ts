@@ -5,13 +5,13 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { materials } from '@/textures';
 import { AttributeLocation } from '@/engine/renderer/renderer';
 
-
+export const ElevatorDepth = 16;
 
 export function buildElevator() {
-  const testWall = buildSegmentedWall([4, DoubleDoorWidth, 4], 12, [12, 3, 12], [0, 0, 0], 0, 0);
-  const testWall2 = buildSegmentedWall([16], 12, [12], [], 0, 0);
-  const testWall3 = buildSegmentedWall([10], 12, [12], [], 0, 0);
-  const testWall4 = buildSegmentedWall([10], 12, [12], [], 0, 0);
+  const testWall = buildSegmentedWall([4, DoubleDoorWidth, 4], 12, [12, 3, 12], [0, 0, 0], 1);
+  const testWall2 = buildSegmentedWall([16], 12, [12], [], 1);
+  const testWall3 = buildSegmentedWall([10], 12, [12], [], 1);
+  const testWall4 = buildSegmentedWall([10], 12, [12], [], 1);
 
   const elevatorBody = new Mesh(createBox(testWall, testWall2, testWall3, testWall4), materials.silver);
   const elevatorRail = new Mesh(

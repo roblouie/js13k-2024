@@ -45,6 +45,7 @@ export class FirstPersonPlayer {
   private isFootstepsStopped = true;
 
   update(gridFaces: Set<Face>[]) {
+    tmpl.innerHTML = `X: ${this.feetCenter.x}, Z: ${this.feetCenter.z}`;
     if (!this.isFrozen) {
       this.updateVelocityFromControls();
     }
