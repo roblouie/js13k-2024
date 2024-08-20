@@ -1,6 +1,5 @@
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { doTimes } from '@/engine/helpers';
-import { AttributeLocation } from '@/engine/renderer/renderer';
 import { Texture } from '@/engine/renderer/texture';
 
 export const DoubleDoorWidth = 8;
@@ -26,8 +25,7 @@ export function buildSegmentedWall(segmentWidths: number[], segmentHeight: numbe
 
       if (texturesPerSide) {
         // @ts-ignore
-        const textIndexes = MoldableCubeGeometry.TexturePerSide(1, 1, 1, ...texturesPerSide);
-        topGeo.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(textIndexes), 1)
+        topGeo.texturePerSide(...texturesPerSide);
       }
       if (!geo) {
         geo = topGeo;
@@ -43,8 +41,8 @@ export function buildSegmentedWall(segmentWidths: number[], segmentHeight: numbe
 
       if (texturesPerSide) {
         // @ts-ignore
-        const textIndexes = MoldableCubeGeometry.TexturePerSide(1, 1, 1, ...texturesPerSide);
-        bottomGeo.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(textIndexes), 1)      }
+        bottomGeo.texturePerSide(...texturesPerSide);
+      }
       if (!geo) {
         geo = bottomGeo;
       } else {

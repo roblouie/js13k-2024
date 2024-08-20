@@ -12,7 +12,6 @@ import { build2dGrid } from '@/engine/physics/surface-collision';
 import { render } from '@/engine/renderer/renderer';
 import { buildElevator, ElevatorDepth } from '@/modeling/elevator';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
-import { buildRoom, RoomDepth } from '@/modeling/room';
 import { FreeCam } from '@/core/free-cam';
 import { makeHotel } from '@/modeling/hotel';
 
@@ -39,7 +38,6 @@ export class GameState implements State {
     this.gridFaces = build2dGrid(meshToFaces([floor, hotel]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
-      console.log('clicked');
       tmpl.requestPointerLock();
     });
     this.player.cameraRotation.set(0, 90, 0);

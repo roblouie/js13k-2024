@@ -2,8 +2,9 @@ import { buildRoom, RoomDepth, RoomWidth } from '@/modeling/room';
 import { buildSegmentedWall } from '@/modeling/building-blocks';
 import { materials } from '@/textures';
 
+const HallwayWidth = 10;
+
 export function makeHotel() {
-  const HallwayWidth = 10;
 
   const wallpapered = [
     materials.wallpaper.texture!,
@@ -55,7 +56,27 @@ export function makeHotel() {
         .rotate_(0, Math.PI / 2)
         .translate_(-49.5, 0, 59)
     )
-    // Build right side wall
+    .merge(makeBracing(0, 0))
+    .merge(makeBracing(0, RoomDepth - 0.5))
+    .merge(makeBracing(0, RoomDepth + HallwayWidth))
+    .merge(makeBracing(0, RoomDepth * 2 + HallwayWidth - 0.5))
+    .merge(makeBracing(0, RoomDepth * 2 + HallwayWidth * 2))
+    .merge(makeBracing(0, RoomDepth * 3 + HallwayWidth * 2 - 0.5))
+
     .computeNormals()
     .done_();
+}
+
+function makeBracing(xOffset: number, zOffset: number) {
+  const wood = [
+    materials.potentialPlasterWall.texture!,
+    materials.potentialPlasterWall.texture!,
+    materials.potentialPlasterWall.texture!,
+    materials.potentialPlasterWall.texture!,
+    materials.potentialPlasterWall.texture!,
+    materials.potentialPlasterWall.texture!,
+  ];
+
+  return buildSegmentedWall([1, HallwayWidth - 1, 1], 12, [12, 1.5, 12], [], 1.5, 4, wood)[0]
+    .translate_(xOffset, 0, HallwayWidth + 1.75 + zOffset);
 }

@@ -1,9 +1,3 @@
-export function toImageDom(svgString: string) {
-  const image_ = document.createElement('img');
-  image_.src = `type:image/svg+xml,${btoa(svgString)}`;
-  return image_;
-}
-
 export function toObjectUrl(svgString: string) {
   return URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
 }
@@ -24,6 +18,7 @@ export async function toImageData(svgString: string): Promise<ImageData> {
   return context.getImageData(0, 0, image_.width, image_.height);
 }
 
+//TODO: Consider removing if I don't end up using it anywhere
 export async function toHeightmap(svgString: string, scale_: number): Promise<number[]> {
   const imageData = await toImageData(svgString);
   return [...imageData.data]

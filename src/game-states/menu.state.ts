@@ -1,10 +1,6 @@
 import { State } from '@/core/state';
 import { Scene } from '@/engine/renderer/scene';
 import { Camera } from '@/engine/renderer/camera';
-import { newNoiseLandscape } from '@/engine/new-new-noise';
-import { Mesh } from '@/engine/renderer/mesh';
-import { PlaneGeometry } from '@/engine/plane-geometry';
-import { materials, skyboxes } from '@/textures';
 import { render } from '@/engine/renderer/renderer';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 
@@ -21,11 +17,6 @@ export class MenuState implements State {
   }
 
   async onEnter() {
-    const heightmap = await newNoiseLandscape(256, 6, 0.04, 3, 'fractalNoise', 80);
-    const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255, heightmap).spreadTextureCoords(), materials.grass);
-    const water = new Mesh(new PlaneGeometry(1024, 1024, 10, 10).translate_(0, 20).done_().spreadTextureCoords(160, 160), materials.water)
-    this.scene.add_(floor, water);
-
     this.scene.updateWorldMatrix();
 
     tmpl.innerHTML = '';

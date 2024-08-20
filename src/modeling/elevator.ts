@@ -21,15 +21,16 @@ export function buildElevator() {
       .done_()
     , materials.silver);
 
-  const texturesPerSide = MoldableCubeGeometry.TexturePerSide(1, 1, 1,
+  const texturesPerSide = [
     materials.silver.texture!,
     materials.silver.texture!,
     materials.silver.texture!,
     materials.silver.texture!,
     materials.silver.texture!,
     materials.elevatorPanel.texture!,
-  );
-  const panel = new Mesh(new MoldableCubeGeometry(2, 2, 0.5).setAttribute_(AttributeLocation.TextureDepth, new Float32Array(texturesPerSide), 1).translate_(5.4, 5, 5.2).done_(), materials.elevatorPanel);
+  ]
+  // @ts-ignore
+  const panel = new Mesh(new MoldableCubeGeometry(2, 2, 0.5).texturePerSide(...texturesPerSide).translate_(5.4, 5, 5.2).done_(), materials.elevatorPanel);
   //
   const bfSegments = [1.25, 4, 0.5, 4, 0.5, 4, 1.25];
   const lrSegments = [0.5, 4, 0.5, 4, 0.5];

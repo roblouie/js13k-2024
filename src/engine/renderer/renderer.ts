@@ -7,7 +7,7 @@ import {
   emissive, lightPovMvp,
   modelviewProjection,
   normalMatrix,
-  textureRepeat, u_skybox, u_viewDirectionProjectionInverse
+  textureRepeat,
 } from '@/engine/shaders/shaders';
 import { createOrtho, Object3d } from '@/engine/renderer/object-3d';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';

@@ -23,17 +23,6 @@ export class MoldableCubeGeometry {
   heightSegments: number;
   depthSegments: number;
 
-  static TexturePerSide(widthDivisions: number, heightDivisions: number, depthDivisions: number,
-                        left: Texture, right: Texture, top: Texture, bottom: Texture, back: Texture, front: Texture) {
-    const leftTexture = getTextureForSide(depthDivisions, heightDivisions, left);
-    const rightTexture = getTextureForSide(depthDivisions, heightDivisions, right);
-    const topTexture = getTextureForSide(widthDivisions, depthDivisions, top);
-    const bottomTexture = getTextureForSide(widthDivisions, depthDivisions, bottom);
-    const backTexture = getTextureForSide(widthDivisions, heightDivisions, back);
-    const frontTexture = getTextureForSide(widthDivisions, heightDivisions, front);
-    return [...topTexture, ...bottomTexture, ...leftTexture, ...rightTexture,  ...backTexture, ...frontTexture];
-  }
-
   texturePerSide(left: Texture, right: Texture, top: Texture, bottom: Texture, back: Texture, front: Texture) {
     const allSides = [
         ...getTextureForSide(this.depthSegments, this.heightSegments, left),

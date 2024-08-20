@@ -7,10 +7,6 @@ const textureSize = 512;
 export const materials: {[key: string]: Material} = {};
 
 export async function initTextures() {
-  // @ts-ignore
-  // materials.grass.texture!.textureRepeat.x = 160;
-  // materials.grass.texture!.textureRepeat.y = 10;
-
   materials.brickWall = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(true, true))});
   materials.brickWall.texture?.textureRepeat.set(1.5, 1.5);
   materials.stone = new Material({texture: textureLoader.load_(await bricksRocksPlanksWood(true, false))});
@@ -21,7 +17,6 @@ export async function initTextures() {
   materials.gold = new Material({ texture: textureLoader.load_(await metals(0)), emissive: [0.7, 0.7, 0.7, 0.7] });
   materials.silver = new Material({ texture: textureLoader.load_(await metals(1)) });
   materials.iron = new Material({ texture: textureLoader.load_(await metals(2)) });
-  materials.banner = new Material({ texture: textureLoader.load_(await banner()) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
   materials.parquetFloor = new Material({ texture: textureLoader.load_(await parquetFloor())});
   materials.texturedWallpaper = new Material({ texture: textureLoader.load_(await texturedWallpaper())});
@@ -263,153 +258,7 @@ function marbleFloor() {
     </filter>
     <rect width="100%" height="100%" fill="url(#pattern)" filter="url(#filter)"/>
 </svg>`)
-
-//   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-//     <pattern id="pattern" width="256" height="256" patternUnits="userSpaceOnUse">
-//         <circle r="290" fill="red"/>
-//         <path d="M0 0H128V256H256V128H0z"/>
-//     </pattern>
-//     <filter id="filter">
-//         <feTurbulence baseFrequency=".04" numOctaves="4"/>
-//         <feBlend in="SourceGraphic" mode="lighten"/>
-//         <feColorMatrix values="1 -1 0 0 0
-//                                1 -1 0 0 0
-//                                1 -1 0 0 0
-//                                0 0 0 0 1"/>
-//     </filter>
-//     <rect width="100%" height="100%" fill="url(#pattern)" filter="url(#filter)"/>
-// </svg>`)
 }
-
-function drawWaterDarkBlue() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <filter id="filter" x="0" y="0" width="100%" height="100%">
-        <feTurbulence baseFrequency=".007" numOctaves="3" seed="1">
-          <animate
-            attributeName="baseFrequency"
-            values=".007;0.01;0.007"
-            dur="10s"
-            repeatCount="indefinite" />
-        </feTurbulence>
-        <feComponentTransfer>
-            <feFuncA type="gamma" amplitude="-0.9" exponent=".1" offset="1.2"/>
-        </feComponentTransfer>
-        <feColorMatrix values="0 0 0 1 -1
-                           0 0 0 1 -0.4
-                           1 0 0 1 0
-                           0 0 0 0 1"/>
-        <feBlend in="SourceGraphic" mode="color"/>
-    </filter>
-    <rect width="100%" height="100%" fill="blue" filter="url(#filter)"/>
-</svg>
-`)
-}
-
-// async function attemptAnimated() {
-//   const image = await toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" style="background-color:blue">
-//     <linearGradient id="g3">
-//         <stop offset="0" stop-color="black"/>
-//         <stop offset="0.1" stop-color="white"/>
-//         <stop offset="0.9" stop-color="white"/>
-//         <stop offset="1" stop-color="black"/>
-//     </linearGradient>
-//     <linearGradient id="g2" gradientTransform="rotate(90)">
-//         <stop offset="0" stop-color="black"/>
-//         <stop offset="0.1" stop-color="white"/>
-//         <stop offset="0.9" stop-color="white"/>
-//         <stop offset="1" stop-color="black"/>
-//     </linearGradient>
-//     <mask id="m2">
-//         <rect fill="url(#g3)" height="100%" width="100%" x="0" y="0"/>
-//     </mask>
-//     <mask id="m1">
-//         <rect fill="url(#g2)" height="100%" width="100%" x="0" y="0"/>
-//     </mask>
-//     <g mask="url(#m2)">
-//     <filter id="filter" x="0" y="0" width="100%" height="100%">
-//         <feTurbulence baseFrequency=".007" numOctaves="3" seed="1">
-//             <animate
-//                     attributeName="baseFrequency"
-//                     values=".007;0.008;0.007"
-//                     dur="20s"
-//                     repeatCount="indefinite" />
-//         </feTurbulence>
-//         <feComponentTransfer>
-//             <feFuncA type="gamma" amplitude="-0.9" exponent=".1" offset="1.2">
-//                 <animate
-//                         attributeName="offset"
-//                         values="1.2;1.25;1.2"
-//                         dur="4s"
-//                         repeatCount="indefinite" />
-//             </feFuncA>
-//         </feComponentTransfer>
-//         <feColorMatrix values="0 0 0 1 -1
-//                            0 0 0 1 -0.4
-//                            1 0 0 1 0
-//                            0 0 0 0 1"/>
-//         <feBlend in="SourceGraphic" mode="color"/>
-//     </filter>
-//
-//     <rect width="100%" height="100%" fill="blue" filter="url(#filter)" mask="url(#m1)"/>
-//     </g>
-// </svg>
-// `)
-//
-//   document.body.appendChild(image);
-//
-//   function test() {
-//   }
-//
-//   return [image, test];
-//
-// }
-
-function drawWaterLightAqua() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <filter id="filter" x="0" y="0" width="100%" height="100%">
-        <feTurbulence baseFrequency=".007" numOctaves="3" seed="1" stitchTiles="stitch">
-        </feTurbulence>
-        <feComponentTransfer>
-            <feFuncA type="gamma" amplitude="-.8" exponent=".2" offset="1.3"/>
-        </feComponentTransfer>
-        <feColorMatrix values="0 0 0 1 0
-                           0 0 0 1 0
-                           0 0 0 1 0
-                           0 0 0 0 1"/>
-        <feBlend in="SourceGraphic" mode="color"/>
-    </filter>
-    <rect width="100%" height="100%" fill="aqua" filter="url(#filter)"/>
-</svg>
-`)
-}
-
-function drawWaterDarkerAqua() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <filter id="filter" x="0" y="0" width="100%" height="100%">
-        <feTurbulence baseFrequency=".007" numOctaves="3" seed="1" stitchTiles="stitch">
-        </feTurbulence>
-        <feComponentTransfer>
-            <feFuncA type="gamma" amplitude="-0.7" exponent=".1" offset="1.2"/>
-        </feComponentTransfer>
-        <feColorMatrix values="0 0 0 1 -0.4
-                           0 0 0 1 -0.4
-                           1 0 0 1 0.4
-                           0 0 0 0 1"/>
-        <feBlend in="SourceGraphic" mode="color"/>
-    </filter>
-    <rect width="100%" height="100%" fill="#00bcd4" filter="url(#filter)"/>
-</svg>`)
-}
-
-
-
-
-
-function stars() {
-  return `<filter x="0" y="0" width="100%" height="100%" id="s"><feTurbulence baseFrequency="0.2" stitchTiles="stitch" /><feColorMatrix values="0, 0, 0, 9, -5.5, 0, 0, 0, 9, -5.5, 0, 0, 0, 9, -5.5, 0, 0, 0, 0, 1"/></filter>`;
-}
-
-
 
 function getPattern(width_ = 160, height_ = 256) {
   return `<pattern id="p" width="${width_}" height="${height_}" patternUnits="userSpaceOnUse"><path d="m 0 246 h 148 V 125 H 0 V112 h72 V0 h15 v112 h 74 V 0 H 0"/></pattern>`;
@@ -458,11 +307,4 @@ ${ content ? content : '' }
 
 export function testHeightmap() {
   return metals(1, true);
-}
-
-
-const bannerColor = '#460c0c';
-
-function banner() {
-  return toImage(`<svg width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100%" height="100%" fill="${bannerColor}"></rect></svg>`);
 }
