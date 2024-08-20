@@ -30,6 +30,10 @@ export async function initTextures() {
   materials.wallpaper = new Material({ texture: textureLoader.load_(await wallpaper())});
   materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await greenPlasterWall())});
 
+  for (let i = 1; i <= 13; i++) {
+    materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});
+  }
+
   textureLoader.bindTextures();
 }
 
@@ -290,6 +294,21 @@ export function face() {
 
 export function metals(content: string, isHeightmap = false) {
   const method = isHeightmap ? toHeightmap : toImage;
+    console.log(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+<filter id="b">
+<feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
+<feColorMatrix values="
+0.2, 0.2, 0.2, 0,
+-0.01, 0.2, 0.2, 0.2,
+0, -0.01, 0.2 ,0.2,
+0.2,0,-0.01,0.2,
+0,0,0,1"/>
+</filter>
+<rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
+${ content ? content : '' }
+</svg>`)
+
+
   return method(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
 <filter id="b">
 <feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
@@ -303,6 +322,10 @@ export function metals(content: string, isHeightmap = false) {
 <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
 ${ content ? content : '' }
 </svg>`, 1);
+}
+
+function roomSign(roomNumber: string) {
+  return metals(`<text x="21%" y="42%" font-size="150px" style="transform: scaleY(1.5)">${roomNumber}</text>`)
 }
 
 export function testHeightmap() {

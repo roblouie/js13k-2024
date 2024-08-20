@@ -15,21 +15,21 @@ export function makeHotel() {
     materials.wallpaper.texture!,
   ];
 
-  return buildRoom().translate_(0, 0, HallwayWidth)
-    .merge(buildRoom().translate_(0, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom().translate_(0, 0, HallwayWidth * 3 + 50))
+  return buildRoom(1).translate_(0, 0, HallwayWidth)
+    .merge(buildRoom(2).translate_(0, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(3).translate_(0, 0, HallwayWidth * 3 + 50))
     // Second row of 3
-    .merge(buildRoom().translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth))
-    .merge(buildRoom().translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom().translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 3 + 50))
+    .merge(buildRoom(5).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth))
+    .merge(buildRoom(7).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(9).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 3 + 50))
     // Third Row of 3
-    .merge(buildRoom().rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth))
-    .merge(buildRoom().rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom().rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 3 + 50))
+    .merge(buildRoom(4, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth))
+    .merge(buildRoom(6, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(8, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 3 + 50))
     // Fourth Row of 3
-    .merge(buildRoom().rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth))
-    .merge(buildRoom().rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom().rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 3 + 50))
+    .merge(buildRoom(10, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth))
+    .merge(buildRoom(11, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(12, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 3 + 50))
 
     // Move out on Z by half room depth to space rooms out from elevator
     // Move left on X by half hallway width + half room width  to center layout

@@ -22,8 +22,8 @@ export class GameState implements State {
 
   constructor() {
     this.scene = new Scene();
-    //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
-    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
+    this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
+    //this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
   }
 
   onEnter() {

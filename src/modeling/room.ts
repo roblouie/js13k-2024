@@ -13,7 +13,7 @@ const NormalDoorWidth = 5;
 export const RoomWidth = 34;
 export const RoomDepth = 25;
 
-export function buildRoom() {
+export function buildRoom(roomNumber: number, swapSign?: boolean) {
 
   const testWall = buildSegmentedWall([3, NormalDoorWidth, 15], 12, [12, 3, 12], [0, 0, 0], 1,
   4, [
@@ -114,15 +114,25 @@ export function buildRoom() {
       .merge(bathroomWallTrim[0].rotate_(0, Math.PI / 2).translate_(-4, 0, -5.25))
       .merge(outerLargeTrimPiece()).computeNormals().done_();
 
+  const doorNumberPlate = new MoldableCubeGeometry(1, 1).texturePerSide(
+    materials.silver.texture!,
+    materials.silver.texture!,
+    materials.silver.texture!,
+    materials[roomNumber].texture!,
+    materials.silver.texture!,
+    materials.silver.texture!,
+  ).translate_(-16.75, 5, swapSign ? 9.5 : 2.5);
+
   return createBox(testWall3, testWall4, testWall2, testWall)
-      .merge(bathroomDoorWall)
-      .merge(secondBathroomWall)
-      .merge(bedPlaceholder)
-      .merge(counterPlaceholder)
-      .merge(toiletPlaceholder)
-      .merge(bathPlaceholder)
-      .merge(trim)
-      .done_();
+    .merge(bathroomDoorWall)
+    .merge(secondBathroomWall)
+    .merge(bedPlaceholder)
+    .merge(counterPlaceholder)
+    .merge(toiletPlaceholder)
+    .merge(bathPlaceholder)
+    .merge(trim)
+    .merge(doorNumberPlate)
+    .done_();
 }
 
 function createTrimBoard() {
