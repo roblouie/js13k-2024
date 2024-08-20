@@ -23,15 +23,15 @@ export class GameState implements State {
 
   constructor() {
     this.scene = new Scene();
-    // this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
+    //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
   }
 
   onEnter() {
-    const floor = new Mesh(new PlaneGeometry(1024, 1024, 255, 255).spreadTextureCoords(5, 5).translate_(0).done_(), materials.redCarpet);
-    const ceiling = new Mesh(new MoldableCubeGeometry(1024, 1, 1024).translate_(0, 12).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
+    const floor = new Mesh(new PlaneGeometry(180, 180, 20, 20).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
+    const ceiling = new Mesh(new MoldableCubeGeometry(170, 1, 120).translate_(0, 12, 65).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
     // Move hotel layout to just outside the elevator
-    const hotel = new Mesh(makeHotel().translate_(0, 0, ElevatorDepth / 2).done_(), materials.wallpaper);
+    const hotel = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
     // const elevatorParts = buildElevator();

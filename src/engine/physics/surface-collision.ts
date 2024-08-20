@@ -2,9 +2,9 @@ import { Face } from './face';
 import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { FirstPersonPlayer } from '@/core/first-person-player';
 
-export const halfLevelSize = 128;
-const cellSize = 8;
-const cellsInEachDirection = 16;
+export const halfLevelSize = 90;
+const cellSize = 20;
+const cellsInEachDirection = 9;
 
 export function getGridPosition(point: EnhancedDOMPoint) {
   return Math.floor((point.x + halfLevelSize) / cellSize) + (Math.floor((point.z + halfLevelSize) / cellSize) * cellsInEachDirection);
