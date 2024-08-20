@@ -3,8 +3,8 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { FirstPersonPlayer } from '@/core/first-person-player';
 
 export const halfLevelSize = 90;
-const cellSize = 20;
-const cellsInEachDirection = 9;
+const cellSize = 15;
+const cellsInEachDirection = 12;
 
 export function getGridPosition(point: EnhancedDOMPoint) {
   return Math.floor((point.x + halfLevelSize) / cellSize) + (Math.floor((point.z + halfLevelSize) / cellSize) * cellsInEachDirection);
