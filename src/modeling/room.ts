@@ -14,7 +14,7 @@ import { Texture } from '@/engine/renderer/texture';
 
 // Original elevator door width too big
 const NormalDoorWidth = 5;
-export const RoomWidth = 36;
+export const RoomWidth = 34;
 export const RoomDepth = 25;
 
 export function buildRoom() {
@@ -101,7 +101,7 @@ export function buildRoom() {
   function outerLargeTrimPiece() {
     return new MoldableCubeGeometry(1, 4, 3).texturePerSide(...allWhite).translate_(-16.6, 3, 10)
       .merge(new MoldableCubeGeometry(1, 4, 15).texturePerSide(...allWhite).translate_(-16.6, 3, -4))
-      .merge(new MoldableCubeGeometry(30, 4, 1).texturePerSide(...allWhite).translate_(0, 3, 12.1));
+      .merge(new MoldableCubeGeometry(33, 4, 1).texturePerSide(...allWhite).translate_(0, 3, 12.1));
   }
 
   const outerTrimFront = buildSegmentedWall([3, NormalDoorWidth, 15], 12, [1, 1, 1], [1, 0, 1], 1.5, 12, allWhite)
