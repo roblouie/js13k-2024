@@ -2,14 +2,10 @@ import {
   buildSegmentedWall,
   createBox,
   DoorTopSegment,
-  DoubleDoorWidth,
-  SegmentedWall, WallHeight
+  WallHeight
 } from '@/modeling/building-blocks';
-import { Material } from '@/engine/renderer/material';
-import { Mesh } from '@/engine/renderer/mesh';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { materials } from '@/textures';
-import { AttributeLocation } from '@/engine/renderer/renderer';
 import { Texture } from '@/engine/renderer/texture';
 
 // Original elevator door width too big
@@ -99,9 +95,11 @@ export function buildRoom() {
 
   // TRIM
   function outerLargeTrimPiece() {
-    return new MoldableCubeGeometry(1, 4, 3).texturePerSide(...allWhite).translate_(-16.6, 3, 10)
-      .merge(new MoldableCubeGeometry(1, 4, 15).texturePerSide(...allWhite).translate_(-16.6, 3, -4))
-      .merge(new MoldableCubeGeometry(33, 4, 1).texturePerSide(...allWhite).translate_(0, 3, 12.1));
+    return new MoldableCubeGeometry(1, 3.5, 3).texturePerSide(...allWhite).translate_(-16.6, 2.5, 10)
+      .merge(new MoldableCubeGeometry(1, 3.5, 15).texturePerSide(...allWhite).translate_(-16.6, 2.5, -4))
+      .merge(new MoldableCubeGeometry(1, 3.5, 23).texturePerSide(...allWhite).translate_(16.6, 2.5, 0))
+      .merge(new MoldableCubeGeometry(33, 3.5, 1).texturePerSide(...allWhite).translate_(0, 2.5, 12.1))
+      .merge(new MoldableCubeGeometry(33, 3.5, 1).texturePerSide(...allWhite).translate_(0, 2.5, -12.1))
   }
 
   const outerTrimFront = buildSegmentedWall([3, NormalDoorWidth, 15], 12, [1, 1, 1], [1, 0, 1], 1.5, 12, allWhite)
@@ -125,4 +123,8 @@ export function buildRoom() {
       .merge(bathPlaceholder)
       .merge(trim)
       .done_();
+}
+
+function createTrimBoard() {
+
 }
