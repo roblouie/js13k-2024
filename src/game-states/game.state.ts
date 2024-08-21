@@ -18,7 +18,7 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { DoorData, LeverDoorObject3d } from '@/lever-door';
 
 export class GameState implements State {
-  player: FirstPersonPlayer | FreeCam;
+  player: FirstPersonPlayer;
   scene: Scene;
   gridFaces: Set<Face>[] = [];
 
@@ -29,9 +29,7 @@ export class GameState implements State {
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
 
-    this.door = new LeverDoorObject3d(new EnhancedDOMPoint(-3.5, 4.5, 26),
-      new DoorData(new Mesh(new MoldableCubeGeometry(4.5, 8, 0.5), materials.silver), new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true)
-    , -90);
+    this.door = new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.silver), new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true));
   }
 
   onEnter() {
@@ -51,15 +49,26 @@ export class GameState implements State {
     this.player.cameraRotation.set(0, 90, 0);
   }
 
+  playerDoorDifference = new EnhancedDOMPoint();
+
   onUpdate() {
     this.player.update(this.gridFaces);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 
-    const distance = new EnhancedDOMPoint().subtractVectors(this.player.camera.position_, this.door.switchPosition).magnitude;
-    if (distance < 7 && controls.isConfirm) {
-      this.door.pullLever();
-    }
+    //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
+    tmpl.innerHTML = '';
+      const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, this.door.doorData.placedPosition).magnitude;
+      if (distance < 8) {
+        const direction = this.player.normal.dot(this.playerDoorDifference.normalize_());
+        if (direction > 0.8) {
+          tmpl.innerHTML = 'E Open';
+          if (controls.isConfirm) {
+            this.door.pullLever();
+          }
+        }
+      }
+
 
     this.door.update();
   }

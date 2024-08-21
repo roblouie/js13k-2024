@@ -44,8 +44,10 @@ export class FirstPersonPlayer {
 
   private isFootstepsStopped = true;
 
+  normal = new EnhancedDOMPoint();
+
   update(gridFaces: Set<Face>[]) {
-    tmpl.innerHTML = `X: ${this.feetCenter.x}, Z: ${this.feetCenter.z}`;
+    // tmpl.innerHTML = `X: ${this.feetCenter.x}, Z: ${this.feetCenter.z}`;
     if (!this.isFrozen) {
       this.updateVelocityFromControls();
     }
@@ -64,6 +66,9 @@ export class FirstPersonPlayer {
     this.camera.position_.y += 3.5;
 
     this.camera.setRotation_(...this.cameraRotation.toArray());
+
+    this.normal.set(0, 0, 1);
+    this.normal.set(this.camera.rotationMatrix.transformPoint(this.normal));
 
     this.camera.updateWorldMatrix();
   }

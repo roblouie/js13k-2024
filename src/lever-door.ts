@@ -5,16 +5,21 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { Face } from '@/engine/physics/face';
 import { meshToFaces } from '@/engine/physics/parse-faces';
-import { materials } from "@/textures";
 
 export class DoorData extends Object3d {
   swapHingeSideX: -1 | 1;
   swapHingeSideZ: -1 | 1;
   closedDoorCollisionM: Mesh;
   originalRot = 0;
+  placedPosition: EnhancedDOMPoint;
+  normal = new EnhancedDOMPoint(0, 1, 0);
 
   constructor(doorMesh: Mesh, position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
     super(doorMesh);
+    this.placedPosition = new EnhancedDOMPoint(...position_.toArray());
+    this.placedPosition.x -= 2 * swapHingeSideX;
+    this.placedPosition.y -= 2;
+    this.placedPosition.z -= 2;
     this.swapHingeSideX = swapHingeSideX;
     this.swapHingeSideZ = swapHingeSideZ;
 
@@ -30,50 +35,39 @@ export class DoorData extends Object3d {
     if (swapOpenClosed) {
       this.rotation_.y = 90;
       this.originalRot = 90;
+      // this.normal.set(0, 0, 1);
     }
   }
 }
 
-export class LeverDoorObject3d extends Object3d {
+export class LeverDoorObject3d {
   doorData: DoorData;
   isActivated = false;
   isFinished = false;
-  switchPosition: EnhancedDOMPoint;
   closedDoorCollision: Face[];
-  private openClose = 1;
-  private isAnimating = true;
+  private openClose = -1;
+  private isAnimating = false;
 
 
-  constructor(switchPosition: EnhancedDOMPoint, doorData: DoorData, switchRotationDegrees = 0) {
-    const base = new Mesh(new MoldableCubeGeometry(1, 2, 1).spreadTextureCoords(), materials.iron);
-    const lever = new Mesh(
-      new MoldableCubeGeometry(1, 1, 4, 3, 3)
-        .cylindrify(0.25, 'z')
-        .merge(new MoldableCubeGeometry(3, 1, 1, 1, 3, 3).cylindrify(0.25, 'x').translate_(0, 0, 2))
-        .computeNormals(true)
-        .done_(), materials.wood);
-    super(base, lever);
-
+  constructor(doorData: DoorData) {
     this.doorData = doorData;
-    this.switchPosition = switchPosition;
-    this.position_.set(switchPosition);
-    this.rotation_.y = switchRotationDegrees;
-
-    lever.rotation_.x = -45;
-
     this.closedDoorCollision = meshToFaces([doorData.closedDoorCollisionM]);
   }
 
   pullLever() {
-    this.isActivated = true;
+    if (!this.isAnimating) {
+      this.isAnimating = true;
+      this.openClose *= -1;
+      this.isActivated = true;
+    }
   }
 
   update(){
-    if (this.isActivated && !this.isFinished) {
-        this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * 3;
-        this.children_[1].rotation_.x += 3;
-        if (Math.abs(this.doorData.rotation_.y) - this.doorData.originalRot >= 120) {
+    if (this.isAnimating) {
+        this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * 3 * this.openClose;
+        if (Math.abs(this.doorData.rotation_.y) - this.doorData.originalRot === (this.openClose === -1 ? 0 : 120)) {
           this.isFinished = true;
+          this.isAnimating = false;
         }
     }
   }
