@@ -5,6 +5,7 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { Face } from '@/engine/physics/face';
 import { meshToFaces } from '@/engine/physics/parse-faces';
+import { materials } from '@/textures';
 
 export class DoorData extends Object3d {
   swapHingeSideX: -1 | 1;
@@ -15,7 +16,8 @@ export class DoorData extends Object3d {
   collisionMesh: Mesh;
 
   constructor(doorMesh: Mesh, position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
-    super(doorMesh);
+    const mesh = new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall)
+    super(mesh);
     this.placedPosition = new EnhancedDOMPoint(position_.x - (swapOpenClosed ? 2 * swapHingeSideX : 0), position_.y, position_.z - (swapOpenClosed ? 2 * swapHingeSideX : 0));
     this.swapHingeSideX = swapHingeSideX;
     this.swapHingeSideZ = swapHingeSideZ;
