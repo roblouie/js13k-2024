@@ -40,7 +40,7 @@ export function makeHotel() {
 
     // Draw back wall
     .merge(
-      buildSegmentedWall([45, 11, 45], 12, [12, 2, 12], [], 1, 4, wallpapered)[0]
+      buildSegmentedWall([45, 11, 45], 12, [12, 3, 12], [], 1, 4, wallpapered)[0]
         .translate_(0, 0, 118)
     )
 

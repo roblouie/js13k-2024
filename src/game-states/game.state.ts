@@ -8,7 +8,7 @@ import { materials } from '@/textures';
 import { PlaneGeometry } from '@/engine/plane-geometry';
 import { Mesh } from '@/engine/renderer/mesh';
 import { meshToFaces } from '@/engine/physics/parse-faces';
-import { build2dGrid } from '@/engine/physics/surface-collision';
+import { build2dGrid, findWallCollisionsFromList } from '@/engine/physics/surface-collision';
 import { render } from '@/engine/renderer/renderer';
 import { buildElevator, ElevatorDepth } from '@/modeling/elevator';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
@@ -22,14 +22,18 @@ export class GameState implements State {
   scene: Scene;
   gridFaces: Set<Face>[] = [];
 
-  door: LeverDoorObject3d;
+  doors: LeverDoorObject3d[];
 
   constructor() {
     this.scene = new Scene();
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
 
-    this.door = new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.silver), new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true));
+    this.doors = [
+      new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall), new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true)),
+      new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall), new EnhancedDOMPoint(3, 4.5, 124), -1, -1, false)),
+      new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall), new EnhancedDOMPoint(-3, 4.5, 124), 1, -1, false)),
+    ];
   }
 
   onEnter() {
@@ -39,8 +43,7 @@ export class GameState implements State {
     const hotel = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
-    // const elevatorParts = buildElevator();
-    this.scene.add_(ceiling, floor, hotel, ...elevator, this.door.doorData);
+    this.scene.add_(ceiling, floor, hotel, ...elevator, ...this.doors.flatMap(door => door.doorData));
     this.gridFaces = build2dGrid(meshToFaces([floor, hotel]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
@@ -58,18 +61,32 @@ export class GameState implements State {
 
     //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
     tmpl.innerHTML = '';
-      const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, this.door.doorData.placedPosition).magnitude;
+
+    tmpl.innerHTML += `CAMERA X: ${this.player.normal.x}, Y: ${this.player.normal.y} Z: ${this.player.normal.z}<br/>`;
+
+    this.doors.forEach((door, i) => {
+      tmpl.innerHTML += ` DOOR ${i} X: ${door.doorData.placedPosition.x}, Y: ${door.doorData.placedPosition.y} Z: ${door.doorData.placedPosition.z}<br/>`;
+
+      const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, door.doorData.placedPosition).magnitude;
+
+      tmpl.innerHTML += `DISTANCE ${i}: ${distance}<br/>`
+
+      if (door.openClose === -1 && !door.isAnimating && distance < 7) {
+        findWallCollisionsFromList(door.closedDoorCollision, this.player)
+      }
+
       if (distance < 8) {
         const direction = this.player.normal.dot(this.playerDoorDifference.normalize_());
-        if (direction > 0.8) {
-          tmpl.innerHTML = 'E Open';
+        tmpl.innerHTML += `DIRECTION ${i}: ${direction}<br/>`
+        if (distance < 1 || direction > 0.75) {
+          tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Door</div>`;
           if (controls.isConfirm) {
-            this.door.pullLever();
+            door.pullLever();
           }
         }
       }
 
-
-    this.door.update();
+      door.update();
+    });
   }
 }
