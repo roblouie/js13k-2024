@@ -123,7 +123,7 @@ function redCarpet() {
     <filter id="filter">
         <feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2"/>
         
-        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#800" surfaceScale="1" result="d">
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#700" surfaceScale="1" result="d">
             <feDistantLight azimuth="90" elevation="55"/>
         </feDiffuseLighting>
     </filter>

@@ -1,6 +1,6 @@
 import {
   buildSegmentedWall,
-  createBox,
+  createBox, DoorHeight,
   DoorTopSegment,
   WallHeight
 } from '@/modeling/building-blocks';
@@ -108,10 +108,12 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
   const outerTrimRight = buildSegmentedWall([34], 12, [1], [1], 1.5, 12, allWhite); //new MoldableCubeGeometry(34, 2, 1.5);
   const bathroomDoorTrim = buildSegmentedWall([4.25, NormalDoorWidth - 0.5, 4.25], 12, [1, 1, 1], [1, 0, 1], 1.5, 12, allWhite);
   const bathroomWallTrim = buildSegmentedWall([12], 12, [1], [1], 1.5, 12, allWhite) //new MoldableCubeGeometry(1.5, 1, 12);
+  const doorTrim = buildSegmentedWall([0.5, NormalDoorWidth - 0.5, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, allWhite);
   const trim =
     createBox(outerTrimLeft, outerTrimRight, outerTrimBack, outerTrimFront)
       .merge(bathroomDoorTrim[0].rotate_(0, Math.PI).translate_(-10))
       .merge(bathroomWallTrim[0].rotate_(0, Math.PI / 2).translate_(-4, 0, -5.25))
+      .merge(doorTrim[0].rotate_(0, Math.PI / 2).translate_(-16.5, 0, 6))
       .merge(outerLargeTrimPiece()).computeNormals().done_();
 
   const doorNumberPlate = new MoldableCubeGeometry(1, 1).texturePerSide(
@@ -121,7 +123,7 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
     materials[roomNumber].texture!,
     materials.silver.texture!,
     materials.silver.texture!,
-  ).translate_(-16.75, 5, swapSign ? 9.5 : 2.5);
+  ).translate_(-16.6, 5, swapSign ? 9.5 : 2.5);
 
   return createBox(testWall3, testWall4, testWall2, testWall)
     .merge(bathroomDoorWall)
