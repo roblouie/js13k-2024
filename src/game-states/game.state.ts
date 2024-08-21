@@ -30,8 +30,15 @@ export class GameState implements State {
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
 
     this.doors = [
+      // 1304 door
       new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall), new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true)),
+
+      // 1305 door
+      new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall), new EnhancedDOMPoint(3.75, 4.5, 33.75), -1, -1, true)),
+
+      // 1313 Door Left
       new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall), new EnhancedDOMPoint(3, 4.5, 124), -1, -1, false)),
+      // 1313 Door Right
       new LeverDoorObject3d(new DoorData(new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall), new EnhancedDOMPoint(-3, 4.5, 124), 1, -1, false)),
     ];
   }
@@ -43,7 +50,7 @@ export class GameState implements State {
     const hotel = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
-    this.scene.add_(ceiling, floor, hotel, ...elevator, ...this.doors.flatMap(door => door.doorData));
+    this.scene.add_(ceiling, floor, hotel, ...elevator, ...this.doors.flatMap(door => [door.doorData]));
     this.gridFaces = build2dGrid(meshToFaces([floor, hotel]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
@@ -65,20 +72,21 @@ export class GameState implements State {
     tmpl.innerHTML += `CAMERA X: ${this.player.normal.x}, Y: ${this.player.normal.y} Z: ${this.player.normal.z}<br/>`;
 
     this.doors.forEach((door, i) => {
-      tmpl.innerHTML += ` DOOR ${i} X: ${door.doorData.placedPosition.x}, Y: ${door.doorData.placedPosition.y} Z: ${door.doorData.placedPosition.z}<br/>`;
 
       const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, door.doorData.placedPosition).magnitude;
 
-      tmpl.innerHTML += `DISTANCE ${i}: ${distance}<br/>`
 
       if (door.openClose === -1 && !door.isAnimating && distance < 7) {
         findWallCollisionsFromList(door.closedDoorCollision, this.player)
       }
 
       if (distance < 8) {
+        tmpl.innerHTML += ` DOOR ${i} X: ${door.doorData.placedPosition.x}, Y: ${door.doorData.placedPosition.y} Z: ${door.doorData.placedPosition.z}<br/>`;
+        tmpl.innerHTML += `DISTANCE ${i}: ${distance}<br/>`
+
         const direction = this.player.normal.dot(this.playerDoorDifference.normalize_());
         tmpl.innerHTML += `DIRECTION ${i}: ${direction}<br/>`
-        if (distance < 1 || direction > 0.75) {
+        if (distance < 1 || direction > 0.77) {
           tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Door</div>`;
           if (controls.isConfirm) {
             door.pullLever();

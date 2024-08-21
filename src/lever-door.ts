@@ -16,7 +16,7 @@ export class DoorData extends Object3d {
 
   constructor(doorMesh: Mesh, position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
     super(doorMesh);
-    this.placedPosition = new EnhancedDOMPoint(position_.x - (swapOpenClosed ? 2 : 0), position_.y, position_.z - (swapOpenClosed ? 2 : 0));
+    this.placedPosition = new EnhancedDOMPoint(position_.x - (swapOpenClosed ? 2 * swapHingeSideX : 0), position_.y, position_.z - (swapOpenClosed ? 2 * swapHingeSideX : 0));
     this.swapHingeSideX = swapHingeSideX;
     this.swapHingeSideZ = swapHingeSideZ;
 
@@ -25,7 +25,7 @@ export class DoorData extends Object3d {
 
     this.collisionMesh = new Mesh(
       new MoldableCubeGeometry(swapOpenClosed ? 1 : 4, 7, swapOpenClosed ? 4 :1)
-        .translate_(position_.x - (swapOpenClosed ? 2 : 0), position_.y, position_.z - (swapOpenClosed ? 2 : 0))
+        .translate_(position_.x - (swapOpenClosed ? 2 * swapHingeSideX : 0), position_.y, position_.z - (swapOpenClosed ? 2 * swapHingeSideX : 0))
         .done_()
       , new Material());
 
