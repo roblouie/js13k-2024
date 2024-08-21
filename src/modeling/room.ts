@@ -83,8 +83,8 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
     .texturePerSide(...allWhite)
     .done_();
 
-  const toiletPlaceholder = new MoldableCubeGeometry(2, 3, 2)
-    .translate_(-14.5, 1.5, -1.5)
+  const toiletPlaceholder = new MoldableCubeGeometry(2, 3, 4.75)
+    .translate_(-14.5, 1.5, -0.25)
     .texturePerSide(...allWhite)
     .done_();
 

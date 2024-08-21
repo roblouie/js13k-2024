@@ -14,16 +14,24 @@ import { buildElevator, ElevatorDepth } from '@/modeling/elevator';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { FreeCam } from '@/core/free-cam';
 import { makeHotel } from '@/modeling/hotel';
+import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
+import { DoorData, LeverDoorObject3d } from '@/lever-door';
 
 export class GameState implements State {
   player: FirstPersonPlayer | FreeCam;
   scene: Scene;
   gridFaces: Set<Face>[] = [];
 
+  door: LeverDoorObject3d;
+
   constructor() {
     this.scene = new Scene();
-    this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
-    //this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
+    //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
+    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
+
+    this.door = new LeverDoorObject3d(new EnhancedDOMPoint(-3.5, 4.5, 26),
+      new DoorData(new Mesh(new MoldableCubeGeometry(4.5, 8, 0.5), materials.silver), new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true)
+    , -90);
   }
 
   onEnter() {
@@ -34,7 +42,7 @@ export class GameState implements State {
     const elevator = buildElevator();
 
     // const elevatorParts = buildElevator();
-    this.scene.add_(ceiling, floor, hotel, ...elevator);
+    this.scene.add_(ceiling, floor, hotel, ...elevator, this.door.doorData);
     this.gridFaces = build2dGrid(meshToFaces([floor, hotel]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
@@ -47,5 +55,12 @@ export class GameState implements State {
     this.player.update(this.gridFaces);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
+
+    const distance = new EnhancedDOMPoint().subtractVectors(this.player.camera.position_, this.door.switchPosition).magnitude;
+    if (distance < 7 && controls.isConfirm) {
+      this.door.pullLever();
+    }
+
+    this.door.update();
   }
 }
