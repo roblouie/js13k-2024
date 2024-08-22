@@ -1,6 +1,7 @@
 import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import { toImage, toHeightmap } from '@/engine/svg-maker/svg-string-converters';
+import { Texture } from '@/engine/renderer/texture';
 
 const textureSize = 512;
 

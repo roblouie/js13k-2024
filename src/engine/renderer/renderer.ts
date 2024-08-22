@@ -38,7 +38,7 @@ const textureRepeatLocation = gl.getUniformLocation(lilgl.program, textureRepeat
 
 const origin = new EnhancedDOMPoint(0, 0, 0);
 
-const lightPovProjection = createOrtho(-105,105,-105,105,-400,400);
+const lightPovProjection = createOrtho(-60,60,-60,60,-80,80);
 
 const inverseLightDirection = new EnhancedDOMPoint(-0.8, 1.5, -1).normalize_();
 const lightPovView = new Object3d();

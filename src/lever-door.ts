@@ -6,6 +6,7 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { Face } from '@/engine/physics/face';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { materials } from '@/textures';
+import { getAllWhite } from '@/modeling/building-blocks';
 
 export class DoorData extends Object3d {
   swapHingeSideX: -1 | 1;
@@ -14,9 +15,21 @@ export class DoorData extends Object3d {
   originalRot = 0;
   placedPosition: EnhancedDOMPoint;
   collisionMesh: Mesh;
+  isLocked = false
 
-  constructor(doorMesh: Mesh, position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
-    const mesh = new Mesh(new MoldableCubeGeometry(5, 8, 0.5), materials.potentialPlasterWall)
+  constructor(position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
+    const mesh = new Mesh(
+      new MoldableCubeGeometry(5, 8, 0.5)
+        .texturePerSide(...getAllWhite())
+        .merge(
+          new MoldableCubeGeometry(1, 1, 1, 4, 4)
+            .cylindrify(0.2, 'z')
+            .translate_(2 * swapHingeSideX, -0.5)
+            .texturePerSide(materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!)
+        )
+        .done_(),
+      materials.potentialPlasterWall
+    )
     super(mesh);
     this.placedPosition = new EnhancedDOMPoint(position_.x - (swapOpenClosed ? 2 * swapHingeSideX : 0), position_.y, position_.z - (swapOpenClosed ? 2 * swapHingeSideX : 0));
     this.swapHingeSideX = swapHingeSideX;
