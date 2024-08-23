@@ -1,5 +1,5 @@
 export interface State {
-  onUpdate: (timeElapsed: number) => void;
+  onUpdate: (...args: any[]) => void;
   onEnter?: Function;
   onLeave?: Function;
 }

@@ -7,8 +7,11 @@ export class PathNode {
   eastSibling?: PathNode;
   westSibling?: PathNode;
 
-  constructor(position: EnhancedDOMPoint) {
+  name?: string;
+
+  constructor(position: EnhancedDOMPoint, name: string) {
     this.position = position;
+    this.name = name;
   }
 
   getPresentSiblings(): PathNode[] {

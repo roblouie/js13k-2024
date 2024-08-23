@@ -69,7 +69,7 @@ export class GameState implements State {
 
   onUpdate() {
     this.player.update(this.gridFaces);
-    this.enemy.update();
+    this.enemy.update(this.player);
     this.enemyModel.position_.set(this.enemy.position);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
