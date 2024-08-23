@@ -12,10 +12,10 @@ import { build2dGrid, findWallCollisionsFromList } from '@/engine/physics/surfac
 import { render } from '@/engine/renderer/renderer';
 import { buildElevator, ElevatorDepth } from '@/modeling/elevator';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
-import { FreeCam } from '@/core/free-cam';
 import { makeHotel } from '@/modeling/hotel';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { DoorData, LeverDoorObject3d } from '@/lever-door';
+import { enemy } from '@/ai/enemy-ai';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -23,6 +23,8 @@ export class GameState implements State {
   gridFaces: Set<Face>[] = [];
 
   doors: LeverDoorObject3d[];
+  enemy = enemy;
+  enemyModel: Mesh;
 
   constructor() {
     this.scene = new Scene();
@@ -43,6 +45,8 @@ export class GameState implements State {
     ];
 
     this.doors[0].doorData.isLocked = true;
+
+    this.enemyModel = new Mesh(new MoldableCubeGeometry(6, 6, 6).translate_(0, 3).done_(), materials.tinyTiles);
   }
 
   onEnter() {
@@ -52,7 +56,7 @@ export class GameState implements State {
     const hotel = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
-    this.scene.add_(ceiling, floor, hotel, ...elevator, ...this.doors.flatMap(door => [door.doorData]));
+    this.scene.add_(ceiling, floor, hotel, ...elevator, ...this.doors.flatMap(door => [door.doorData]), this.enemyModel);
     this.gridFaces = build2dGrid(meshToFaces([floor, hotel]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
@@ -65,13 +69,15 @@ export class GameState implements State {
 
   onUpdate() {
     this.player.update(this.gridFaces);
+    this.enemy.update();
+    this.enemyModel.position_.set(this.enemy.position);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 
     //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
     tmpl.innerHTML = '';
 
-    tmpl.innerHTML += `CAMERA X: ${this.player.normal.x}, Y: ${this.player.normal.y} Z: ${this.player.normal.z}<br/>`;
+    tmpl.innerHTML += `PLAYER X: ${this.player.feetCenter.x}, Y: ${this.player.feetCenter.y} Z: ${this.player.feetCenter.z}<br/>`;
 
     this.doors.forEach((door, i) => {
 
