@@ -9,9 +9,14 @@ const TopRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 118), 'Top Ri
 
 // MIDDLE HALLWAY INTERSECTIONS
 const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12));
-const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118));
+const Room1304Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 24));
+const Room1305Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 36));
 const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5));
+const Room1306Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 59));
+
 const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
+const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118));
+
 
 // OUTER HALLWAY INTERSECTIONS
 const FirstQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
