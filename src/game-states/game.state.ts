@@ -15,7 +15,8 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { makeHotel } from '@/modeling/hotel';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { DoorData, LeverDoorObject3d } from '@/lever-door';
-import { enemy } from '@/ai/enemy-ai';
+import { AiNavPoints, makeNavPoints } from '@/ai/ai-nav-points';
+import { Enemy } from '@/ai/enemy-ai';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -23,7 +24,7 @@ export class GameState implements State {
   gridFaces: Set<Face>[] = [];
 
   doors: LeverDoorObject3d[];
-  enemy = enemy;
+  enemy: Enemy
   enemyModel: Mesh;
 
   constructor() {
@@ -45,6 +46,10 @@ export class GameState implements State {
     ];
 
     this.doors[0].doorData.isLocked = true;
+
+    makeNavPoints(this.doors);
+
+    this.enemy = new Enemy(AiNavPoints[0]);
 
     this.enemyModel = new Mesh(new MoldableCubeGeometry(6, 6, 6).translate_(0, 3).done_(), materials.tinyTiles);
   }
@@ -76,6 +81,7 @@ export class GameState implements State {
 
     //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
     tmpl.innerHTML = '';
+    tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
 
     tmpl.innerHTML += `PLAYER X: ${this.player.feetCenter.x}, Y: ${this.player.feetCenter.y} Z: ${this.player.feetCenter.z}<br/>`;
 

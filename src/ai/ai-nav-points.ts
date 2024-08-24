@@ -1,39 +1,50 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { PathNode } from '@/ai/path-node';
+import { DoorData } from '@/lever-door';
 
-// OUTER CORNERS
-const LowerLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 12), 'Bottom Left Corner');
-const LowerRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 12), 'Bottom Right Corner');
-const TopLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 118), 'Top Left Corner');
-const TopRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 118), 'Top Right Corner');
+export const AiNavPoints: PathNode[] = [];
 
-// MIDDLE HALLWAY INTERSECTIONS
-const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12));
-const Room1304Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 24));
-const Room1305Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 36));
-const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5));
-const Room1306Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 59));
+export function makeNavPoints(doors: DoorData[]) {
 
-const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
-const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118));
+  // OUTER CORNERS
+  const LowerLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 12), undefined, undefined, 'Bottom Left Corner');
+  const LowerRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 12),undefined, undefined, 'Bottom Right Corner');
+  const TopLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 118),undefined, undefined, 'Top Left Corner');
+  const TopRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 118),undefined, undefined, 'Top Right Corner');
+
+  // MIDDLE HALLWAY INTERSECTIONS
+  const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12));
+  const Room1304Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 24), doors[0], 1304, `Room 1304 Doorway`);
+  const Room1305Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 36), doors[1], 1305, 'Room 1305 Doorway'); // 12 diff from prev
+  const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5)); // 11.5 diff from prev
+  const Room1306Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 59)); // 11.5 diff from prev
+  const Room1307Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 71)); // 12 diff from prev
+  const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
+  const Room1308Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 94)) // 11.5 diff from prev
+  const Room1309Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 106)); // 12 diff from prev
+  const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5)); // 11.5 diff from prev
 
 
-// OUTER HALLWAY INTERSECTIONS
-const FirstQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
-const FirstQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5));
-const SecondQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5));
-const SecondQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5));
+  // LEFT HALLWAY INTERSECTIONS
+  const Room1301Entrance = new PathNode(new EnhancedDOMPoint(44, 2.5, 24)); // same z as 1304, same x as all left hallways
+  const FirstQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
 
-LowerLeftCorner.northSibling = TopLeftCorner;
-LowerLeftCorner.eastSibling = LowerRightCorner;
+  // RIGHT HALLWAY
+  const FirstQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5));
+  const SecondQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5));
+  const SecondQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5));
 
-LowerRightCorner.northSibling = TopRightCorner;
-LowerRightCorner.westSibling = LowerLeftCorner;
+  LowerLeftCorner.northSibling = TopLeftCorner;
+  LowerLeftCorner.eastSibling = LowerRightCorner;
 
-TopLeftCorner.southSibling = LowerLeftCorner;
-TopLeftCorner.eastSibling = TopRightCorner;
+  LowerRightCorner.northSibling = TopRightCorner;
+  LowerRightCorner.westSibling = LowerLeftCorner;
 
-TopRightCorner.southSibling = LowerRightCorner;
-TopRightCorner.westSibling = TopLeftCorner;
+  TopLeftCorner.southSibling = LowerLeftCorner;
+  TopLeftCorner.eastSibling = TopRightCorner;
 
-export const AiNavPoints = [LowerLeftCorner, LowerRightCorner, TopLeftCorner, TopRightCorner];
+  TopRightCorner.southSibling = LowerRightCorner;
+  TopRightCorner.westSibling = TopLeftCorner;
+
+  AiNavPoints.push(LowerLeftCorner, LowerRightCorner, TopLeftCorner, TopRightCorner)
+}

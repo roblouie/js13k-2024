@@ -5,7 +5,9 @@ import { controls } from '@/core/controls';
 import {
   findWallCollisionsFromList, getGridPosition, getGridPositionWithNeighbors,
 } from '@/engine/physics/surface-collision';
-import { clamp } from '@/engine/helpers';
+import { clamp, findClosestNavPoint } from '@/engine/helpers';
+import { PathNode } from '@/ai/path-node';
+import { AiNavPoints } from '@/ai/ai-nav-points';
 
 class Sphere {
   center: EnhancedDOMPoint;
@@ -45,9 +47,11 @@ export class FirstPersonPlayer {
   private isFootstepsStopped = true;
 
   normal = new EnhancedDOMPoint();
+  closestNavPoint: PathNode;
 
   update(gridFaces: Set<Face>[]) {
-    // tmpl.innerHTML = `X: ${this.feetCenter.x}, Z: ${this.feetCenter.z}`;
+    this.closestNavPoint = findClosestNavPoint(AiNavPoints, this.feetCenter);
+
     if (!this.isFrozen) {
       this.updateVelocityFromControls();
     }

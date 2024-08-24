@@ -1,11 +1,11 @@
 import { PathNode } from '@/ai/path-node';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { AiNavPoints } from '@/ai/ai-nav-points';
 import { State } from '@/core/state';
 import { StateMachine } from '@/core/state-machine';
 import { FirstPersonPlayer } from '@/core/first-person-player';
+import { findClosestNavPoint } from '@/engine/helpers';
 
-class EnemyAi {
+export class Enemy {
   position: EnhancedDOMPoint;
   currentNode: PathNode;
   nextNode: PathNode;
@@ -46,19 +46,6 @@ class EnemyAi {
   }
 
   chaseUpdate(player: FirstPersonPlayer) {
-    const findClosestNavPoint = (points: PathNode[], target: EnhancedDOMPoint) => {
-      let closestPoint: PathNode;
-      let smallestDistance = Infinity;
-      points.forEach(point => {
-        const distance = new EnhancedDOMPoint().subtractVectors(target, point.position).magnitude;
-        if (distance < smallestDistance) {
-          closestPoint = point;
-          smallestDistance = distance;
-        }
-      });
-      return closestPoint;
-    }
-
     const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
     if (distance.magnitude > 1) {
       const direction_ = distance.normalize_().scale_(0.2);
@@ -75,4 +62,3 @@ class EnemyAi {
   }
 }
 
-export const enemy = new EnemyAi(AiNavPoints[0]);

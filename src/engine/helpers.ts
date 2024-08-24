@@ -1,4 +1,5 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
+import { PathNode } from '@/ai/path-node';
 
 
 export function doTimes<T>(times: number, callback: (index: number) => T): T[] {
@@ -38,4 +39,17 @@ export function calculateVertexNormals(points: EnhancedDOMPoint[], indices: numb
   }
 
   return vertexNormals.map(vector => vector.normalize_());
+}
+
+export function findClosestNavPoint(points: PathNode[], target: EnhancedDOMPoint) {
+  let closestPoint: PathNode;
+  let smallestDistance = Infinity;
+  points.forEach(point => {
+    const distance = new EnhancedDOMPoint().subtractVectors(target, point.position).magnitude;
+    if (distance < smallestDistance) {
+      closestPoint = point;
+      smallestDistance = distance;
+    }
+  });
+  return closestPoint;
 }
