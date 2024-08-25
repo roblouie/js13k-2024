@@ -82,6 +82,8 @@ export class GameState implements State {
     //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
     tmpl.innerHTML = '';
     tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
+    tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
+    tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
 
     tmpl.innerHTML += `PLAYER X: ${this.player.feetCenter.x}, Y: ${this.player.feetCenter.y} Z: ${this.player.feetCenter.z}<br/>`;
 

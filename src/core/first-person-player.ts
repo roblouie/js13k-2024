@@ -50,7 +50,7 @@ export class FirstPersonPlayer {
   closestNavPoint: PathNode;
 
   update(gridFaces: Set<Face>[]) {
-    this.closestNavPoint = findClosestNavPoint(AiNavPoints, this.feetCenter);
+    this.closestNavPoint = findClosestNavPoint(AiNavPoints, this.feetCenter)[0];
 
     if (!this.isFrozen) {
       this.updateVelocityFromControls();

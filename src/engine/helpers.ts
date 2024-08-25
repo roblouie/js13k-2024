@@ -41,15 +41,18 @@ export function calculateVertexNormals(points: EnhancedDOMPoint[], indices: numb
   return vertexNormals.map(vector => vector.normalize_());
 }
 
-export function findClosestNavPoint(points: PathNode[], target: EnhancedDOMPoint) {
+export function findClosestNavPoint(points: PathNode[], target: EnhancedDOMPoint, alreadyChecked?: Set<PathNode>): [PathNode, number] {
   let closestPoint: PathNode;
   let smallestDistance = Infinity;
   points.forEach(point => {
-    const distance = new EnhancedDOMPoint().subtractVectors(target, point.position).magnitude;
-    if (distance < smallestDistance) {
-      closestPoint = point;
-      smallestDistance = distance;
+    if (!alreadyChecked?.has(point)) {
+      const distance = new EnhancedDOMPoint().subtractVectors(target, point.position).magnitude;
+      if (distance < smallestDistance) {
+        closestPoint = point;
+        smallestDistance = distance;
+      }
     }
   });
-  return closestPoint;
+  // @ts-ignore
+  return [closestPoint, smallestDistance];
 }
