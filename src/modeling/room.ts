@@ -69,7 +69,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       .texturePerSide(...getAllWhite())
       .done_();
 
-  const counterPlaceholder = new MoldableCubeGeometry(3, 1, 3)
+  const counterPlaceholder = new MoldableCubeGeometry(3, 1, 5)
     .translate_(-5.5, 3, -4.5)
     .texturePerSide(...getAllWhite())
     .done_();
@@ -84,10 +84,30 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
     .texturePerSide(...getAllWhite())
     .done_();
 
-  const closetPlaceholder = new MoldableCubeGeometry(3, 8, 6)
+  const closetPlaceholder = new MoldableCubeGeometry(4, 8, 6)
     .translate_(14, 4, 5)
     .texturePerSide(...getAllWhite())
     .done_();
+
+  const allWood = [
+    materials.wood.texture!,
+    materials.wood.texture!,
+    materials.wood.texture!,
+    materials.wood.texture!,
+    materials.wood.texture!,
+    materials.wood.texture!,
+  ]
+
+  const closet = new MoldableCubeGeometry(0.2, 8, 6).translate_(1.5).texturePerSide(...allWood) // back
+      .merge(new MoldableCubeGeometry(3, 0.2, 6).translate_(0, -4).texturePerSide(...allWood)) // top
+      .merge(new MoldableCubeGeometry(3, 0.2, 6).translate_(0, 4).texturePerSide(...allWood)) // bottom
+      .merge(new MoldableCubeGeometry(3, 8.2, 0.2).translate_(0, 0, 3.1).texturePerSide(...allWood))
+      .merge(new MoldableCubeGeometry(3, 8.2, 0.2).translate_(0, 0, -3.1).texturePerSide(...allWood))
+      .merge(new MoldableCubeGeometry(0.2, 8, 3).translate_(-2.2, 0, -1).rotate_(0, -0.3).texturePerSide(...allWood))
+      .merge(new MoldableCubeGeometry(0.2, 8, 3).translate_(-2.2, 0, 1).rotate_(0, 0.3).texturePerSide(...allWood))
+      .translate_(14, 4.5, 5)
+      .done_()
+    // new MoldableCubeGeometry(3, 8, 6)
 
   // TRIM
   function outerLargeTrimPiece() {
@@ -128,9 +148,12 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
   if (isIncludeDetails) {
     return walls.merge(trim)
       .merge(doorNumberPlate)
+      .merge(closet)
       // TODO: REMOVE THESE
       .merge(bedPlaceholder)
-      .merge(closetPlaceholder);
+      .merge(bathPlaceholder)
+      .merge(toiletPlaceholder)
+      .merge(counterPlaceholder)
   } else {
     return walls
       .merge(bedPlaceholder)
