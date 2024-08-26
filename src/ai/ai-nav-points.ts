@@ -49,17 +49,17 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   // LEFT HALLWAY INTERSECTIONS
   const Room1301Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 36), 1301, doors[0]);
-  const FirstQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
+  const LowerQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5), undefined, undefined, 'Lower Quarter Left Hallway');
   const Room1302Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 71), 1302, doors[1]);
-  const SecondQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5));
+  const UpperQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5), undefined, undefined, 'Upper Quarter Left Hallway');
   const Room1303Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 106), 1303, doors[2]);
 
 
   // RIGHT HALLWAY
   const Room1310Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 24), 1310, doors[9], true);
-  const FirstQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5));
+  const LowerQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5), undefined, undefined, 'Lower Quarter Right Hallway');
   const Room1311Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 59), 1311, doors[10], true);
-  const SecondQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5));
+  const UpperQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5), undefined, undefined, 'Upper Quarter Right Hallway');
   const Room1312Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 94), 1312, doors[11], true); // 11.5 diff from prev
 
   // Connect corners
@@ -74,6 +74,18 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   TopCenterEntrance.insertBetweenHor(TopLeftCorner, TopRightCorner);
   UpperQuarterCenterIntersection.insertBetweenVert(TopCenterEntrance, BottomCenterEntrance);
   LowerQuarterCenterIntersection.insertBetweenVert(UpperQuarterCenterIntersection, BottomCenterEntrance);
+
+  // Connect left hallway
+  LowerQuarterLeftIntersection.insertBetweenVert(TopLeftCorner, LowerLeftCorner);
+  LowerQuarterLeftIntersection.attachThisRightToOtherLeft(LowerQuarterCenterIntersection);
+  UpperQuarterLeftIntersection.insertBetweenVert(TopLeftCorner, LowerQuarterLeftIntersection);
+  UpperQuarterLeftIntersection.attachThisLeftToOtherRight(UpperQuarterCenterIntersection);
+
+  // Connect Right hallway
+  LowerQuarterRightIntersection.insertBetweenVert(TopRightCorner, LowerRightCorner);
+  LowerQuarterRightIntersection.attachThisLeftToOtherRight(LowerQuarterCenterIntersection);
+  UpperQuarterRightIntersection.insertBetweenVert(TopRightCorner, LowerQuarterRightIntersection);
+  UpperQuarterRightIntersection.attachThisLeftToOtherRight(UpperQuarterCenterIntersection);
 
 
   AiNavPoints.push(
