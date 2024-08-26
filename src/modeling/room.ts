@@ -65,7 +65,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
 
 
   const bedPlaceholder = new MoldableCubeGeometry(7, 2, 8)
-      .translate_(5, 2, -5.5)
+      .translate_(5, 2, -6.5)
       .texturePerSide(...getAllWhite())
       .done_();
 
@@ -81,6 +81,11 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
 
   const bathPlaceholder = new MoldableCubeGeometry(7, 2, 3)
     .translate_(-11.5, 1.5, -9)
+    .texturePerSide(...getAllWhite())
+    .done_();
+
+  const closetPlaceholder = new MoldableCubeGeometry(3, 8, 6)
+    .translate_(14, 4, 5)
     .texturePerSide(...getAllWhite())
     .done_();
 
@@ -123,9 +128,13 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
   if (isIncludeDetails) {
     return walls.merge(trim)
       .merge(doorNumberPlate)
+      // TODO: REMOVE THESE
+      .merge(bedPlaceholder)
+      .merge(closetPlaceholder);
   } else {
     return walls
       .merge(bedPlaceholder)
+      .merge(closetPlaceholder)
       .merge(counterPlaceholder)
       .merge(toiletPlaceholder)
       .merge(bathPlaceholder)
