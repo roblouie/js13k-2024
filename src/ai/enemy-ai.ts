@@ -49,7 +49,11 @@ export class Enemy {
   lastPlayerNode: PathNode;
   chaseUpdate(player: FirstPersonPlayer) {
     // Handle door opening, while door is opening, don't do anything else
-    if (this.currentNode.door && this.nextNode.door && this.currentNode.roomNumber === this.nextNode.roomNumber && (this.currentNode.door.openClose === -1 || this.currentNode.door.isAnimating)) {
+    if (
+      this.currentNode.door && this.nextNode.door
+      && this.currentNode.roomNumber === this.nextNode.roomNumber
+      && this.currentNode !== this.nextNode
+      && (this.currentNode.door.openClose === -1 || this.currentNode.door.isAnimating)) {
       if (!this.currentNode.door.isAnimating) {
         this.currentNode.door.pullLever(true);
       }

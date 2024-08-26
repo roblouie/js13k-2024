@@ -87,6 +87,26 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   UpperQuarterRightIntersection.insertBetweenVert(TopRightCorner, LowerQuarterRightIntersection);
   UpperQuarterRightIntersection.attachThisLeftToOtherRight(UpperQuarterCenterIntersection);
 
+  // Connect Left Rooms
+  Room1301Entrance.insertBetweenVert(LowerLeftCorner, LowerQuarterLeftIntersection);
+  Room1302Entrance.insertBetweenVert(LowerQuarterLeftIntersection, UpperQuarterLeftIntersection);
+  Room1303Entrance.insertBetweenVert(UpperQuarterLeftIntersection, TopLeftCorner);
+
+  // Connect Right Rooms
+  Room1310Entrance.insertBetweenVert(LowerRightCorner, LowerQuarterRightIntersection);
+  Room1311Entrance.insertBetweenVert(LowerQuarterRightIntersection, UpperQuarterRightIntersection);
+  Room1312Entrance.insertBetweenVert(UpperQuarterRightIntersection, TopRightCorner);
+
+  // Connect Center Rooms
+  Room1304Entrance.insertBetweenVert(BottomCenterEntrance, LowerQuarterCenterIntersection);
+  Room1305Entrance.insertBetweenVert(Room1304Entrance, LowerQuarterCenterIntersection);
+
+  Room1306Entrance.insertBetweenVert(LowerQuarterCenterIntersection, UpperQuarterCenterIntersection);
+  Room1307Entrance.insertBetweenVert(Room1306Entrance, UpperQuarterCenterIntersection);
+
+  Room1308Entrance.insertBetweenVert(UpperQuarterCenterIntersection, TopCenterEntrance);
+  Room1309Entrance.insertBetweenVert(Room1308Entrance, TopCenterEntrance);
+
 
   AiNavPoints.push(
     // Corners
