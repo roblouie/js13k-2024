@@ -63,14 +63,23 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
     materials.tinyTiles.texture!,
     materials.tinyTiles.texture!).translate_(-4, 6, -6.25);
 
+  const bathroomCornerColumn = new MoldableCubeGeometry(3.5, WallHeight, 4).texturePerSide(
+    materials.tinyTiles.texture!,
+    materials.tinyTiles.texture!,
+    materials.tinyTiles.texture!,
+    materials.tinyTiles.texture!,
+    materials.tinyTiles.texture!,
+    materials.tinyTiles.texture!,
+  ).translate_(-6, 6, -9.5).spreadTextureCoords();
+
 
   const bedPlaceholder = new MoldableCubeGeometry(7, 2, 8)
       .translate_(5, 2, -6.5)
       .texturePerSide(...getAllWhite())
       .done_();
 
-  const counterPlaceholder = new MoldableCubeGeometry(3, 1, 5)
-    .translate_(-5.5, 3, -4.5)
+  const counterPlaceholder = new MoldableCubeGeometry(3, 1, 7)
+    .translate_(-5.5, 3, -4)
     .texturePerSide(...getAllWhite())
     .done_();
 
@@ -144,6 +153,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
   const walls = createBox(testWall3, testWall4, testWall2, testWall)
     .merge(bathroomDoorWall)
     .merge(secondBathroomWall)
+    .merge(bathroomCornerColumn);
 
   if (isIncludeDetails) {
     return walls.merge(trim)
