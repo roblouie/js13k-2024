@@ -32,61 +32,49 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   const TopRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 118),undefined, undefined, 'Top Right Corner');
 
   // MIDDLE HALLWAY INTERSECTIONS
-  const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12));
+  const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12), undefined, undefined, 'Bottom Center Hallway');
   const Room1304Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 24), 1304, doors[3], true);
 
   const Room1305Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 36), 1305,  doors[4]);
 
 
-  const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5)); // 11.5 diff from prev
-  const Room1306Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5]); // 11.5 diff from prev
+  const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5), undefined, undefined, 'Lower Quarter Center Hallway'); // 11.5 diff from prev
+  const Room1306Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5], true); // 11.5 diff from prev
   const Room1307Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 71), 1307, doors[6]); // 12 diff from prev
-  const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
-  const Room1308Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 94)) // 11.5 diff from prev
-  const Room1309Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 106)); // 12 diff from prev
-  const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5)); // 11.5 diff from prev
+  const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5), undefined, undefined, 'Upper Quarter Center Hallway');
+  const Room1308Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 94), 1308, doors[7], true) // 11.5 diff from prev
+  const Room1309Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 106), 1309, doors[8]); // 12 diff from prev
+  const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5), undefined, undefined, 'Top Center Hallway'); // 11.5 diff from prev
 
 
   // LEFT HALLWAY INTERSECTIONS
-  const Room1301Entrance = new PathNode(new EnhancedDOMPoint(44, 2.5, 36));
+  const Room1301Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 36), 1301, doors[0]);
   const FirstQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
-  const Room1302Entrance = new PathNode(new EnhancedDOMPoint(44, 2.5, 71));
+  const Room1302Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 71), 1302, doors[1]);
   const SecondQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5));
-  const Room1303Entrance = new PathNode(new EnhancedDOMPoint(44, 2.5, 106));
+  const Room1303Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 106), 1303, doors[2]);
 
 
   // RIGHT HALLWAY
-  const Room1310Entrance = new PathNode(new EnhancedDOMPoint(-44, 2.5, 24));
+  const Room1310Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 24), 1310, doors[9], true);
   const FirstQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5));
-  const Room1311Entrance = new PathNode(new EnhancedDOMPoint(-44, 2.5, 59));
+  const Room1311Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 59), 1311, doors[10], true);
   const SecondQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5));
-  const Room1312Entrance = new PathNode(new EnhancedDOMPoint(-44, 2.5, 94)) // 11.5 diff from prev
+  const Room1312Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 94), 1312, doors[11], true); // 11.5 diff from prev
 
-  // Connect bottom
-  LowerLeftCorner.aboveSibling = TopLeftCorner;
-  LowerLeftCorner.rightSibling = BottomCenterEntrance;
-
-  BottomCenterEntrance.aboveSibling = Room1304Entrance;
-  BottomCenterEntrance.rightSibling = LowerRightCorner;
-  BottomCenterEntrance.leftSibling = LowerLeftCorner;
-
-  // Room 1304
-  Room1304Entrance.aboveSibling = Room1305Entrance;
-  Room1304Entrance.belowSibling = BottomCenterEntrance;
-
-  // Room 1305
-  Room1305Entrance.insertBetweenVert(LowerQuarterCenterIntersection, Room1304Entrance);
-
-  // Lower Quarter Center Intersection
-
-  LowerRightCorner.aboveSibling = TopRightCorner;
-  LowerRightCorner.leftSibling = LowerLeftCorner;
-
-  TopLeftCorner.belowSibling = LowerLeftCorner;
+  // Connect corners
   TopLeftCorner.rightSibling = TopRightCorner;
+  TopLeftCorner.belowSibling = LowerLeftCorner;
 
   TopRightCorner.belowSibling = LowerRightCorner;
-  TopRightCorner.leftSibling = TopLeftCorner;
+  LowerLeftCorner.rightSibling = LowerRightCorner;
+
+  // Connect center hallways
+  BottomCenterEntrance.insertBetweenHor(LowerLeftCorner, LowerRightCorner);
+  TopCenterEntrance.insertBetweenHor(TopLeftCorner, TopRightCorner);
+  UpperQuarterCenterIntersection.insertBetweenVert(TopCenterEntrance, BottomCenterEntrance);
+  LowerQuarterCenterIntersection.insertBetweenVert(UpperQuarterCenterIntersection, BottomCenterEntrance);
+
 
   AiNavPoints.push(
     // Corners
