@@ -30,7 +30,7 @@ export function makeNavPoints(doors: DoorData[]) {
 
 
   // LEFT HALLWAY INTERSECTIONS
-  const Room1301Entrance = new PathNode(new EnhancedDOMPoint(44, 2.5, 24)); // same z as 1304, same x as all left hallways
+  const Room1301Entrance = new PathNode(new EnhancedDOMPoint(44, 2.5, 36));
   const FirstQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
   const Room1302Entrance = new PathNode(new EnhancedDOMPoint(44, 2.5, 71));
   const SecondQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5));
@@ -38,8 +38,11 @@ export function makeNavPoints(doors: DoorData[]) {
 
 
   // RIGHT HALLWAY
+  const Room1310Entrance = new PathNode(new EnhancedDOMPoint(-44, 2.5, 24));
   const FirstQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5));
+  const Room1311Entrance = new PathNode(new EnhancedDOMPoint(-44, 2.5, 59));
   const SecondQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5));
+  const Room1312Entrance = new PathNode(new EnhancedDOMPoint(-44, 2.5, 94)) // 11.5 diff from prev
 
   // Connect bottom
   LowerLeftCorner.aboveSibling = TopLeftCorner;

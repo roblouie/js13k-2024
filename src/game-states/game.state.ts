@@ -33,6 +33,15 @@ export class GameState implements State {
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
 
     this.doors = [
+      // 1301 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(47.75, 4.5, 33.75), -1, -1, true)),
+
+      // 1302 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(47.75, 4.5, 68.75), -1, -1, true)),
+
+      // 1303 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(47.75, 4.5, 103.75), -1, -1, true)),
+
       // 1304 door
       new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true)),
 
@@ -44,8 +53,6 @@ export class GameState implements State {
       // 1313 Door Right
       new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(-3, 4.5, 124), 1, -1, false)),
     ];
-
-    this.doors[0].doorData.isLocked = true;
 
     makeNavPoints(this.doors);
 

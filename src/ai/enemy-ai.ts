@@ -3,7 +3,6 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { State } from '@/core/state';
 import { StateMachine } from '@/core/state-machine';
 import { FirstPersonPlayer } from '@/core/first-person-player';
-import { findClosestNavPoint } from '@/engine/helpers';
 
 export class Enemy {
   position: EnhancedDOMPoint;
