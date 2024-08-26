@@ -4,7 +4,7 @@ import { materials } from '@/textures';
 
 const HallwayWidth = 10;
 
-export function makeHotel() {
+export function makeHotel(isIncludingDetails = false) {
 
   const wallpapered = [
     materials.wallpaper.texture!,
@@ -15,21 +15,21 @@ export function makeHotel() {
     materials.wallpaper.texture!,
   ];
 
-  return buildRoom(1).translate_(0, 0, HallwayWidth)
-    .merge(buildRoom(2).translate_(0, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom(3).translate_(0, 0, HallwayWidth * 3 + 50))
+  const hotel = buildRoom(1, false, isIncludingDetails).translate_(0, 0, HallwayWidth)
+    .merge(buildRoom(2, false, isIncludingDetails).translate_(0, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(3, false, isIncludingDetails).translate_(0, 0, HallwayWidth * 3 + 50))
     // Second row of 3
-    .merge(buildRoom(5).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth))
-    .merge(buildRoom(7).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom(9).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 3 + 50))
+    .merge(buildRoom(5, false, isIncludingDetails).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth))
+    .merge(buildRoom(7, false, isIncludingDetails).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(9, false, isIncludingDetails).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 3 + 50))
     // Third Row of 3
-    .merge(buildRoom(4, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth))
-    .merge(buildRoom(6, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom(8, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 3 + 50))
+    .merge(buildRoom(4, true, isIncludingDetails).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth))
+    .merge(buildRoom(6, true, isIncludingDetails).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(8, true, isIncludingDetails).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 3 + 50))
     // Fourth Row of 3
-    .merge(buildRoom(10, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth))
-    .merge(buildRoom(11, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 2 + 25))
-    .merge(buildRoom(12, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 3 + 50))
+    .merge(buildRoom(10, true, isIncludingDetails).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth))
+    .merge(buildRoom(11, true, isIncludingDetails).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 2 + 25))
+    .merge(buildRoom(12, true, isIncludingDetails).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 3 + 50))
 
     // Move out on Z by half room depth to space rooms out from elevator
     // Move left on X by half hallway width + half room width  to center layout
@@ -56,10 +56,13 @@ export function makeHotel() {
         .rotate_(0, Math.PI / 2)
         .translate_(-49.5, 0, 59)
     )
-    .merge(makeAllBracing())
-
-    .computeNormals()
     .done_();
+
+  if (isIncludingDetails) {
+    hotel.merge(makeAllBracing()).computeNormals()
+  }
+
+  return hotel;
 }
 
 function makeAllBracing() {

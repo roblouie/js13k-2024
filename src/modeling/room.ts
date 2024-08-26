@@ -14,7 +14,7 @@ const NormalDoorWidth = 5;
 export const RoomWidth = 34;
 export const RoomDepth = 25;
 
-export function buildRoom(roomNumber: number, swapSign?: boolean) {
+export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails = false) {
 
   const testWall = buildSegmentedWall([3, NormalDoorWidth, 15], 12, [12, 3, 12], [0, 0, 0], 1,
   4, [
@@ -62,9 +62,6 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
     materials.tinyTiles.texture!,
     materials.tinyTiles.texture!,
     materials.tinyTiles.texture!).translate_(-4, 6, -6.25);
-
-
-
 
 
   const bedPlaceholder = new MoldableCubeGeometry(7, 2, 8)
@@ -119,16 +116,20 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
     materials.silver.texture!,
   ).translate_(-16.6, 5, swapSign ? 9.5 : 2.5);
 
-  return createBox(testWall3, testWall4, testWall2, testWall)
+  const walls = createBox(testWall3, testWall4, testWall2, testWall)
     .merge(bathroomDoorWall)
     .merge(secondBathroomWall)
-    .merge(bedPlaceholder)
-    .merge(counterPlaceholder)
-    .merge(toiletPlaceholder)
-    .merge(bathPlaceholder)
-    .merge(trim)
-    .merge(doorNumberPlate)
-    .done_();
+
+  if (isIncludeDetails) {
+    return walls.merge(trim)
+      .merge(doorNumberPlate)
+  } else {
+    return walls
+      .merge(bedPlaceholder)
+      .merge(counterPlaceholder)
+      .merge(toiletPlaceholder)
+      .merge(bathPlaceholder)
+  }
 }
 
 function createTrimBoard() {

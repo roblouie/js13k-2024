@@ -87,11 +87,12 @@ export class GameState implements State {
     const floor = new Mesh(new PlaneGeometry(180, 180, 20, 20).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
     const ceiling = new Mesh(new MoldableCubeGeometry(170, 1, 120).translate_(0, 12, 65).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
     // Move hotel layout to just outside the elevator
-    const hotel = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
+    const hotelRender = new Mesh(makeHotel(true).translate_(0, 0, 6).done_(), materials.wallpaper);
+    const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
-    this.scene.add_(ceiling, floor, hotel, ...elevator, ...this.doors.flatMap(door => [door.doorData]), this.enemyModel);
-    this.gridFaces = build2dGrid(meshToFaces([floor, hotel]));
+    this.scene.add_(ceiling, floor, hotelRender, ...elevator, ...this.doors.flatMap(door => [door.doorData]), this.enemyModel);
+    this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
       tmpl.requestPointerLock();
