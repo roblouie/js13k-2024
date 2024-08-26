@@ -14,7 +14,7 @@ const NormalDoorWidth = 5;
 export const RoomWidth = 34;
 export const RoomDepth = 25;
 
-export function buildRoom(roomNumber: number, swapSign?: boolean) {
+export function buildRoom() {
 
   const testWall = buildSegmentedWall([3, NormalDoorWidth, 15], 12, [12, 3, 12], [0, 0, 0], 1,
   4, [
@@ -64,9 +64,6 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
     materials.tinyTiles.texture!).translate_(-4, 6, -6.25);
 
 
-
-
-
   const bedPlaceholder = new MoldableCubeGeometry(7, 2, 8)
       .translate_(5, 2, -5.5)
       .texturePerSide(...getAllWhite())
@@ -87,7 +84,20 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
     .texturePerSide(...getAllWhite())
     .done_();
 
-  // TRIM
+
+
+  return createBox(testWall3, testWall4, testWall2, testWall)
+    .merge(bathroomDoorWall)
+    .merge(secondBathroomWall)
+    .merge(bedPlaceholder)
+    .merge(counterPlaceholder)
+    .merge(toiletPlaceholder)
+    .merge(bathPlaceholder)
+    .done_();
+}
+
+export function createDetails(roomNumber: number, swapSign?: boolean) {
+// TRIM
   function outerLargeTrimPiece() {
     return new MoldableCubeGeometry(1, 3.5, 3).texturePerSide(...getAllWhite()).translate_(-16.6, 2.5, 10)
       .merge(new MoldableCubeGeometry(1, 3.5, 15).texturePerSide(...getAllWhite()).translate_(-16.6, 2.5, -4))
@@ -119,18 +129,5 @@ export function buildRoom(roomNumber: number, swapSign?: boolean) {
     materials.silver.texture!,
   ).translate_(-16.6, 5, swapSign ? 9.5 : 2.5);
 
-  return createBox(testWall3, testWall4, testWall2, testWall)
-    .merge(bathroomDoorWall)
-    .merge(secondBathroomWall)
-    .merge(bedPlaceholder)
-    .merge(counterPlaceholder)
-    .merge(toiletPlaceholder)
-    .merge(bathPlaceholder)
-    .merge(trim)
-    .merge(doorNumberPlate)
-    .done_();
-}
-
-function createTrimBoard() {
-
+  return trim.merge(doorNumberPlate);
 }

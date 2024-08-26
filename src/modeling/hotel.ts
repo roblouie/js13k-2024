@@ -1,10 +1,14 @@
-import { buildRoom, RoomDepth, RoomWidth } from '@/modeling/room';
+import { buildRoom, createDetails, RoomDepth, RoomWidth } from '@/modeling/room';
 import { buildSegmentedWall } from '@/modeling/building-blocks';
 import { materials } from '@/textures';
+import { meshToFaces } from '@/engine/physics/parse-faces';
+import { Mesh } from '@/engine/renderer/mesh';
+import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
+import { Face } from '@/engine/physics/face';
 
 const HallwayWidth = 10;
 
-export function makeHotel() {
+export function makeHotel(): [Face[], MoldableCubeGeometry] {
 
   const wallpapered = [
     materials.wallpaper.texture!,
@@ -15,7 +19,7 @@ export function makeHotel() {
     materials.wallpaper.texture!,
   ];
 
-  return buildRoom(1).translate_(0, 0, HallwayWidth)
+  const collidable = buildRoom(1).translate_(0, 0, HallwayWidth)
     .merge(buildRoom(2).translate_(0, 0, HallwayWidth * 2 + 25))
     .merge(buildRoom(3).translate_(0, 0, HallwayWidth * 3 + 50))
     // Second row of 3
@@ -56,10 +60,34 @@ export function makeHotel() {
         .rotate_(0, Math.PI / 2)
         .translate_(-49.5, 0, 59)
     )
-    .merge(makeAllBracing())
+    .translate_(0, 0, 6)
 
-    .computeNormals()
     .done_();
+
+  const collidableFaces = meshToFaces([new Mesh(collidable, materials.wallpaper)]);
+
+  const drawableHotel = createDetails(1).translate_(0, 0, HallwayWidth)
+    .merge(createDetails(2).translate_(0, 0, HallwayWidth * 2 + 25))
+    .merge(createDetails(3).translate_(0, 0, HallwayWidth * 3 + 50))
+    // Second row of 3
+    .merge(createDetails(5).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth))
+    .merge(createDetails(7).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 2 + 25))
+    .merge(createDetails(9).translate_(-HallwayWidth - RoomWidth, 0, HallwayWidth * 3 + 50))
+    // Third Row of 3
+    .merge(createDetails(4, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth))
+    .merge(createDetails(6, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 2 + 25))
+    .merge(createDetails(8, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 2, 0, HallwayWidth * 3 + 50))
+    // Fourth Row of 3
+    .merge(createDetails(10, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth))
+    .merge(createDetails(11, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 2 + 25))
+    .merge(createDetails(12, true).rotate_(0, Math.PI).translate_((-HallwayWidth - RoomWidth) * 3, 0, HallwayWidth * 3 + 50))
+    .translate_((RoomWidth + HallwayWidth) * 1.5, 0, HallwayWidth + 4)
+    .merge(makeAllBracing())
+    .translate_(0, 0, 6)
+
+
+
+  return [collidableFaces, collidable.merge(drawableHotel).computeNormals().done_()];
 }
 
 function makeAllBracing() {
