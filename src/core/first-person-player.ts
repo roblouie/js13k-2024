@@ -8,6 +8,7 @@ import {
 import { clamp, findClosestNavPoint } from '@/engine/helpers';
 import { PathNode } from '@/ai/path-node';
 import { AiNavPoints } from '@/ai/ai-nav-points';
+import { HidingPlace } from '@/hiding-place';
 
 class Sphere {
   center: EnhancedDOMPoint;
@@ -30,6 +31,8 @@ export class FirstPersonPlayer {
   cameraRotation = new EnhancedDOMPoint(0, 0, 0);
   collisionSphere: Sphere;
   isOnDirt = true;
+  isHiding = false;
+  hidFrom = new EnhancedDOMPoint();
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.closestNavPoint = startingPoint;
@@ -39,16 +42,33 @@ export class FirstPersonPlayer {
 
     const rotationSpeed = 0.002;
     controls.onMouseMove(mouseMovement => {
-      this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
-      this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
-      this.cameraRotation.x = clamp(this.cameraRotation.x, -Math.PI / 2, Math.PI / 2);
-      this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
+      // if (!this.isHiding) {
+        this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
+        this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
+        this.cameraRotation.x = clamp(this.cameraRotation.x, -Math.PI / 2, Math.PI / 2);
+        this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
+      // }
     });
   }
 
   private isFootstepsStopped = true;
 
   normal = new EnhancedDOMPoint();
+
+
+  hide(hidingPlace: HidingPlace) {
+    this.hidFrom.set(this.feetCenter);
+    this.isHiding = true;
+    this.isFrozen = true;
+    this.camera.position_.set(hidingPlace.position);
+    this.cameraRotation.set(hidingPlace.cameraRotation);
+  }
+
+  unhide() {
+    this.isHiding = false;
+    this.isFrozen = false;
+    this.feetCenter.set(this.hidFrom);
+  }
 
   update(gridFaces: Set<Face>[]) {
     this.closestNavPoint = findClosestNavPoint([this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()], this.feetCenter)[0];
@@ -57,18 +77,21 @@ export class FirstPersonPlayer {
       this.updateVelocityFromControls();
     }
 
-    this.velocity.y -= 0.008; // gravity
+    if (!this.isHiding) {
+      this.velocity.y -= 0.008; // gravity
 
-    const playerGridPositions = getGridPositionWithNeighbors(this.feetCenter, gridFaces.length);
+      const playerGridPositions = getGridPositionWithNeighbors(this.feetCenter, gridFaces.length);
 
-    playerGridPositions.forEach(p => findWallCollisionsFromList(gridFaces[p], this));
+      playerGridPositions.forEach(p => findWallCollisionsFromList(gridFaces[p], this));
 
-    //findWallCollisionsFromList(faces, this);
-    this.feetCenter.add_(this.velocity);
+      //findWallCollisionsFromList(faces, this);
+      this.feetCenter.add_(this.velocity);
 
-
-    this.camera.position_.set(this.feetCenter);
-    this.camera.position_.y += 3.5;
+      this.camera.position_.set(this.feetCenter);
+      this.camera.position_.y += 3.5;
+    } else if (controls.isConfirm && !controls.prevConfirm) {
+      this.unhide();
+    }
 
     this.camera.setRotation_(...this.cameraRotation.toArray());
 

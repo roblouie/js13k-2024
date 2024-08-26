@@ -1,5 +1,6 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { LeverDoorObject3d } from '@/lever-door';
+import { HidingPlace } from '@/hiding-place';
 
 export class PathNode {
   position: EnhancedDOMPoint;
@@ -9,14 +10,16 @@ export class PathNode {
   leftSibling?: PathNode;
   door?: LeverDoorObject3d;
   roomNumber?: number;
+  hidingPlace?: HidingPlace;
 
   name?: string;
 
-  constructor(position: EnhancedDOMPoint, door?: LeverDoorObject3d, roomNumber?: number, name?: string) {
+  constructor(position: EnhancedDOMPoint, door?: LeverDoorObject3d, roomNumber?: number, name?: string, hidingPlace?: HidingPlace) {
     this.position = position;
     this.name = name;
     this.door = door;
     this.roomNumber = roomNumber;
+    this.hidingPlace = hidingPlace;
   }
 
   getPresentSiblings(): PathNode[] {

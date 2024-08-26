@@ -100,6 +100,7 @@ export class GameState implements State {
   }
 
   playerDoorDifference = new EnhancedDOMPoint();
+  playerHidingPlaceDifference = new EnhancedDOMPoint();
 
   onUpdate() {
     this.player.update(this.gridFaces);
@@ -114,36 +115,54 @@ export class GameState implements State {
     tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
     tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
 
-    tmpl.innerHTML += `PLAYER X: ${this.player.feetCenter.x}, Y: ${this.player.feetCenter.y} Z: ${this.player.feetCenter.z}<br/>`;
+    tmpl.innerHTML += `PLAYER CAMREA ROT X: ${this.player.cameraRotation.x}, Y: ${this.player.cameraRotation.y} Z: ${this.player.cameraRotation.z}<br/>`;
 
-    this.doors.forEach((door, i) => {
+      const door = this.player.closestNavPoint.door;
+      if (door) {
+        const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, door.doorData.placedPosition).magnitude;
+        if (door.openClose === -1 && !door.isAnimating && distance < 7) {
+          findWallCollisionsFromList(door.closedDoorCollision, this.player)
+        }
 
-      const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, door.doorData.placedPosition).magnitude;
+        if (distance < 8) {
+          // tmpl.innerHTML += ` DOOR ${i} X: ${door.doorData.placedPosition.x}, Y: ${door.doorData.placedPosition.y} Z: ${door.doorData.placedPosition.z}<br/>`;
+          // tmpl.innerHTML += `DISTANCE ${i}: ${distance}<br/>`
 
-
-      if (door.openClose === -1 && !door.isAnimating && distance < 7) {
-        findWallCollisionsFromList(door.closedDoorCollision, this.player)
-      }
-
-      if (distance < 8) {
-        tmpl.innerHTML += ` DOOR ${i} X: ${door.doorData.placedPosition.x}, Y: ${door.doorData.placedPosition.y} Z: ${door.doorData.placedPosition.z}<br/>`;
-        tmpl.innerHTML += `DISTANCE ${i}: ${distance}<br/>`
-
-        const direction = this.player.normal.dot(this.playerDoorDifference.normalize_());
-        tmpl.innerHTML += `DIRECTION ${i}: ${direction}<br/>`
-        if (distance < 1 || direction > 0.77) {
-          if (door.doorData.isLocked) {
-            tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
-          } else {
-            tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Door</div>`;
-            if (controls.isConfirm) {
-              door.pullLever();
+          const direction = this.player.normal.dot(this.playerDoorDifference.normalize_());
+          // tmpl.innerHTML += `DIRECTION ${i}: ${direction}<br/>`
+          if (distance < 1 || direction > 0.77) {
+            if (door.doorData.isLocked) {
+              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
+            } else {
+              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Door</div>`;
+              if (controls.isConfirm) {
+                door.pullLever();
+              }
             }
           }
         }
       }
 
-      door.update();
-    });
+     this.doors.forEach(door => {
+        if (door.isAnimating) {
+          door.update();
+        }
+     });
+
+      const hidingPlace = this.player.closestNavPoint.hidingPlace;
+      if (hidingPlace) {
+        const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position_, hidingPlace.position).magnitude;
+        tmpl.innerHTML += `PLAYER POS: ${this.player.camera.position_.x}, ${this.player.camera.position_.y}, ${this.player.camera.position_.z}<br>`
+        tmpl.innerHTML += `HIDING PLACE DISTANCE: ${distance}`;
+        if (distance < 8) {
+          const direction = this.player.normal.dot(this.playerHidingPlaceDifference.normalize_());
+          if (direction > 0.77 && !this.player.isHiding) {
+            tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 HIDE</div>`;
+            if (controls.isConfirm && !controls.prevConfirm) {
+              this.player.hide(hidingPlace);
+            }
+          }
+        }
+      }
   }
 }

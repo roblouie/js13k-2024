@@ -1,6 +1,7 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { PathNode } from '@/ai/path-node';
 import { LeverDoorObject3d } from '@/lever-door';
+import { HidingPlace } from '@/hiding-place';
 
 export const AiNavPoints: PathNode[] = [];
 
@@ -8,16 +9,30 @@ function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, doo
   const roomEntranceNode = new PathNode(roomPosition, door, roomNumber, `Room ${roomNumber} Entrance`);
   const bathEntranceOffset = new EnhancedDOMPoint(12, 0, -1);
   const roomOffset = new EnhancedDOMPoint(27, 0, -3);
+  const closetHidingPlaceOffset = new EnhancedDOMPoint(36, 0, -2);
   if (isGoingRight) {
     bathEntranceOffset.scale_(-1);
     roomOffset.scale_(-1);
+    closetHidingPlaceOffset.scale_(-1);
     const bathEntranceNode = new PathNode(new EnhancedDOMPoint(roomPosition.x + bathEntranceOffset.x, roomPosition.y, roomPosition.z + bathEntranceOffset.z), door, roomNumber, `Room ${roomNumber} Bath Entrance`);
     roomEntranceNode.attachThisRightToOtherLeft(bathEntranceNode);
-    bathEntranceNode.attachThisRightToOtherLeft(new PathNode(new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z), undefined, roomNumber, `Room ${roomNumber} Room`));
+    bathEntranceNode.attachThisRightToOtherLeft(new PathNode(
+      new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z),
+      undefined,
+      roomNumber,
+      `Room ${roomNumber} Room`,
+      new HidingPlace(new EnhancedDOMPoint(roomPosition.x + closetHidingPlaceOffset.x, 5.5, roomPosition.z + closetHidingPlaceOffset.z), new EnhancedDOMPoint(0, -1.7))
+    ));
   } else {
     const bathEntranceNode = new PathNode(new EnhancedDOMPoint(roomPosition.x + bathEntranceOffset.x, roomPosition.y, roomPosition.z + bathEntranceOffset.z), door, roomNumber, `Room ${roomNumber} Bath Entrance`);
     roomEntranceNode.attachThisLeftToOtherRight(bathEntranceNode);
-    bathEntranceNode.attachThisLeftToOtherRight(new PathNode(new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z), undefined, roomNumber, `Room ${roomNumber} Room`));
+    bathEntranceNode.attachThisLeftToOtherRight(new PathNode(
+      new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z),
+      undefined,
+      roomNumber,
+      `Room ${roomNumber} Room`,
+      new HidingPlace(new EnhancedDOMPoint(roomPosition.x + closetHidingPlaceOffset.x, 5.5, roomPosition.z + closetHidingPlaceOffset.z), new EnhancedDOMPoint(0, 1.7))
+    ));
   }
 
   return roomEntranceNode;
