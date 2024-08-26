@@ -23,6 +23,7 @@ export class FirstPersonPlayer {
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
   velocity = new EnhancedDOMPoint(0, 0, 0);
   isFrozen = false;
+  closestNavPoint: PathNode;
 
   // mesh: Mesh;
   camera: Camera;
@@ -30,7 +31,8 @@ export class FirstPersonPlayer {
   collisionSphere: Sphere;
   isOnDirt = true;
 
-  constructor(camera: Camera) {
+  constructor(camera: Camera, startingPoint: PathNode) {
+    this.closestNavPoint = startingPoint;
     this.feetCenter.set(0, 10, -0);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
@@ -47,10 +49,9 @@ export class FirstPersonPlayer {
   private isFootstepsStopped = true;
 
   normal = new EnhancedDOMPoint();
-  closestNavPoint: PathNode;
 
   update(gridFaces: Set<Face>[]) {
-    this.closestNavPoint = findClosestNavPoint(AiNavPoints, this.feetCenter)[0];
+    this.closestNavPoint = findClosestNavPoint([this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()], this.feetCenter)[0];
 
     if (!this.isFrozen) {
       this.updateVelocityFromControls();

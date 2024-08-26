@@ -1,5 +1,5 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { DoorData } from '@/lever-door';
+import { LeverDoorObject3d } from '@/lever-door';
 
 export class PathNode {
   position: EnhancedDOMPoint;
@@ -7,12 +7,12 @@ export class PathNode {
   belowSibling?: PathNode;
   rightSibling?: PathNode;
   leftSibling?: PathNode;
-  door?: DoorData;
+  door?: LeverDoorObject3d;
   roomNumber?: number;
 
   name?: string;
 
-  constructor(position: EnhancedDOMPoint, door?: DoorData, roomNumber?: number, name?: string) {
+  constructor(position: EnhancedDOMPoint, door?: LeverDoorObject3d, roomNumber?: number, name?: string) {
     this.position = position;
     this.name = name;
     this.door = door;
@@ -24,14 +24,19 @@ export class PathNode {
     return [this.aboveSibling, this.belowSibling, this.rightSibling, this.leftSibling].filter(i => i !== undefined);
   }
 
-  attachNorthToOtherSouth(other: PathNode) {
+  attachThisTopToOtherBottom(other: PathNode) {
     this.aboveSibling = other;
     other.belowSibling = this;
   }
 
-  attachEastToOtherWest(other: PathNode) {
+  attachThisRightToOtherLeft(other: PathNode) {
     this.rightSibling = other;
     other.leftSibling = this;
+  }
+
+  attachThisLeftToOtherRight(other: PathNode) {
+    this.leftSibling = other;
+    other.rightSibling = this;
   }
 
   insertBetweenVert(above: PathNode, below: PathNode) {

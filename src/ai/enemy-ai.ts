@@ -48,6 +48,15 @@ export class Enemy {
   positionInPathCache = 0;
   lastPlayerNode: PathNode;
   chaseUpdate(player: FirstPersonPlayer) {
+    // Handle door opening, while door is opening, don't do anything else
+    if (this.currentNode.door && this.nextNode.door && this.currentNode.roomNumber === this.nextNode.roomNumber && (this.currentNode.door.openClose === -1 || this.currentNode.door.isAnimating)) {
+      if (!this.currentNode.door.isAnimating) {
+        this.currentNode.door.pullLever(true);
+      }
+      return;
+    }
+
+
     const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
     if (distance.magnitude > 0.5) {
       const direction_ = distance.normalize_().scale_(0.2);

@@ -1,10 +1,29 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { PathNode } from '@/ai/path-node';
-import { DoorData } from '@/lever-door';
+import { LeverDoorObject3d } from '@/lever-door';
 
 export const AiNavPoints: PathNode[] = [];
 
-export function makeNavPoints(doors: DoorData[]) {
+function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, door: LeverDoorObject3d, isGoingRight?: boolean) {
+  const roomEntranceNode = new PathNode(roomPosition, door, roomNumber, `Room ${roomNumber} Entrance`);
+  const bathEntranceOffset = new EnhancedDOMPoint(12, 0, -1);
+  const roomOffset = new EnhancedDOMPoint(27, 0, -3);
+  if (isGoingRight) {
+    bathEntranceOffset.scale_(-1);
+    roomOffset.scale_(-1);
+    const bathEntranceNode = new PathNode(new EnhancedDOMPoint(roomPosition.x + bathEntranceOffset.x, roomPosition.y, roomPosition.z + bathEntranceOffset.z), door, roomNumber, `Room ${roomNumber} Bath Entrance`);
+    roomEntranceNode.attachThisRightToOtherLeft(bathEntranceNode);
+    bathEntranceNode.attachThisRightToOtherLeft(new PathNode(new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z), undefined, roomNumber, `Room ${roomNumber} Room`));
+  } else {
+    const bathEntranceNode = new PathNode(new EnhancedDOMPoint(roomPosition.x + bathEntranceOffset.x, roomPosition.y, roomPosition.z + bathEntranceOffset.z), door, roomNumber, `Room ${roomNumber} Bath Entrance`);
+    roomEntranceNode.attachThisLeftToOtherRight(bathEntranceNode);
+    bathEntranceNode.attachThisLeftToOtherRight(new PathNode(new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z), undefined, roomNumber, `Room ${roomNumber} Room`));
+  }
+
+  return roomEntranceNode;
+}
+
+export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   // OUTER CORNERS
   const LowerLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 12), undefined, undefined, 'Bottom Left Corner');
@@ -14,15 +33,14 @@ export function makeNavPoints(doors: DoorData[]) {
 
   // MIDDLE HALLWAY INTERSECTIONS
   const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12));
-  const Room1304Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 24), doors[0], 1304, `Room 1304 Doorway`);
+  const Room1304Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 24), 1304, doors[3], true);
 
-  const Room1305Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 36), doors[1], 1305, 'Room 1305 Doorway'); // 12 diff from prev
-    const Room1305Bath = new PathNode(new EnhancedDOMPoint(12, 2.5, 35), doors[1], 1305, `Room 1305 Bath`);
-    const Room1305Room = new PathNode(new EnhancedDOMPoint(27, 2.5, 33), undefined, 1305, `Room 1305 Room`);
+  const Room1305Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 36), 1305,  doors[4]);
+
 
   const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5)); // 11.5 diff from prev
-  const Room1306Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 59)); // 11.5 diff from prev
-  const Room1307Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 71)); // 12 diff from prev
+  const Room1306Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5]); // 11.5 diff from prev
+  const Room1307Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 71), 1307, doors[6]); // 12 diff from prev
   const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
   const Room1308Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 94)) // 11.5 diff from prev
   const Room1309Entrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 106)); // 12 diff from prev
@@ -57,12 +75,7 @@ export function makeNavPoints(doors: DoorData[]) {
   Room1304Entrance.belowSibling = BottomCenterEntrance;
 
   // Room 1305
-  Room1305Entrance.aboveSibling = LowerQuarterCenterIntersection;
-  Room1305Entrance.belowSibling = Room1304Entrance;
-  Room1305Entrance.leftSibling = Room1305Bath;
-  Room1305Bath.leftSibling = Room1305Room;
-  Room1305Bath.rightSibling = Room1305Entrance;
-  Room1305Room.rightSibling = Room1305Bath;
+  Room1305Entrance.insertBetweenVert(LowerQuarterCenterIntersection, Room1304Entrance);
 
   // Lower Quarter Center Intersection
 
@@ -77,9 +90,6 @@ export function makeNavPoints(doors: DoorData[]) {
 
   AiNavPoints.push(
     // Corners
-    LowerLeftCorner, LowerRightCorner, TopLeftCorner, TopRightCorner,
-
-    // Center Hallway
-    BottomCenterEntrance, Room1304Entrance, Room1305Entrance, Room1305Bath, Room1305Room
+    LowerLeftCorner, BottomCenterEntrance
   )
 }

@@ -61,13 +61,15 @@ export class LeverDoorObject3d {
   closedDoorCollision: Set<Face>;
   openClose = -1;
   isAnimating = false;
+  speed = 3;
 
   constructor(doorData: DoorData) {
     this.doorData = doorData;
     this.closedDoorCollision = new Set(this.doorData.closedDoorCollision);
   }
 
-  pullLever() {
+  pullLever(isEnemy = false) {
+    this.speed = isEnemy ? 1 : 3;
     if (!this.isAnimating) {
       this.isAnimating = true;
       this.openClose *= -1;
@@ -76,7 +78,7 @@ export class LeverDoorObject3d {
 
   update(){
     if (this.isAnimating) {
-        this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * 3 * this.openClose;
+        this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * this.speed * this.openClose;
         if (Math.abs(this.doorData.rotation_.y) - this.doorData.originalRot === (this.openClose === -1 ? 0 : 120)) {
           this.isAnimating = false;
         }

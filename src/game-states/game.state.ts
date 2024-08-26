@@ -30,7 +30,6 @@ export class GameState implements State {
   constructor() {
     this.scene = new Scene();
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
-    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500))
 
     this.doors = [
       // 1301 door
@@ -48,6 +47,27 @@ export class GameState implements State {
       // 1305 door
       new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(3.75, 4.5, 33.75), -1, -1, true)),
 
+      // 1306 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(-3.75, 4.5, 61.25), 1, 1, true)),
+
+      // 1307 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(3.75, 4.5, 68.75), -1, -1, true)),
+
+      // 1308 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(-3.75, 4.5, 96.25), 1, 1, true)),
+
+      // 1309 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(3.75, 4.5, 103.75), -1, -1, true)),
+
+      // 1310 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(-47.75, 4.5, 26.25), 1, 1, true)),
+
+      // 1311 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(-47.75, 4.5, 61.25), 1, 1, true)),
+
+      // 1312 door
+      new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(-47.75, 4.5, 96.25), 1, 1, true)),
+
       // 1313 Door Left
       new LeverDoorObject3d(new DoorData(new EnhancedDOMPoint(3, 4.5, 124), -1, -1, false)),
       // 1313 Door Right
@@ -55,6 +75,8 @@ export class GameState implements State {
     ];
 
     makeNavPoints(this.doors);
+
+    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[1])
 
     this.enemy = new Enemy(AiNavPoints[0]);
 
