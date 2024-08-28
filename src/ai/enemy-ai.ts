@@ -29,18 +29,35 @@ export class Enemy {
     const siblings = startingNode.getPresentSiblings();
     this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
     this.patrolState = { onUpdate: () => this.patrolUpdate() };
-    this.chaseState = { onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player) };
+    this.chaseState = {
+      onEnter: () => this.chaseEnter(),
+      onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player)
+    };
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
     this.stateMachine = new StateMachine(this.patrolState);
     this.model = upyri();
   }
 
+  testFrameCount = 0;
+
   update(player: FirstPersonPlayer) {
+    this.testFrameCount++;
+
+    if (this.testFrameCount > 300) {
+      this.testFrameCount = 0;
+      if (this.stateMachine.getState() === this.patrolState) {
+        this.stateMachine.setState(this.chaseState);
+      } else {
+        this.stateMachine.setState(this.patrolState);
+      }
+    }
+
     this.stateMachine.getState().onUpdate(player);
     this.model.position_.set(this.position);
   }
 
   patrolUpdate() {
+    tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor()) {
       return;
@@ -88,7 +105,14 @@ export class Enemy {
     return false;
   }
 
+  chaseEnter() {
+    this.pathCache = [];
+    this.positionInPathCache = 0;
+  }
+
   chaseUpdate(player: FirstPersonPlayer) {
+    tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor()) {
       return;
@@ -104,7 +128,7 @@ export class Enemy {
       this.moveInTravelingDirection();
       this.currentNode = this.nextNode;
 
-      if (this.lastPlayerNode === player.closestNavPoint && this.pathCache) {
+      if (this.lastPlayerNode === player.closestNavPoint && this.pathCache.length) {
         this.nextNode = this.pathCache[this.positionInPathCache];
         if (this.positionInPathCache < this.pathCache.length - 1) {
           this.positionInPathCache++;

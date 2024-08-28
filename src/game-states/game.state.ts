@@ -102,13 +102,14 @@ export class GameState implements State {
   playerHidingPlaceDifference = new EnhancedDOMPoint();
 
   onUpdate() {
+    //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
+    tmpl.innerHTML = '';
+
     this.player.update(this.gridFaces);
     this.enemy.update(this.player);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 
-    //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
-    tmpl.innerHTML = '';
     tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
     tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
     tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
