@@ -16,6 +16,12 @@ export class Enemy {
   stateMachine: StateMachine;
   model: Mesh;
   // lookatPoint = new EnhancedDOMPoint();
+  pathCache: PathNode[] = [];
+  positionInPathCache = 0;
+  lastPlayerNode: PathNode;
+  speed = 0.2;
+
+  travelingDirection = new EnhancedDOMPoint();
 
   constructor(startingNode: PathNode) {
     this.currentNode = startingNode;
@@ -25,38 +31,35 @@ export class Enemy {
     this.patrolState = { onUpdate: () => this.patrolUpdate() };
     this.chaseState = { onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player) };
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
-    this.stateMachine = new StateMachine(this.chaseState);
+    this.stateMachine = new StateMachine(this.patrolState);
     this.model = upyri();
   }
 
   update(player: FirstPersonPlayer) {
     this.stateMachine.getState().onUpdate(player);
     this.model.position_.set(this.position);
-    // this.lookatPoint.lerp(this.nextNode.position, 0.01);
-    // this.model.lookAt(this.nextNode.position);
-  }
-
-  moveTowardsPoint() {
-
   }
 
   patrolUpdate() {
     const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
-    if (distance.magnitude > 1) {
-      const direction_ = distance.normalize_().scale_(0.2);
-      this.position.add_(direction_);
+    if (distance.magnitude > 2) {
+      const direction_ = distance.normalize_();
+      this.travelingDirection.lerp(direction_, 0.1);
+      this.moveInTravelingDirection();
     } else {
+      this.moveInTravelingDirection();
       this.currentNode = this.nextNode;
       const siblings = this.currentNode.getPresentSiblings();
       this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
     }
   }
 
-  pathCache: PathNode[] = [];
-  positionInPathCache = 0;
-  lastPlayerNode: PathNode;
-
-  travelingDirection = new EnhancedDOMPoint();
+  moveInTravelingDirection() {
+    if (this.currentNode !== this.nextNode) {
+      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.speed));
+      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection))
+    }
+  }
 
   chaseUpdate(player: FirstPersonPlayer) {
     // Handle door opening, while door is opening, don't do anything else
@@ -74,13 +77,11 @@ export class Enemy {
 
     const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
     if (distance.magnitude > 6) {
-      const direction_ = distance.normalize_();//.scale_(0.2);
+      const direction_ = distance.normalize_();
       this.travelingDirection.lerp(direction_, 0.05);
-      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(0.2));
-      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection))
+      this.moveInTravelingDirection();
     } else {
-      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(0.2));
-      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection))
+      this.moveInTravelingDirection();
       this.currentNode = this.nextNode;
 
       if (this.lastPlayerNode === player.closestNavPoint && this.pathCache) {
