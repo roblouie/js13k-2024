@@ -116,25 +116,24 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   UpperQuarterRightIntersection.attachThisLeftToOtherRight(UpperQuarterCenterIntersection);
 
   // Connect Left Rooms
-  Room1301Entrance.insertBetweenVert(LowerLeftCorner, LowerQuarterLeftIntersection);
-  Room1302Entrance.insertBetweenVert(LowerQuarterLeftIntersection, UpperQuarterLeftIntersection);
-  Room1303Entrance.insertBetweenVert(UpperQuarterLeftIntersection, TopLeftCorner);
+  Room1301Entrance.insertBetweenVert(LowerQuarterLeftIntersection, LowerLeftCorner);
+  Room1302Entrance.insertBetweenVert(UpperQuarterLeftIntersection, LowerQuarterLeftIntersection);
+  Room1303Entrance.insertBetweenVert(TopLeftCorner, UpperQuarterLeftIntersection);
 
   // Connect Right Rooms
-  Room1310Entrance.insertBetweenVert(LowerRightCorner, LowerQuarterRightIntersection);
-  Room1311Entrance.insertBetweenVert(LowerQuarterRightIntersection, UpperQuarterRightIntersection);
-  Room1312Entrance.insertBetweenVert(UpperQuarterRightIntersection, TopRightCorner);
+  Room1310Entrance.insertBetweenVert(LowerQuarterRightIntersection, LowerRightCorner);
+  Room1311Entrance.insertBetweenVert(UpperQuarterRightIntersection, LowerQuarterRightIntersection);
+  Room1312Entrance.insertBetweenVert(TopRightCorner, UpperQuarterRightIntersection);
 
   // Connect Center Rooms
-  Room1304Entrance.insertBetweenVert(BottomCenterEntrance, LowerQuarterCenterIntersection);
-  Room1305Entrance.insertBetweenVert(Room1304Entrance, LowerQuarterCenterIntersection);
+  Room1304Entrance.insertBetweenVert(LowerQuarterCenterIntersection, BottomCenterEntrance);
+  Room1305Entrance.insertBetweenVert(LowerQuarterCenterIntersection, Room1304Entrance);
 
-  Room1306Entrance.insertBetweenVert(LowerQuarterCenterIntersection, UpperQuarterCenterIntersection);
-  Room1307Entrance.insertBetweenVert(Room1306Entrance, UpperQuarterCenterIntersection);
+  Room1306Entrance.insertBetweenVert(UpperQuarterCenterIntersection, LowerQuarterCenterIntersection);
+  Room1307Entrance.insertBetweenVert(UpperQuarterCenterIntersection, Room1306Entrance);
 
-  Room1308Entrance.insertBetweenVert(UpperQuarterCenterIntersection, TopCenterEntrance);
-  Room1309Entrance.insertBetweenVert(Room1308Entrance, TopCenterEntrance);
-
+  Room1308Entrance.insertBetweenVert(TopCenterEntrance, UpperQuarterCenterIntersection);
+  Room1309Entrance.insertBetweenVert(TopCenterEntrance, Room1308Entrance);
 
   AiNavPoints.push(
     // Corners

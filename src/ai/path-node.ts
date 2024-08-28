@@ -52,7 +52,7 @@ export class PathNode {
   insertBetweenHor(left: PathNode, right: PathNode) {
     this.leftSibling = left;
     this.rightSibling = right;
-    left.leftSibling = this;
-    right.rightSibling = this;
+    left.rightSibling = this;
+    right.leftSibling = this;
   }
 }

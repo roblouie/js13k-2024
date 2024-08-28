@@ -41,15 +41,27 @@ export class Enemy {
   }
 
   patrolUpdate() {
+    // Handle door opening, while door is opening, don't do anything else
+    if (this.handleDoor()) {
+      return;
+    }
+
     const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
-    if (distance.magnitude > 2) {
+    if (distance.magnitude > 6) {
       const direction_ = distance.normalize_();
-      this.travelingDirection.lerp(direction_, 0.1);
+      this.travelingDirection.lerp(direction_, 0.05);
       this.moveInTravelingDirection();
     } else {
       this.moveInTravelingDirection();
+      let lastNode = this.currentNode;
       this.currentNode = this.nextNode;
-      const siblings = this.currentNode.getPresentSiblings();
+      let siblings = this.currentNode.getPresentSiblings();
+      if (siblings.length > 1) {
+        siblings = siblings.filter(p => {
+          const isGoingToEnterRoom = this.currentNode.door && p.door && this.currentNode.roomNumber === p.roomNumber && this.currentNode !== p;
+          return p !== lastNode && !isGoingToEnterRoom;
+        });
+      }
       this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
     }
   }
@@ -61,16 +73,24 @@ export class Enemy {
     }
   }
 
-  chaseUpdate(player: FirstPersonPlayer) {
-    // Handle door opening, while door is opening, don't do anything else
+  handleDoor() {
     if (
       this.currentNode.door && this.nextNode.door
       && this.currentNode.roomNumber === this.nextNode.roomNumber
       && this.currentNode !== this.nextNode
-      && (this.currentNode.door.openClose === -1 || this.currentNode.door.isAnimating)) {
+      && (this.currentNode.door.openClose === -1 || this.currentNode.door.isAnimating))
+    {
       if (!this.currentNode.door.isAnimating) {
         this.currentNode.door.pullLever(true);
       }
+      return true;
+    }
+    return false;
+  }
+
+  chaseUpdate(player: FirstPersonPlayer) {
+    // Handle door opening, while door is opening, don't do anything else
+    if (this.handleDoor()) {
       return;
     }
 
