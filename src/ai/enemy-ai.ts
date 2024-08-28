@@ -3,6 +3,8 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { State } from '@/core/state';
 import { StateMachine } from '@/core/state-machine';
 import { FirstPersonPlayer } from '@/core/first-person-player';
+import { Mesh } from '@/engine/renderer/mesh';
+import { upyri } from '@/ai/enemy-model';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -12,6 +14,8 @@ export class Enemy {
   chaseState: State;
   killState: State;
   stateMachine: StateMachine;
+  model: Mesh;
+  // lookatPoint = new EnhancedDOMPoint();
 
   constructor(startingNode: PathNode) {
     this.currentNode = startingNode;
@@ -22,10 +26,14 @@ export class Enemy {
     this.chaseState = { onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player) };
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
     this.stateMachine = new StateMachine(this.chaseState);
+    this.model = upyri();
   }
 
   update(player: FirstPersonPlayer) {
     this.stateMachine.getState().onUpdate(player);
+    this.model.position_.set(this.position);
+    // this.lookatPoint.lerp(this.nextNode.position, 0.01);
+    // this.model.lookAt(this.nextNode.position);
   }
 
   moveTowardsPoint() {
@@ -47,6 +55,9 @@ export class Enemy {
   pathCache: PathNode[] = [];
   positionInPathCache = 0;
   lastPlayerNode: PathNode;
+
+  travelingDirection = new EnhancedDOMPoint();
+
   chaseUpdate(player: FirstPersonPlayer) {
     // Handle door opening, while door is opening, don't do anything else
     if (
@@ -62,10 +73,14 @@ export class Enemy {
 
 
     const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
-    if (distance.magnitude > 0.5) {
-      const direction_ = distance.normalize_().scale_(0.2);
-      this.position.add_(direction_);
+    if (distance.magnitude > 6) {
+      const direction_ = distance.normalize_();//.scale_(0.2);
+      this.travelingDirection.lerp(direction_, 0.05);
+      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(0.2));
+      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection))
     } else {
+      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(0.2));
+      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection))
       this.currentNode = this.nextNode;
 
       if (this.lastPlayerNode === player.closestNavPoint && this.pathCache) {

@@ -17,6 +17,7 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { DoorData, LeverDoorObject3d } from '@/lever-door';
 import { AiNavPoints, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
+import { upyri } from '@/ai/enemy-model';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -24,8 +25,7 @@ export class GameState implements State {
   gridFaces: Set<Face>[] = [];
 
   doors: LeverDoorObject3d[];
-  enemy: Enemy
-  enemyModel: Mesh;
+  enemy: Enemy;
 
   constructor() {
     this.scene = new Scene();
@@ -79,8 +79,6 @@ export class GameState implements State {
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[1])
 
     this.enemy = new Enemy(AiNavPoints[0]);
-
-    this.enemyModel = new Mesh(new MoldableCubeGeometry(6, 6, 6).translate_(0, 3).done_(), materials.tinyTiles);
   }
 
   onEnter() {
@@ -91,7 +89,7 @@ export class GameState implements State {
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
-    this.scene.add_(ceiling, floor, hotelRender, ...elevator, ...this.doors.flatMap(door => [door.doorData]), this.enemyModel);
+    this.scene.add_(ceiling, floor, hotelRender, ...elevator, ...this.doors.flatMap(door => [door.doorData]), this.enemy.model);
     this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {
@@ -106,7 +104,6 @@ export class GameState implements State {
   onUpdate() {
     this.player.update(this.gridFaces);
     this.enemy.update(this.player);
-    this.enemyModel.position_.set(this.enemy.position);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 

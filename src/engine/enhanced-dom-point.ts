@@ -97,6 +97,13 @@ export class EnhancedDOMPoint extends DOMPoint {
     return this;
   }
 
+  lerp(otherVector: EnhancedDOMPoint, alpha: number) {
+    this.x += ( otherVector.x - this.x ) * alpha;
+    this.y += ( otherVector.y - this.y ) * alpha;
+    this.z += ( otherVector.z - this.z ) * alpha;
+    return this;
+  }
+
   isEqualTo(otherVector: EnhancedDOMPoint): boolean {
     return this.x === otherVector.x && this.y === otherVector.y && this.z === otherVector.z;
   }

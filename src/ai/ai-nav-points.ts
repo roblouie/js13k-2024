@@ -107,7 +107,7 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   LowerQuarterLeftIntersection.insertBetweenVert(TopLeftCorner, LowerLeftCorner);
   LowerQuarterLeftIntersection.attachThisRightToOtherLeft(LowerQuarterCenterIntersection);
   UpperQuarterLeftIntersection.insertBetweenVert(TopLeftCorner, LowerQuarterLeftIntersection);
-  UpperQuarterLeftIntersection.attachThisLeftToOtherRight(UpperQuarterCenterIntersection);
+  UpperQuarterLeftIntersection.attachThisRightToOtherLeft(UpperQuarterCenterIntersection);
 
   // Connect Right hallway
   LowerQuarterRightIntersection.insertBetweenVert(TopRightCorner, LowerRightCorner);
