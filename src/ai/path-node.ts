@@ -22,9 +22,13 @@ export class PathNode {
     this.hidingPlace = hidingPlace;
   }
 
+  getAllSiblings(): (PathNode | undefined)[] {
+    return [this.aboveSibling, this.belowSibling, this.rightSibling, this.leftSibling];
+  }
+
   getPresentSiblings(): PathNode[] {
     // @ts-ignore
-    return [this.aboveSibling, this.belowSibling, this.rightSibling, this.leftSibling].filter(i => i !== undefined);
+    return this.getAllSiblings().filter(i => i !== undefined);
   }
 
   attachThisTopToOtherBottom(other: PathNode) {
@@ -55,4 +59,5 @@ export class PathNode {
     left.rightSibling = this;
     right.leftSibling = this;
   }
+
 }

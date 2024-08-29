@@ -32,7 +32,7 @@ export class Enemy {
     this.position = new EnhancedDOMPoint().set(startingNode.position);
     const siblings = startingNode.getPresentSiblings();
     this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
-    this.patrolState = { onUpdate: () => this.patrolUpdate() };
+    this.patrolState = { onUpdate: (player: FirstPersonPlayer) => this.patrolUpdate(player) };
     this.chaseState = {
       onEnter: (player: FirstPersonPlayer) => this.chaseEnter(player),
       onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player)
@@ -66,7 +66,9 @@ export class Enemy {
     this.model.position_.set(this.position);
   }
 
-  patrolUpdate() {
+  patrolUpdate(player: FirstPersonPlayer) {
+    this.checkVision(player);
+
     tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor()) {
@@ -132,6 +134,7 @@ export class Enemy {
 
   chaseUpdate(player: FirstPersonPlayer) {
     tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+    this.checkVision(player);
 
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor()) {
@@ -199,7 +202,28 @@ export class Enemy {
   }
 
   checkVision(player: FirstPersonPlayer) {
+    const followPathToEnd = (node: PathNode | undefined, directionIndex: number) => {
+      const sibling = node?.getAllSiblings()[directionIndex];
+      // If the next node in a given direction is the one the player is on, and there's
+      if (sibling && ((!sibling.door || sibling.door.openClose === 1) || !(sibling.roomNumber && node.roomNumber && sibling.roomNumber === node.roomNumber))) {
+        if (sibling === player.closestNavPoint) {
+          tmpl.innerHTML += 'PLAYER SEEN<br>';
+          return true;
+        } else {
+          followPathToEnd(sibling, directionIndex);
+        }
+      }
+    }
 
+    if (this.currentNode === player.closestNavPoint) {
+      tmpl.innerHTML += 'PLAYER SEEN<br>';
+      return;
+    }
+
+    followPathToEnd(this.currentNode, 0)
+    || followPathToEnd(this.currentNode, 1)
+    || followPathToEnd(this.currentNode, 2)
+    || followPathToEnd(this.currentNode, 3);
   }
 }
 
