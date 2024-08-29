@@ -206,16 +206,24 @@ export class Enemy {
       const sibling = node?.getAllSiblings()[directionIndex];
       // If the next node in a given direction is the one the player is on, and there's
       if (sibling && ((!sibling.door || sibling.door.openClose === 1) || !(sibling.roomNumber && node.roomNumber && sibling.roomNumber === node.roomNumber))) {
+        // If our sightline caught the players node
         if (sibling === player.closestNavPoint) {
-          tmpl.innerHTML += 'PLAYER SEEN<br>';
-          return true;
+          // Make sure the player is close enough to it to actually be seen
+          const isPlayerCloseEnough = (directionIndex < 2 && Math.abs(player.differenceFromNavPoint.x) < 6) || (directionIndex > 1 && Math.abs(player.differenceFromNavPoint.z) < 6);
+          const isEnemyCloseEnough = (directionIndex < 2 && Math.abs(this.currentNodeDifference.x) < 6) || (directionIndex > 1 && Math.abs(this.currentNodeDifference.z) < 6);
+          if (!player.isHiding && isPlayerCloseEnough && isEnemyCloseEnough) {
+            tmpl.innerHTML += 'PLAYER SEEN<br>';
+            return true;
+          }
         } else {
           followPathToEnd(sibling, directionIndex);
         }
       }
     }
 
-    if (this.currentNode === player.closestNavPoint) {
+    const isPlayerCloseEnough = (Math.abs(player.differenceFromNavPoint.x) < 7) || (Math.abs(player.differenceFromNavPoint.z) < 6);
+    const isEnemyCloseEnough = (Math.abs(this.currentNodeDifference.x) < 7) || (Math.abs(this.currentNodeDifference.z) < 6);
+    if (!player.isHiding && this.currentNode === player.closestNavPoint && isPlayerCloseEnough && isEnemyCloseEnough) {
       tmpl.innerHTML += 'PLAYER SEEN<br>';
       return;
     }

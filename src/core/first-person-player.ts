@@ -33,6 +33,7 @@ export class FirstPersonPlayer {
   isOnDirt = true;
   isHiding = false;
   hidFrom = new EnhancedDOMPoint();
+  differenceFromNavPoint = new EnhancedDOMPoint();
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.closestNavPoint = startingPoint;
@@ -71,7 +72,10 @@ export class FirstPersonPlayer {
   }
 
   update(gridFaces: Set<Face>[]) {
-    this.closestNavPoint = findClosestNavPoint([this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()], this.feetCenter)[0];
+    const results = findClosestNavPoint([this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()], this.feetCenter);
+    this.closestNavPoint = results[0];
+    this.differenceFromNavPoint = results[2];
+    tmpl.innerHTML += `PLAYER NODE DIFF: ${results[2].x}, ${results[2].z}<br>`;
 
     if (!this.isFrozen) {
       this.updateVelocityFromControls();
