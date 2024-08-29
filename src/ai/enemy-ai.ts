@@ -5,6 +5,7 @@ import { StateMachine } from '@/core/state-machine';
 import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
+import { controls } from '@/core/controls';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -20,8 +21,11 @@ export class Enemy {
   positionInPathCache = 0;
   lastPlayerNode: PathNode;
   speed = 0.2;
-
   travelingDirection = new EnhancedDOMPoint();
+  nextNodeDifference = new EnhancedDOMPoint();
+  nextNodeDistance = 0;
+  nextNodeDirection = new EnhancedDOMPoint();
+  currentNodeDifference = new EnhancedDOMPoint();
 
   constructor(startingNode: PathNode) {
     this.currentNode = startingNode;
@@ -30,7 +34,7 @@ export class Enemy {
     this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
     this.patrolState = { onUpdate: () => this.patrolUpdate() };
     this.chaseState = {
-      onEnter: () => this.chaseEnter(),
+      onEnter: (player: FirstPersonPlayer) => this.chaseEnter(player),
       onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player)
     };
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
@@ -38,15 +42,21 @@ export class Enemy {
     this.model = upyri();
   }
 
-  testFrameCount = 0;
+  updateNodeDistanceData() {
+    this.nextNodeDifference.subtractVectors(this.nextNode.position, this.position);
+    this.nextNodeDistance = this.nextNodeDifference.magnitude;
+    this.nextNodeDirection = this.nextNodeDifference.clone_().normalize_();
+    this.currentNodeDifference.subtractVectors(this.currentNode.position, this.position);
+  }
+
 
   update(player: FirstPersonPlayer) {
-    this.testFrameCount++;
+    this.updateNodeDistanceData();
 
-    if (this.testFrameCount > 300) {
+    if (controls.isConfirm && !controls.prevConfirm) {
       this.testFrameCount = 0;
       if (this.stateMachine.getState() === this.patrolState) {
-        this.stateMachine.setState(this.chaseState);
+        this.stateMachine.setState(this.chaseState, player);
       } else {
         this.stateMachine.setState(this.patrolState);
       }
@@ -63,10 +73,8 @@ export class Enemy {
       return;
     }
 
-    const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
-    if (distance.magnitude > 6) {
-      const direction_ = distance.normalize_();
-      this.travelingDirection.lerp(direction_, 0.05);
+    if (this.nextNodeDistance > 6) {
+      this.travelingDirection.lerp(this.nextNodeDirection, 0.05);
       this.moveInTravelingDirection();
     } else {
       this.moveInTravelingDirection();
@@ -81,13 +89,20 @@ export class Enemy {
       }
       this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
     }
+    if (!this.nextNode) {
+      this.nextNode = this.currentNode;
+    }
   }
 
   moveInTravelingDirection() {
-    if (this.currentNode !== this.nextNode) {
+    if (this.nextNodeDistance > 0.3) {
+      const enemyFeetPos = 2.5;
+      // if (this.currentNode !== this.nextNode) {
       this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.speed));
-      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection))
+      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
+      this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
     }
+    tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
   }
 
   handleDoor() {
@@ -105,9 +120,14 @@ export class Enemy {
     return false;
   }
 
-  chaseEnter() {
+  chaseEnter(player: FirstPersonPlayer) {
     this.pathCache = [];
     this.positionInPathCache = 0;
+    this.advancePathToPlayer(player);
+    this.nextNode = this.pathCache[0] ?? this.currentNode;
+    this.positionInPathCache++;
+    const direction = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position).normalize_();
+    this.travelingDirection.set(direction);
   }
 
   chaseUpdate(player: FirstPersonPlayer) {
@@ -119,57 +139,66 @@ export class Enemy {
     }
 
 
-    const distance = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position);
-    if (distance.magnitude > 6) {
-      const direction_ = distance.normalize_();
-      this.travelingDirection.lerp(direction_, 0.05);
+    if (this.nextNodeDistance > 6) {
+      tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
+      this.travelingDirection.lerp(this.nextNodeDirection, 0.05);
       this.moveInTravelingDirection();
     } else {
       this.moveInTravelingDirection();
       this.currentNode = this.nextNode;
-
-      if (this.lastPlayerNode === player.closestNavPoint && this.pathCache.length) {
-        this.nextNode = this.pathCache[this.positionInPathCache];
-        if (this.positionInPathCache < this.pathCache.length - 1) {
-          this.positionInPathCache++;
-        }
-
-        return;
+      this.advancePathToPlayer(player);
+      if (!this.nextNode) {
+        this.nextNode = this.currentNode;
       }
-
-      this.positionInPathCache = 0;
-      this.lastPlayerNode = player.closestNavPoint;
-
-      const search = (start: PathNode, target?: PathNode) => {
-        if (start === target) return [start];
-
-        const queue: { node: PathNode; path: PathNode[] }[] = [{ node: start, path: [start] }];
-        const visited: Set<PathNode> = new Set();
-
-        while (queue.length > 0) {
-          const { node, path } = queue.shift()!;
-          visited.add(node);
-
-          for (const sibling of node.getPresentSiblings()) {
-            if (!visited.has(sibling)) {
-              const newPath = [...path, sibling];
-
-              if (sibling === target) {
-                return newPath;
-              }
-
-              queue.push({ node: sibling, path: newPath });
-            }
-          }
-        }
-      }
-
-      this.pathCache = search(this.currentNode, player.closestNavPoint)!;
     }
 
   }
 
+  advancePathToPlayer(player: FirstPersonPlayer) {
+    if (this.lastPlayerNode === player.closestNavPoint && this.pathCache.length) {
+      this.nextNode = this.pathCache[this.positionInPathCache];
+      if (this.positionInPathCache < this.pathCache.length - 1) {
+        this.positionInPathCache++;
+      }
+
+      return;
+    }
+
+    this.positionInPathCache = 0;
+    this.lastPlayerNode = player.closestNavPoint;
+
+    const search = (start: PathNode, target?: PathNode) => {
+      if (start === target) return [start];
+
+      const queue: { node: PathNode; path: PathNode[] }[] = [{ node: start, path: [start] }];
+      const visited: Set<PathNode> = new Set();
+
+      while (queue.length > 0) {
+        const { node, path } = queue.shift()!;
+        visited.add(node);
+
+        for (const sibling of node.getPresentSiblings()) {
+          if (!visited.has(sibling)) {
+            const newPath = [...path, sibling];
+
+            if (sibling === target) {
+              return newPath;
+            }
+
+            queue.push({ node: sibling, path: newPath });
+          }
+        }
+      }
+    }
+
+    this.pathCache = search(this.currentNode, player.closestNavPoint)!;
+  }
+
   killUpdate(player: FirstPersonPlayer) {
+
+  }
+
+  checkVision(player: FirstPersonPlayer) {
 
   }
 }
