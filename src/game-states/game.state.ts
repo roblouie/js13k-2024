@@ -5,7 +5,6 @@ import { Scene } from '@/engine/renderer/scene';
 import { Face } from '@/engine/physics/face';
 import { Camera } from '@/engine/renderer/camera';
 import { materials } from '@/textures';
-import { PlaneGeometry } from '@/engine/plane-geometry';
 import { Mesh } from '@/engine/renderer/mesh';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { build2dGrid, findWallCollisionsFromList } from '@/engine/physics/surface-collision';
@@ -17,7 +16,6 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { DoorData, LeverDoorObject3d } from '@/lever-door';
 import { AiNavPoints, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
-import { upyri } from '@/ai/enemy-model';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -82,7 +80,7 @@ export class GameState implements State {
   }
 
   onEnter() {
-    const floor = new Mesh(new PlaneGeometry(180, 180, 20, 20).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
+    const floor = new Mesh(new MoldableCubeGeometry(180, 1, 180, 20, 1, 20).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
     const ceiling = new Mesh(new MoldableCubeGeometry(170, 1, 120).translate_(0, 12, 65).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
     // Move hotel layout to just outside the elevator
     const hotelRender = new Mesh(makeHotel(true).translate_(0, 0, 6).done_(), materials.wallpaper);
@@ -110,11 +108,9 @@ export class GameState implements State {
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 
-    tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
-    tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
-    tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
-
-    tmpl.innerHTML += `PLAYER CAMREA ROT X: ${this.player.cameraRotation.x}, Y: ${this.player.cameraRotation.y} Z: ${this.player.cameraRotation.z}<br/>`;
+    // tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
+    // tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
+    // tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
 
       const door = this.player.closestNavPoint.door;
       if (door) {
@@ -151,8 +147,8 @@ export class GameState implements State {
       const hidingPlace = this.player.closestNavPoint.hidingPlace;
       if (hidingPlace) {
         const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position_, hidingPlace.position).magnitude;
-        tmpl.innerHTML += `PLAYER POS: ${this.player.camera.position_.x}, ${this.player.camera.position_.y}, ${this.player.camera.position_.z}<br>`
-        tmpl.innerHTML += `HIDING PLACE DISTANCE: ${distance}`;
+        // tmpl.innerHTML += `PLAYER POS: ${this.player.camera.position_.x}, ${this.player.camera.position_.y}, ${this.player.camera.position_.z}<br>`
+        // tmpl.innerHTML += `HIDING PLACE DISTANCE: ${distance}`;
         if (distance < 8) {
           const direction = this.player.normal.dot(this.playerHidingPlaceDifference.normalize_());
           if (direction > 0.77 && !this.player.isHiding) {

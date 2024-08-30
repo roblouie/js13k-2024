@@ -1,6 +1,6 @@
 import { Material } from '@/engine/renderer/material';
 import { textureLoader } from '@/engine/renderer/texture-loader';
-import { toImage, toHeightmap } from '@/engine/svg-maker/svg-string-converters';
+import { toImage } from '@/engine/svg-maker/svg-string-converters';
 import { Texture } from '@/engine/renderer/texture';
 
 const textureSize = 512;
@@ -15,13 +15,9 @@ export async function initTextures() {
   materials.planks = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(false, true))});
   materials.face = new Material({ texture: textureLoader.load_(await face())});
   materials.bloodCircle = new Material({ texture: textureLoader.load_(await drawBloodCircle()), isTransparent: true });
-  materials.gold = new Material({ texture: textureLoader.load_(await metals(0)), emissive: [0.7, 0.7, 0.7, 0.7] });
   materials.silver = new Material({ texture: textureLoader.load_(await metals(1)) });
   materials.iron = new Material({ texture: textureLoader.load_(await metals(2)) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
-  materials.parquetFloor = new Material({ texture: textureLoader.load_(await parquetFloor())});
-  materials.texturedWallpaper = new Material({ texture: textureLoader.load_(await texturedWallpaper())});
-  materials.patternedWallpaper = new Material({ texture: textureLoader.load_(await patternedWallpaper())});
   materials.tinyTiles = new Material({ texture: textureLoader.load_(await tinyTiles())});
   materials.lighterWoodTest = new Material({ texture: textureLoader.load_(await lighterWoodTest())});
   materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
@@ -191,59 +187,6 @@ function tinyTiles() {
 `);
 }
 
-function patternedWallpaper() {
-  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
-    <filter id="filter">
-        <feTurbulence baseFrequency=".004 .1"/>
-        <feColorMatrix values="0 0 0 1 0
-                               0 .3 0 0 0
-                               0 0 0 0 0
-                               0 0 0 0 1"/>
-    </filter>
-    <pattern id="pattern" width="1" height="1" patternTransform="skewY(60)">
-        <rect width="100%" height="100%" filter="url(#filter)"/>
-    </pattern>
-    <g id="g">
-        <rect id="r" width="25.1%" height="100%" fill="url(#pattern)"/>
-        <use href="#r" x="49.9%"/>
-    </g>
-    <use href="#g" x="-100%" transform="scale(-1 1)"/>
-</svg>`)
-}
-
-function texturedWallpaper() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <pattern id="pattern" width="3" height="2" patternUnits="userSpaceOnUse">
-        <circle r="4" fill="#875"/>
-        <rect width="1" height="1"/>
-    </pattern>
-    <filter id="filter">  
-      <feTurbulence baseFrequency=".02 .002" numOctaves="3"/>
-      <feDisplacementMap in="SourceGraphic" scale="9"/>
-    </filter>
-    <rect x="-10%" y="-10%" width="120%" height="120%" fill="url(#pattern)" filter="url(#filter)"/>
-</svg>`)
-}
-
-function parquetFloor() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <pattern id="pattern" width="256" height="256" patternUnits="userSpaceOnUse">
-        <path id="p" d="M.5.5v127h42V.5h1v127h42V.5h1v127h42V.5" fill="#da6"/>
-        <use href="#p" x="128" y="128"/>
-    </pattern>
-    <filter id="filter">
-        <feTurbulence type="fractalNoise" baseFrequency=".1 .01" numOctaves="3"/>
-        <feComposite in="SourceGraphic" operator="in"/>
-        <feBlend in="SourceGraphic" mode="difference"/>
-    </filter>
-    <g id="o">
-        <circle r="71%"/>
-        <circle id="c" r="71%" fill="url(#pattern)" filter="url(#filter)"/>
-        <use href="#c" transform="rotate(90)"/>
-    </g>
-    <use href="#o" x="50%" y="50%"/>
-</svg>`)
-}
 
 function marbleFloor() {
   // new marble floor??
@@ -293,24 +236,8 @@ export function face() {
   return toImage(`<svg style="filter: invert()" width="${textureSize}" height="${textureSize}" xmlns="http://www.w3.org/2000/svg"><filter id="filter" x="-0.01%" primitiveUnits="objectBoundingBox" width="100%" height="100%"><feTurbulence seed="7" type="fractalNoise" baseFrequency="0.005" numOctaves="5" result="n"/><feComposite in="SourceAlpha" operator="in"/><feDisplacementMap in2="n" scale="0.9"/></filter><rect x="0" y="-14" width="100%" height="100%" id="l" filter="url(#filter)"/><rect fill="#fff" width="100%" height="100%"/><use href="#l" x="22%" y="42" transform="scale(2.2, 1.2)"></use><use href="#l" x="-22%" y="42" transform="rotate(.1) scale(-2.2 1.2)"></use><rect fill="#777" x="220" y="230" width="50" height="50"/></svg>`);
 }
 
-export function metals(content: string, isHeightmap = false) {
-  const method = isHeightmap ? toHeightmap : toImage;
-    console.log(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-<filter id="b">
-<feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
-<feColorMatrix values="
-0.2, 0.2, 0.2, 0,
--0.01, 0.2, 0.2, 0.2,
-0, -0.01, 0.2 ,0.2,
-0.2,0,-0.01,0.2,
-0,0,0,1"/>
-</filter>
-<rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
-${ content ? content : '' }
-</svg>`)
-
-
-  return method(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+export function metals(content: string) {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
 <filter id="b">
 <feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
 <feColorMatrix values="
@@ -327,8 +254,4 @@ ${ content ? content : '' }
 
 function roomSign(roomNumber: string) {
   return metals(`<text x="21%" y="42%" font-size="150px" style="transform: scaleY(1.5)">${roomNumber}</text>`)
-}
-
-export function testHeightmap() {
-  return metals(1, true);
 }

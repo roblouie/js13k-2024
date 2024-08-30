@@ -1,13 +1,13 @@
-// @ts-nocheck
-import { audioContext } from './sound-tools.ts';
+export const audioContext: AudioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-export class SimplestMidi {
+class SimplestMidi {
   masterTuningC = 0;
   masterTuningF = 0;
   scaleTuning: number[][] = [];
   tuningC: number[] = [];
   tuningF: number[] = [];
   chvol: GainNode[] = [];
+  chPanner: PannerNode[] = [];
   chmod: GainNode[] = [];
   noiseBuf: { n0: AudioBuffer, n1: AudioBuffer };
   bend: number[] = [];
@@ -46,7 +46,16 @@ export class SimplestMidi {
     for(let i=0;i<16;++i) {
       this.chvol[i] = audioContext.createGain();
       this.chmod[i]= audioContext.createGain();
-      this.chvol[i].connect(this.compressor);
+      this.chPanner[i] = new PannerNode(audioContext, {
+        distanceModel: 'linear',
+        positionX: 0,
+        positionY: 0,
+        positionZ: 0,
+        maxDistance: 80,
+        rolloffFactor: 99,
+        coneOuterGain: 0.1
+      });
+      this.chvol[i].connect(this.chPanner[i]).connect(this.compressor); // TODO: Make one of these for each node
       this.bend[i] = 0;
       this.scaleTuning[i]=[0,0,0,0,0,0,0,0,0,0,0,0];
       this.tuningC[i]=0;
@@ -58,7 +67,9 @@ export class SimplestMidi {
     this.chmod.forEach(mod => mod.disconnect());
   }
 
-  playNote(t,ch,n,v,p, kt) {
+  playNote(t,ch,n,v,p, kt, pannerSettings?: PannerOptions) {
+    this.chPanner[ch].positionX.value = pannerSettings?.positionX ?? 0;
+    this.chPanner[ch].positionZ.value = pannerSettings?.positionZ ?? 0;
     let out,sc,pn;
     const o: any[] =[]; // Oscillator or audiobuffersourcenode
     const g: GainNode[] = [];
@@ -165,7 +176,9 @@ export class SimplestMidi {
     const imag=new Float32Array(w.length);
     const real=new Float32Array(w.length);
     for(let i=1;i<w.length;++i)
-    imag[i]=w[i];
+      imag[i]=w[i];
     return audioContext.createPeriodicWave(real,imag);
   }
 }
+
+export const simplestMidi = new SimplestMidi();

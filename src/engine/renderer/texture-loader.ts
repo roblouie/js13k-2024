@@ -4,19 +4,10 @@ import { Texture } from '@/engine/renderer/texture';
 class TextureLoader {
   textures: Texture[] = [];
 
-  load_(textureSource: TexImageSource, animationFunction?: Function): Texture {
-    const texture = new Texture(this.textures.length, textureSource, animationFunction);
+  load_(textureSource: TexImageSource): Texture {
+    const texture = new Texture(this.textures.length, textureSource);
     this.textures.push(texture);
     return texture;
-  }
-
-  updateAnimatedTextures() {
-    this.textures.forEach((texture, index) => {
-      if (texture.animationFunction) {
-        texture.animationFunction();
-        gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, index, 512, 512, 1, gl.RGBA, gl.UNSIGNED_BYTE, texture.source);
-      }
-    });
   }
 
   bindTextures() {

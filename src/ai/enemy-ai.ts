@@ -6,6 +6,8 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { controls } from '@/core/controls';
+import { audioContext, simplestMidi } from '@/engine/audio/simplest-midi';
+import { bassDrum1 } from '@/engine/sounds';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -96,6 +98,8 @@ export class Enemy {
     }
   }
 
+  footstepInterval = 30;
+  currentInterval = 0;
   moveInTravelingDirection() {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;
@@ -103,6 +107,14 @@ export class Enemy {
       this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.speed));
       this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
+      this.currentInterval++;
+      if (this.currentInterval === this.footstepInterval) {
+        simplestMidi.playNote(audioContext.currentTime, 0, 72, 50, bassDrum1, audioContext.currentTime + 1, {
+          positionX: this.position.x,
+          positionZ: this.position.z,
+        });
+        this.currentInterval = 0;
+      }
     }
     tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
   }

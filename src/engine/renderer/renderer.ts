@@ -85,7 +85,7 @@ export function render(camera: Camera, scene: Scene) {
   const renderMesh = (mesh: Mesh, projection: DOMMatrix) => {
     // @ts-ignore
     gl.useProgram(lilgl.program);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, mesh.material.texture?.animationFunction ? gl.LINEAR : gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     const modelViewProjectionMatrix = projection.multiply(mesh.worldMatrix);
 
     gl.uniform4fv(emissiveLocation, mesh.material.emissive);
@@ -103,9 +103,6 @@ export function render(camera: Camera, scene: Scene) {
     }
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   };
-
-  textureLoader.updateAnimatedTextures();
-
 
   // Render shadow map to depth texture
   gl.useProgram(lilgl.depthProgram);

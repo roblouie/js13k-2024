@@ -9,6 +9,7 @@ import { clamp, findClosestNavPoint } from '@/engine/helpers';
 import { PathNode } from '@/ai/path-node';
 import { AiNavPoints } from '@/ai/ai-nav-points';
 import { HidingPlace } from '@/hiding-place';
+import { audioContext } from '@/engine/audio/simplest-midi';
 
 class Sphere {
   center: EnhancedDOMPoint;
@@ -34,12 +35,14 @@ export class FirstPersonPlayer {
   isHiding = false;
   hidFrom = new EnhancedDOMPoint();
   differenceFromNavPoint = new EnhancedDOMPoint();
+  listener: AudioListener;
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.closestNavPoint = startingPoint;
     this.feetCenter.set(0, 10, -0);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
+    this.listener = audioContext.listener;
 
     const rotationSpeed = 0.002;
     controls.onMouseMove(mouseMovement => {
@@ -103,6 +106,7 @@ export class FirstPersonPlayer {
     this.normal.set(this.camera.rotationMatrix.transformPoint(this.normal));
 
     this.camera.updateWorldMatrix();
+    this.updateAudio();
   }
 
   isJumping = false;
@@ -118,5 +122,20 @@ export class FirstPersonPlayer {
 
     this.velocity.z = depthMovementZ + sidestepZ;
     this.velocity.x = depthMovementX + sidestepX;
+  }
+
+  private updateAudio() {
+    if (this.listener.positionX) {
+      this.listener.positionX.value = this.camera.position_.x;
+      this.listener.positionY.value = this.camera.position_.y;
+      this.listener.positionZ.value = this.camera.position_.z;
+
+      const lookingDirection = new EnhancedDOMPoint(0, 0, -1);
+      const result_ = this.camera.rotationMatrix.transformPoint(lookingDirection);
+
+      this.listener.forwardX.value = result_.x;
+      this.listener.forwardY.value = result_.y;
+      this.listener.forwardZ.value = result_.z;
+    }
   }
 }
