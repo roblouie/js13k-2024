@@ -112,7 +112,7 @@ export function render(camera: Camera, scene: Scene) {
   gl.viewport(0, 0, depthTextureSize.x, depthTextureSize.y);
 
   scene.solidMeshes.forEach((mesh, index) => {
-    if (index > 0) {
+    if (index > 0) { //TODO: REMOVE THIS, this is just to not include the roof in the old shadows
       gl.bindVertexArray(mesh.geometry.vao!);
       gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
       gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
@@ -126,13 +126,6 @@ export function render(camera: Camera, scene: Scene) {
   gl.cullFace(gl.BACK);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   scene.solidMeshes.forEach(mesh => renderMesh(mesh, viewProjectionMatrix));
-
-  // Now render transparent items. For transparent items, stop writing to the depth mask. If we don't do this
-  // the transparent portion of a transparent mesh will hide other transparent items. After rendering the
-  // transparent items, set the depth mask back to writable.
-  gl.depthMask(false);
-  scene.transparentMeshes.forEach(mesh => renderMesh(mesh, viewProjectionMatrix));
-  gl.depthMask(true);
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.
   // In theory this isn't necessary but avoids bugs.

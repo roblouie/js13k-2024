@@ -3,7 +3,6 @@ import { Mesh } from '@/engine/renderer/mesh';
 
 export class Scene extends Object3d {
   solidMeshes: Mesh[] = [];
-  transparentMeshes: Mesh[] = [];
 
   add_(...object3ds: Object3d[]) {
     super.add_(...object3ds);
@@ -14,7 +13,7 @@ export class Scene extends Object3d {
         // @ts-ignore
         object3d.geometry.bindGeometry();
         // @ts-ignore
-        object3d.material.isTransparent ? this.transparentMeshes.push(object3d) : this.solidMeshes.push(object3d);
+        this.solidMeshes.push(object3d);
       }
     })
   }
@@ -26,11 +25,7 @@ export class Scene extends Object3d {
       // @ts-ignore
       if (obj.geometry) {
         // @ts-ignore
-        if (obj.material.isTransparent) {
-          this.transparentMeshes = this.transparentMeshes.filter(mesh => mesh !== obj);
-        } else {
-          this.solidMeshes = this.solidMeshes.filter(mesh => mesh !== obj);
-        }
+        this.solidMeshes = this.solidMeshes.filter(mesh => mesh !== obj);
       }
     });
   }

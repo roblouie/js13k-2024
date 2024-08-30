@@ -7,7 +7,7 @@ import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { controls } from '@/core/controls';
 import { audioContext, simplestMidi } from '@/engine/audio/simplest-midi';
-import { bassDrum1 } from '@/engine/sounds';
+import { bassDrum1, playSong } from '@/sounds';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -18,7 +18,6 @@ export class Enemy {
   killState: State;
   stateMachine: StateMachine;
   model: Mesh;
-  // lookatPoint = new EnhancedDOMPoint();
   pathCache: PathNode[] = [];
   positionInPathCache = 0;
   lastPlayerNode: PathNode;
@@ -56,7 +55,6 @@ export class Enemy {
     this.updateNodeDistanceData();
 
     if (controls.isConfirm && !controls.prevConfirm) {
-      this.testFrameCount = 0;
       if (this.stateMachine.getState() === this.patrolState) {
         this.stateMachine.setState(this.chaseState, player);
       } else {
@@ -116,7 +114,7 @@ export class Enemy {
         this.currentInterval = 0;
       }
     }
-    tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
+    // tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
   }
 
   handleDoor() {
@@ -135,6 +133,7 @@ export class Enemy {
   }
 
   chaseEnter(player: FirstPersonPlayer) {
+    playSong();
     this.pathCache = [];
     this.positionInPathCache = 0;
     this.advancePathToPlayer(player);
@@ -145,7 +144,7 @@ export class Enemy {
   }
 
   chaseUpdate(player: FirstPersonPlayer) {
-    tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+    // tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
     this.checkVision(player);
 
     // Handle door opening, while door is opening, don't do anything else
@@ -155,7 +154,7 @@ export class Enemy {
 
 
     if (this.nextNodeDistance > 6) {
-      tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
+      // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
       this.travelingDirection.lerp(this.nextNodeDirection, 0.05);
       this.moveInTravelingDirection();
     } else {

@@ -13,6 +13,7 @@ class SimplestMidi {
   bend: number[] = [];
   wave: { [key: string]: PeriodicWave };
   compressor: DynamicsCompressorNode;
+  biquadFilter = audioContext.createBiquadFilter();
 
   constructor() {
     const blen = audioContext.sampleRate * 0.5;
@@ -36,8 +37,11 @@ class SimplestMidi {
 
     this.wave={"w9999":this._createWave("w9999")};
 
-    this.compressor.connect(audioContext.destination);
-    this.compressor.threshold.setValueAtTime(-50, audioContext.currentTime);
+    this.biquadFilter.type = "lowshelf";
+    this.biquadFilter.frequency.setValueAtTime(500, audioContext.currentTime);
+    this.biquadFilter.gain.setValueAtTime(20, audioContext.currentTime);
+
+    this.compressor.connect(this.biquadFilter).connect(audioContext.destination);    this.compressor.threshold.setValueAtTime(-50, audioContext.currentTime);
     this.compressor.knee.setValueAtTime(40, audioContext.currentTime);
     this.compressor.ratio.setValueAtTime(12, audioContext.currentTime);
     this.compressor.attack.setValueAtTime(0, audioContext.currentTime);
@@ -55,7 +59,11 @@ class SimplestMidi {
         rolloffFactor: 99,
         coneOuterGain: 0.1
       });
-      this.chvol[i].connect(this.chPanner[i]).connect(this.compressor); // TODO: Make one of these for each node
+      if (i < 8) {
+        this.chvol[i].connect(this.chPanner[i]).connect(this.compressor); // TODO: Make one of these for each node
+      } else {
+        this.chvol[i].connect(this.compressor);
+      }
       this.bend[i] = 0;
       this.scaleTuning[i]=[0,0,0,0,0,0,0,0,0,0,0,0];
       this.tuningC[i]=0;
