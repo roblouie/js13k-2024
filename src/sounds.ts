@@ -5,7 +5,7 @@ export const bassDrum1 = [{ ...defaults, w:"triangle",t:0,f:88,v:1,d:0.05,h:0.03
 
 const doorOpenStartingPOint = [{w:"sawtooth",v:0.4,a:1,h:1,s:0.5,},{g:1,w:"triangle",v:0.6,t:0,f:-0.1,a:0.5,h:1,s:1,r:0.01,b:0,c:0,p:-40,q:20,},{g:1,w:"n1",v:0.2,t:0,f:200,a:0.3,h:1,s:1,r:0.01,b:0,c:0,}];
 const doorOpening2 = [{w:"sawtooth",v:0.4,r:0,a:1,h:1,s:0.5,},{g:1,w:"triangle",v:0.6,t:0,f:-0.3,a:2,h:1,d:1,s:0.5,r:0.01,b:0,c:0,},{g:1,w:"n0",v:0.05,t:0,f:200,a:0.3,h:1,s:1,r:0.01,b:0,c:0,}]
-const doorOpening3 = [{w:"sawtooth",v:0.4,r:0,a:1,h:1,s:0.5,},{g:1,w:"triangle",v:0.6,t:0,f:-0.4,a:2,h:1,d:1,s:0.5,r:0.01,b:0,c:0,p:-1,},{g:1,w:"n0",v:0.08,t:0,f:4,a:0.3,h:1,s:1,r:0.01,b:0,c:0,}];
+export const doorOpening3 = [{w:"sawtooth",v:0.4,r:0,a:1,h:1,s:0.5,},{g:1,w:"triangle",v:0.6,t:0,f:-0.4,a:2,h:1,d:1,s:0.5,r:0.01,b:0,c:0,p:-1,},{g:1,w:"n0",v:0.08,t:0,f:4,a:0.3,h:1,s:1,r:0.01,b:0,c:0,}];
 const violin = [{ ...defaults, w:"sawtooth",v:0.4,a:0.1,d:0.2,},{ ...defaults, w:"sine",v:5,d:0.2,s:0.2,g:1,}];
 const frenchHorn = [{ ...defaults, w:"square",v:0.1,a:0.1,d:0.5,s:0.5,r:0.08,},{ ...defaults, w:"sine",v:1,d:0.1,s:4,g:1,}];
 

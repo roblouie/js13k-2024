@@ -27,6 +27,7 @@ export class Enemy {
   nextNodeDistance = 0;
   nextNodeDirection = new EnhancedDOMPoint();
   currentNodeDifference = new EnhancedDOMPoint();
+  songInterval = 0;
 
   constructor(startingNode: PathNode) {
     this.currentNode = startingNode;
@@ -36,7 +37,8 @@ export class Enemy {
     this.patrolState = { onUpdate: (player: FirstPersonPlayer) => this.patrolUpdate(player) };
     this.chaseState = {
       onEnter: (player: FirstPersonPlayer) => this.chaseEnter(player),
-      onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player)
+      onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player),
+      onLeave: () => clearInterval(this.songInterval),
     };
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
     this.stateMachine = new StateMachine(this.patrolState);
@@ -133,7 +135,9 @@ export class Enemy {
   }
 
   chaseEnter(player: FirstPersonPlayer) {
+    // @ts-ignore
     playSong();
+    this.songInterval = setInterval(playSong, 6000);
     this.pathCache = [];
     this.positionInPathCache = 0;
     this.advancePathToPlayer(player);
