@@ -39,7 +39,7 @@ export class Enemy {
   });
 
   constructor(startingNode: PathNode) {
-    this.footstepPlayer.volume.connect(this.pannerNode).connect(compressor);
+    this.footstepPlayer.volume_.connect(this.pannerNode).connect(compressor);
     this.currentNode = startingNode;
     this.position = new EnhancedDOMPoint().set(startingNode.position);
     const siblings = startingNode.getPresentSiblings();
@@ -63,7 +63,7 @@ export class Enemy {
   }
 
 
-  update(player: FirstPersonPlayer) {
+  update_(player: FirstPersonPlayer) {
     this.updateNodeDistanceData();
 
     if (controls.isConfirm && !controls.prevConfirm) {

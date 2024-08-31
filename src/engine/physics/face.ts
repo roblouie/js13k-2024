@@ -2,11 +2,11 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { calculateFaceNormal } from '@/engine/helpers';
 
 export class Face {
-  points: EnhancedDOMPoint[];
+  points_: EnhancedDOMPoint[];
   normal: EnhancedDOMPoint;
 
   constructor(points: EnhancedDOMPoint[], normal?: EnhancedDOMPoint) {
-    this.points = points;
+    this.points_ = points;
     this.normal = normal ?? calculateFaceNormal(points);
   }
 }

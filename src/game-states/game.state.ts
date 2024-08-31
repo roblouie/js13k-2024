@@ -104,7 +104,7 @@ export class GameState implements State {
     tmpl.innerHTML = '';
 
     this.player.update(this.gridFaces);
-    this.enemy.update(this.player);
+    this.enemy.update_(this.player);
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 
@@ -140,7 +140,7 @@ export class GameState implements State {
 
      this.doors.forEach(door => {
         if (door.isAnimating) {
-          door.update();
+          door.update_();
         }
      });
 

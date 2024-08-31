@@ -30,7 +30,7 @@ export function build2dGrid(allFaces: Face[]) {
   const gridFaces: Set<Face>[] = [];
 
   allFaces.forEach(face => {
-    face.points.map(getGridPosition).forEach(gp => {
+    face.points_.map(getGridPosition).forEach(gp => {
       if (!gridFaces[gp]) {
         gridFaces[gp] = new Set<Face>();
       }
@@ -67,12 +67,12 @@ export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPerson
 
 function testSphereTriangle(s: { center: EnhancedDOMPoint, radius: number }, wall: Face) {
   // Ignore back sides of triangles
-  const dist = new EnhancedDOMPoint().subtractVectors(s.center, wall.points[0]).dot(wall.normal);
+  const dist = new EnhancedDOMPoint().subtractVectors(s.center, wall.points_[0]).dot(wall.normal);
   if (dist < 0) {
     return;
   }
 
-  const p = closestPointInTriangle(s.center, wall.points[0], wall.points[1], wall.points[2]);
+  const p = closestPointInTriangle(s.center, wall.points_[0], wall.points_[1], wall.points_[2]);
   const v = new EnhancedDOMPoint().subtractVectors(s.center, p);
   const squaredDistanceFromPointOnTriangle = v.dot(v);
   const isColliding = squaredDistanceFromPointOnTriangle <= s.radius * s.radius;

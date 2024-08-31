@@ -76,7 +76,7 @@ export class LeverDoorObject3d {
     }
   }
 
-  update(){
+  update_(){
     if (this.isAnimating) {
         this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * this.speed_ * this.openClose;
         if (Math.abs(this.doorData.rotation_.y) - this.doorData.originalRot === (this.openClose === -1 ? 0 : 120)) {

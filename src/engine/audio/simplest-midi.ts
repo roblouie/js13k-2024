@@ -42,7 +42,7 @@ for(let jj=0;jj<64;++jj){
 }
 
 export class SimplestMidiRev2 {
-  volume = audioContext.createGain();
+  volume_ = audioContext.createGain();
   modulator = audioContext.createGain();
   bend = 0;
 
@@ -61,7 +61,7 @@ export class SimplestMidiRev2 {
       const instrumentInfo=instrumentDatas[i];
 
       if(instrumentInfo.output === 0) {
-        out=this.volume;
+        out=this.volume_;
         sc=volume*volume/16384;
         // pn.t is tune factor according to note#
         // pn.f is fixed frequency in Hz.
