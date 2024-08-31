@@ -8,14 +8,17 @@ import { meshToFaces } from '@/engine/physics/parse-faces';
 import { materials } from '@/textures';
 import { getAllWhite } from '@/modeling/building-blocks';
 
-export class DoorData extends Object3d {
+export class LeverDoorObject3d extends Object3d {
   swapHingeSideX: -1 | 1;
   swapHingeSideZ: -1 | 1;
-  closedDoorCollision: Face[];
+  closedDoorCollision: Set<Face>;
   originalRot = 0;
   placedPosition: EnhancedDOMPoint;
   collisionMesh: Mesh;
-  isLocked = false
+  isLocked = false;
+  openClose = -1;
+  isAnimating = false;
+  speed_ = 3;
 
   constructor(position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
     const mesh = new Mesh(
@@ -47,25 +50,12 @@ export class DoorData extends Object3d {
     // Move placed position down to the center of the door after making the collision mesh so the door look at detection goes from center
     this.placedPosition.y -= 3;
 
-    this.closedDoorCollision = meshToFaces([this.collisionMesh]);
+    this.closedDoorCollision =  new Set(meshToFaces([this.collisionMesh]));
 
     if (swapOpenClosed) {
       this.rotation_.y = 90;
       this.originalRot = 90;
     }
-  }
-}
-
-export class LeverDoorObject3d {
-  doorData: DoorData;
-  closedDoorCollision: Set<Face>;
-  openClose = -1;
-  isAnimating = false;
-  speed_ = 3;
-
-  constructor(doorData: DoorData) {
-    this.doorData = doorData;
-    this.closedDoorCollision = new Set(this.doorData.closedDoorCollision);
   }
 
   pullLever(isEnemy = false) {
@@ -78,11 +68,41 @@ export class LeverDoorObject3d {
 
   update_(){
     if (this.isAnimating) {
-        this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * this.speed_ * this.openClose;
-        if (Math.abs(this.doorData.rotation_.y) - this.doorData.originalRot === (this.openClose === -1 ? 0 : 120)) {
-          this.isAnimating = false;
-        }
+      this.rotation_.y += this.swapHingeSideZ * this.swapHingeSideX * this.speed_ * this.openClose;
+      if (Math.abs(this.rotation_.y) - this.originalRot === (this.openClose === -1 ? 0 : 120)) {
+        this.isAnimating = false;
+      }
     }
   }
 }
+
+// export class LeverDoorObject3d {
+//   doorData: DoorData;
+//   closedDoorCollision: Set<Face>;
+//   openClose = -1;
+//   isAnimating = false;
+//   speed_ = 3;
+//
+//   constructor(doorData: DoorData) {
+//     this.doorData = doorData;
+//     this.closedDoorCollision = new Set(this.doorData.closedDoorCollision);
+//   }
+//
+//   pullLever(isEnemy = false) {
+//     this.speed_ = isEnemy ? 1 : 3;
+//     if (!this.isAnimating) {
+//       this.isAnimating = true;
+//       this.openClose *= -1;
+//     }
+//   }
+//
+//   update_(){
+//     if (this.isAnimating) {
+//         this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * this.speed_ * this.openClose;
+//         if (Math.abs(this.doorData.rotation_.y) - this.doorData.originalRot === (this.openClose === -1 ? 0 : 120)) {
+//           this.isAnimating = false;
+//         }
+//     }
+//   }
+// }
 
