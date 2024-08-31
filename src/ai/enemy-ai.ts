@@ -6,7 +6,7 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { controls } from '@/core/controls';
-import { audioContext, compressor, simplestMidi, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
+import { audioContext, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { bassDrum1, playSong } from '@/sounds';
 
 export class Enemy {
@@ -21,7 +21,7 @@ export class Enemy {
   pathCache: PathNode[] = [];
   positionInPathCache = 0;
   lastPlayerNode: PathNode;
-  speed = 0.2;
+  speed_ = 0.2;
   travelingDirection = new EnhancedDOMPoint();
   nextNodeDifference = new EnhancedDOMPoint();
   nextNodeDistance = 0;
@@ -81,7 +81,7 @@ export class Enemy {
   patrolUpdate(player: FirstPersonPlayer) {
     this.checkVision(player);
 
-    tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
+    // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor()) {
       return;
@@ -112,7 +112,7 @@ export class Enemy {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;
       // if (this.currentNode !== this.nextNode) {
-      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.speed));
+      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.speed_));
       this.model_.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       this.currentInterval++;
@@ -195,22 +195,22 @@ export class Enemy {
     const search = (start: PathNode, target?: PathNode) => {
       if (start === target) return [start];
 
-      const queue: { node: PathNode; path: PathNode[] }[] = [{ node: start, path: [start] }];
+      const queue: { node_: PathNode; path_: PathNode[] }[] = [{ node_: start, path_: [start] }];
       const visited: Set<PathNode> = new Set();
 
       while (queue.length > 0) {
-        const { node, path } = queue.shift()!;
-        visited.add(node);
+        const { node_, path_ } = queue.shift()!;
+        visited.add(node_);
 
-        for (const sibling of node.getPresentSiblings()) {
+        for (const sibling of node_.getPresentSiblings()) {
           if (!visited.has(sibling)) {
-            const newPath = [...path, sibling];
+            const newPath = [...path_, sibling];
 
             if (sibling === target) {
               return newPath;
             }
 
-            queue.push({ node: sibling, path: newPath });
+            queue.push({ node_: sibling, path_: newPath });
           }
         }
       }
@@ -234,7 +234,7 @@ export class Enemy {
           const isPlayerCloseEnough = (directionIndex < 2 && Math.abs(player.differenceFromNavPoint.x) < 6) || (directionIndex > 1 && Math.abs(player.differenceFromNavPoint.z) < 6);
           const isEnemyCloseEnough = (directionIndex < 2 && Math.abs(this.currentNodeDifference.x) < 6) || (directionIndex > 1 && Math.abs(this.currentNodeDifference.z) < 6);
           if (!player.isHiding && isPlayerCloseEnough && isEnemyCloseEnough) {
-            tmpl.innerHTML += 'PLAYER SEEN<br>';
+            // tmpl.innerHTML += 'PLAYER SEEN<br>';
             return true;
           }
         } else {
@@ -246,7 +246,7 @@ export class Enemy {
     const isPlayerCloseEnough = (Math.abs(player.differenceFromNavPoint.x) < 7) || (Math.abs(player.differenceFromNavPoint.z) < 6);
     const isEnemyCloseEnough = (Math.abs(this.currentNodeDifference.x) < 7) || (Math.abs(this.currentNodeDifference.z) < 6);
     if (!player.isHiding && this.currentNode === player.closestNavPoint && isPlayerCloseEnough && isEnemyCloseEnough) {
-      tmpl.innerHTML += 'PLAYER SEEN<br>';
+      // tmpl.innerHTML += 'PLAYER SEEN<br>';
       return;
     }
 

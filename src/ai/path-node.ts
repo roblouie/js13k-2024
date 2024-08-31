@@ -31,11 +31,6 @@ export class PathNode {
     return this.getAllSiblings().filter(i => i !== undefined);
   }
 
-  attachThisTopToOtherBottom(other: PathNode) {
-    this.aboveSibling = other;
-    other.belowSibling = this;
-  }
-
   attachThisRightToOtherLeft(other: PathNode) {
     this.rightSibling = other;
     other.leftSibling = this;

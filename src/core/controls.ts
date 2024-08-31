@@ -10,10 +10,10 @@ class Controls {
   keyMap: Map<string, boolean> = new Map();
 
   constructor() {
-    document.addEventListener('keydown', event => this.toggleKey(event, true));
-    document.addEventListener('keyup', event => this.toggleKey(event, false));
-    document.addEventListener('mousedown', () => this.toggleKey({ code: 'KeyE' }, true));
-    document.addEventListener('mouseup', () => this.toggleKey({ code: 'KeyE' }, false));
+    document.addEventListener('keydown', event => this.keyMap.set(event.code, true));
+    document.addEventListener('keyup', event => this.keyMap.set(event.code, false));
+    document.addEventListener('mousedown', () => this.keyMap.set('KeyE', true));
+    document.addEventListener('mouseup', () => this.keyMap.set('KeyE', false));
 
     document.addEventListener('mousemove', event => {
       this.mouseMovement.x = event.movementX;
@@ -36,10 +36,6 @@ class Controls {
     this.inputDirection.x = (leftVal + rightVal);
     this.inputDirection.y = (upVal + downVal);
     this.isConfirm = !!this.keyMap.get('KeyE');
-  }
-
-  private toggleKey(event: { code: string }, isPressed: boolean) {
-    this.keyMap.set(event.code, isPressed);
   }
 }
 

@@ -7,7 +7,7 @@ export function upyri() {
       .spherify(0.8)
       .scale_(1, 1.3, 0.8)
       .selectBy(vert => vert.y > 0.7)
-      .scale_(3, 1, 1)
+      .scale_(3, 1, 1.5)
       .selectBy(vert => vert.y > 0.8)
       .scale_(1.5, 8, 2)
       .texturePerSide(

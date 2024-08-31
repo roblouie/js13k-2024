@@ -108,8 +108,8 @@ export class GameState implements State {
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 
-    tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
-    tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
+    // tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
+    // tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
     // tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
 
       const door = this.player.closestNavPoint.door;
