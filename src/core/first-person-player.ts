@@ -23,7 +23,7 @@ class Sphere {
 export class FirstPersonPlayer {
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
   velocity = new EnhancedDOMPoint(0, 0, 0);
-  isFrozen = false;
+  isFrozen_ = false;
   closestNavPoint: PathNode;
 
   camera: Camera;
@@ -60,14 +60,14 @@ export class FirstPersonPlayer {
   hide(hidingPlace: HidingPlace) {
     this.hidFrom.set(this.feetCenter);
     this.isHiding = true;
-    this.isFrozen = true;
+    this.isFrozen_ = true;
     this.camera.position_.set(hidingPlace.position);
     this.cameraRotation.set(hidingPlace.cameraRotation);
   }
 
   unhide() {
     this.isHiding = false;
-    this.isFrozen = false;
+    this.isFrozen_ = false;
     this.feetCenter.set(this.hidFrom);
   }
 
@@ -85,7 +85,7 @@ export class FirstPersonPlayer {
 
     // tmpl.innerHTML += `PLAYER NODE DIFF: ${this.differenceFromNavPoint.x}, ${this.differenceFromNavPoint.z}<br>`;
 
-    if (!this.isFrozen) {
+    if (!this.isFrozen_) {
       this.updateVelocityFromControls();
     }
 
