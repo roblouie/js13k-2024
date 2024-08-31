@@ -6,7 +6,7 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { controls } from '@/core/controls';
-import { audioContext, simplestMidi } from '@/engine/audio/simplest-midi';
+import { audioContext, compressor, simplestMidi, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { bassDrum1, playSong } from '@/sounds';
 
 export class Enemy {
@@ -28,8 +28,18 @@ export class Enemy {
   nextNodeDirection = new EnhancedDOMPoint();
   currentNodeDifference = new EnhancedDOMPoint();
   songInterval = 0;
+  footstepInterval = 30;
+  currentInterval = 0;
+  footstepPlayer = new SimplestMidiRev2();
+  pannerNode = new PannerNode(audioContext, {
+    distanceModel: 'linear',
+    maxDistance: 80,
+    rolloffFactor: 99,
+    coneOuterGain: 0.1
+  });
 
   constructor(startingNode: PathNode) {
+    this.footstepPlayer.volume.connect(this.pannerNode).connect(compressor);
     this.currentNode = startingNode;
     this.position = new EnhancedDOMPoint().set(startingNode.position);
     const siblings = startingNode.getPresentSiblings();
@@ -98,8 +108,6 @@ export class Enemy {
     }
   }
 
-  footstepInterval = 30;
-  currentInterval = 0;
   moveInTravelingDirection() {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;
@@ -108,11 +116,10 @@ export class Enemy {
       this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       this.currentInterval++;
+      this.pannerNode.positionX.value = this.position.x;
+      this.pannerNode.positionZ.value = this.position.z;
       if (this.currentInterval === this.footstepInterval) {
-        simplestMidi.playNote(audioContext.currentTime, 0, 72, 50, bassDrum1, audioContext.currentTime + 1, {
-          positionX: this.position.x,
-          positionZ: this.position.z,
-        });
+        this.footstepPlayer.playNote(audioContext.currentTime, 72, 50, bassDrum1, audioContext.currentTime + 1);
         this.currentInterval = 0;
       }
     }
