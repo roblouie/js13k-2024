@@ -75,34 +75,3 @@ export class LeverDoorObject3d extends Object3d {
     }
   }
 }
-
-// export class LeverDoorObject3d {
-//   doorData: DoorData;
-//   closedDoorCollision: Set<Face>;
-//   openClose = -1;
-//   isAnimating = false;
-//   speed_ = 3;
-//
-//   constructor(doorData: DoorData) {
-//     this.doorData = doorData;
-//     this.closedDoorCollision = new Set(this.doorData.closedDoorCollision);
-//   }
-//
-//   pullLever(isEnemy = false) {
-//     this.speed_ = isEnemy ? 1 : 3;
-//     if (!this.isAnimating) {
-//       this.isAnimating = true;
-//       this.openClose *= -1;
-//     }
-//   }
-//
-//   update_(){
-//     if (this.isAnimating) {
-//         this.doorData.rotation_.y += this.doorData.swapHingeSideZ * this.doorData.swapHingeSideX * this.speed_ * this.openClose;
-//         if (Math.abs(this.doorData.rotation_.y) - this.doorData.originalRot === (this.openClose === -1 ? 0 : 120)) {
-//           this.isAnimating = false;
-//         }
-//     }
-//   }
-// }
-
