@@ -1,4 +1,4 @@
-export const audioContext: AudioContext = new (window.AudioContext || window.webkitAudioContext)();
+export const audioContext = new AudioContext();
 export const compressor = audioContext.createDynamicsCompressor();
 export const biquadFilter = audioContext.createBiquadFilter();
 biquadFilter.type = 'lowshelf';

@@ -17,7 +17,7 @@ export class Enemy {
   chaseState: State;
   killState: State;
   stateMachine: StateMachine;
-  model: Mesh;
+  model_: Mesh;
   pathCache: PathNode[] = [];
   positionInPathCache = 0;
   lastPlayerNode: PathNode;
@@ -52,7 +52,7 @@ export class Enemy {
     };
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
     this.stateMachine = new StateMachine(this.patrolState);
-    this.model = upyri();
+    this.model_ = upyri();
   }
 
   updateNodeDistanceData() {
@@ -75,7 +75,7 @@ export class Enemy {
     }
 
     this.stateMachine.getState().onUpdate(player);
-    this.model.position_.set(this.position);
+    this.model_.position_.set(this.position);
   }
 
   patrolUpdate(player: FirstPersonPlayer) {
@@ -113,7 +113,7 @@ export class Enemy {
       const enemyFeetPos = 2.5;
       // if (this.currentNode !== this.nextNode) {
       this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.speed));
-      this.model.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
+      this.model_.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       this.currentInterval++;
       this.pannerNode.positionX.value = this.position.x;

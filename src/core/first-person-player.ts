@@ -3,11 +3,10 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { Face } from '@/engine/physics/face';
 import { controls } from '@/core/controls';
 import {
-  findWallCollisionsFromList, getGridPosition, getGridPositionWithNeighbors,
+  findWallCollisionsFromList, getGridPositionWithNeighbors,
 } from '@/engine/physics/surface-collision';
-import { clamp, findClosestNavPoint } from '@/engine/helpers';
+import { clamp } from '@/engine/helpers';
 import { PathNode } from '@/ai/path-node';
-import { AiNavPoints } from '@/ai/ai-nav-points';
 import { HidingPlace } from '@/hiding-place';
 import { audioContext } from '@/engine/audio/simplest-midi';
 
@@ -27,11 +26,9 @@ export class FirstPersonPlayer {
   isFrozen = false;
   closestNavPoint: PathNode;
 
-  // mesh: Mesh;
   camera: Camera;
   cameraRotation = new EnhancedDOMPoint(0, 0, 0);
   collisionSphere: Sphere;
-  isOnDirt = true;
   isHiding = false;
   hidFrom = new EnhancedDOMPoint();
   differenceFromNavPoint = new EnhancedDOMPoint();
@@ -75,10 +72,18 @@ export class FirstPersonPlayer {
   }
 
   update(gridFaces: Set<Face>[]) {
-    const results = findClosestNavPoint([this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()], this.feetCenter);
-    this.closestNavPoint = results[0];
-    this.differenceFromNavPoint = results[2];
-    tmpl.innerHTML += `PLAYER NODE DIFF: ${results[2].x}, ${results[2].z}<br>`;
+    let smallestDistance = Infinity;
+    [this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()].forEach(point => {
+      const difference = new EnhancedDOMPoint().subtractVectors(this.feetCenter, point.position);
+      const distance = difference.magnitude;
+      if (distance < smallestDistance) {
+        this.closestNavPoint = point;
+        smallestDistance = distance;
+        this.differenceFromNavPoint = difference;
+      }
+    });
+
+    // tmpl.innerHTML += `PLAYER NODE DIFF: ${this.differenceFromNavPoint.x}, ${this.differenceFromNavPoint.z}<br>`;
 
     if (!this.isFrozen) {
       this.updateVelocityFromControls();
