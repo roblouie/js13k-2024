@@ -1,10 +1,7 @@
 import { Camera } from '@/engine/renderer/camera';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { Face } from '@/engine/physics/face';
-import { clamp } from '@/engine/helpers';
 import { controls } from '@/core/controls';
-
-
 
 export class FreeCam {
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
@@ -26,7 +23,7 @@ export class FreeCam {
       }
       this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
       this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
-      this.cameraRotation.x = clamp(this.cameraRotation.x, -Math.PI / 2, Math.PI / 2);
+      this.cameraRotation.x = Math.min(Math.max(this.cameraRotation.x, -Math.PI / 2), Math.PI / 2)
       this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
     });
   }

@@ -14,7 +14,7 @@ const instruments = [violin, frenchHorn];
 
 
 const songPlayer = new SimplestMidiRev2();
-songPlayer.volume.connect(audioContext.destination)
+songPlayer.volume.connect(biquadFilter)
 
 export const playSong = () => {
 

@@ -23,14 +23,14 @@ function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, doo
     door,
     roomNumber,
     `Room ${roomNumber} Bath Entrance`,
-    new HidingPlace(new EnhancedDOMPoint(roomPosition.x + showerHidingPlaceOffset.x, 5.5, roomPosition.z + showerHidingPlaceOffset.z), new EnhancedDOMPoint(0, 0))
+    new HidingPlace(new EnhancedDOMPoint(roomPosition.x + showerHidingPlaceOffset.x, 5.5, roomPosition.z + showerHidingPlaceOffset.z), new EnhancedDOMPoint(0, isGoingRight ? 0 : 3.14))
   );
   const roomNode = new PathNode(
     new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z),
     undefined,
     roomNumber,
     `Room ${roomNumber} Room`,
-    new HidingPlace(new EnhancedDOMPoint(roomPosition.x + closetHidingPlaceOffset.x, 5.5, roomPosition.z + closetHidingPlaceOffset.z), new EnhancedDOMPoint(0, -1.7))
+    new HidingPlace(new EnhancedDOMPoint(roomPosition.x + closetHidingPlaceOffset.x, 5.5, roomPosition.z + closetHidingPlaceOffset.z), new EnhancedDOMPoint(0, isGoingRight ? -1.7 : 1.7))
   );
 
   bathEntranceNode.insertBetweenHor(isGoingRight ? roomEntranceNode : roomNode, isGoingRight ? roomNode : roomEntranceNode);

@@ -1,6 +1,6 @@
 import { AttributeLocation } from '@/engine/renderer/renderer';
 import { EnhancedDOMPoint, VectorLike } from '@/engine/enhanced-dom-point';
-import { calculateVertexNormals, doTimes, radsToDegrees } from "@/engine/helpers";
+import { radsToDegrees, unormalizedNormal } from "@/engine/helpers";
 import { Texture } from '@/engine/renderer/texture';
 import { gl } from '@/engine/renderer/lil-gl';
 
@@ -115,8 +115,10 @@ export class MoldableCubeGeometry {
       ['x', 'y', 'z', -1, -1, width_, height_, -depth, widthSegments, heightSegments], // back
     ];
 
-    // @ts-ignore
-    doTimes(sidesToDraw, index => buildPlane(...sides[index]));
+    for (let i = 0; i < sidesToDraw; i++) {
+      // @ts-ignore
+      buildPlane(...sides[i]);
+    }
 
     this.setAttribute_(AttributeLocation.TextureCoords, new Float32Array(uvs), 2);
     this.indices = new Uint16Array(indices);
@@ -237,8 +239,16 @@ export class MoldableCubeGeometry {
    * compute the normals. Use this for shapes that should appear continuous, like spheres.
    */
   computeNormals(shouldCrossPlanes = false) {
-    const updatedNormals = calculateVertexNormals(this.vertices, shouldCrossPlanes ? this.getIndicesWithUniquePositions() : this.indices);
-    this.setAttribute_(AttributeLocation.Normals, new Float32Array(updatedNormals.flatMap(point => point.toArray())), 3);
+    const vertexNormals = this.vertices.map(_ => new EnhancedDOMPoint());
+    const indices = shouldCrossPlanes ? this.getIndicesWithUniquePositions() : this.indices;
+    for (let i = 0; i < indices.length; i+= 3) {
+      const faceNormal = unormalizedNormal([this.vertices[indices[i]], this.vertices[indices[i + 1]], this.vertices[indices[i + 2]]]);
+      vertexNormals[indices[i]].add_(faceNormal);
+      vertexNormals[indices[i + 1]].add_(faceNormal);
+      vertexNormals[indices[i + 2]].add_(faceNormal);
+    }
+
+    this.setAttribute_(AttributeLocation.Normals, new Float32Array( vertexNormals.flatMap(vector => vector.normalize_().toArray())), 3);
     return this;
   }
 

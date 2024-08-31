@@ -5,7 +5,6 @@ import { controls } from '@/core/controls';
 import {
   findWallCollisionsFromList, getGridPositionWithNeighbors,
 } from '@/engine/physics/surface-collision';
-import { clamp } from '@/engine/helpers';
 import { PathNode } from '@/ai/path-node';
 import { HidingPlace } from '@/hiding-place';
 import { audioContext } from '@/engine/audio/simplest-midi';
@@ -46,7 +45,7 @@ export class FirstPersonPlayer {
       // if (!this.isHiding) {
         this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
         this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
-        this.cameraRotation.x = clamp(this.cameraRotation.x, -Math.PI / 2, Math.PI / 2);
+        this.cameraRotation.x = Math.min(Math.max(this.cameraRotation.x, -Math.PI / 2), Math.PI / 2)
         this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
       // }
     });
