@@ -78,13 +78,13 @@ export class Enemy {
   update_(player: FirstPersonPlayer) {
     this.updateNodeDistanceData();
 
-    if (controls.isConfirm && !controls.prevConfirm) {
-      if (this.stateMachine.getState() === this.chaseState) {
-        this.stateMachine.setState(this.searchState, player);
-      } else {
-        this.stateMachine.setState(this.chaseState, player);
-      }
-    }
+    // if (controls.isConfirm && !controls.prevConfirm) {
+    //   if (this.stateMachine.getState() === this.chaseState) {
+    //     this.stateMachine.setState(this.searchState, player);
+    //   } else {
+    //     this.stateMachine.setState(this.chaseState, player);
+    //   }
+    // }
 
     this.stateMachine.getState().onUpdate(player);
     this.model_.position_.set(this.position);
@@ -93,9 +93,9 @@ export class Enemy {
   patrolUpdate(player: FirstPersonPlayer) {
     this.checkVision(player);
 
-    // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
+    tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
-    if (this.handleDoor()) {
+    if (this.handleDoor(player)) {
       return;
     }
 
@@ -138,7 +138,7 @@ export class Enemy {
     // tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
   }
 
-  handleDoor() {
+  handleDoor(player: FirstPersonPlayer) {
     if (
       this.currentNode.door && this.nextNode.door
       && this.currentNode.roomNumber === this.nextNode.roomNumber
@@ -147,6 +147,15 @@ export class Enemy {
     {
       if (!this.currentNode.door.isAnimating) {
         this.currentNode.door.pullLever(true);
+        if (this.currentNode.roomNumber === player.closestNavPoint.roomNumber) {
+          setTimeout(() => {
+            if (player.isHiding) {
+              this.stateMachine.setState(this.searchState, player);
+            } else {
+              this.stateMachine.setState(this.chaseState, player);
+            }
+          }, 1000);
+        }
       }
       return true;
     }
@@ -171,7 +180,7 @@ export class Enemy {
     this.checkVision(player);
 
     // Handle door opening, while door is opening, don't do anything else
-    if (this.handleDoor()) {
+    if (this.handleDoor(player)) {
       return;
     }
 
@@ -246,7 +255,10 @@ export class Enemy {
           const isPlayerCloseEnough = (directionIndex < 2 && Math.abs(player.differenceFromNavPoint.x) < 6) || (directionIndex > 1 && Math.abs(player.differenceFromNavPoint.z) < 6);
           const isEnemyCloseEnough = (directionIndex < 2 && Math.abs(this.currentNodeDifference.x) < 6) || (directionIndex > 1 && Math.abs(this.currentNodeDifference.z) < 6);
           if (!player.isHiding && isPlayerCloseEnough && isEnemyCloseEnough) {
-            // tmpl.innerHTML += 'PLAYER SEEN<br>';
+            tmpl.innerHTML += 'PLAYER SEEN<br>';
+            if (this.stateMachine.getState() !== this.chaseState) {
+              this.stateMachine.setState(this.chaseState, player);
+            }
             return true;
           }
         } else {
@@ -258,7 +270,10 @@ export class Enemy {
     const isPlayerCloseEnough = (Math.abs(player.differenceFromNavPoint.x) < 7) || (Math.abs(player.differenceFromNavPoint.z) < 6);
     const isEnemyCloseEnough = (Math.abs(this.currentNodeDifference.x) < 7) || (Math.abs(this.currentNodeDifference.z) < 6);
     if (!player.isHiding && this.currentNode === player.closestNavPoint && isPlayerCloseEnough && isEnemyCloseEnough) {
-      // tmpl.innerHTML += 'PLAYER SEEN<br>';
+      tmpl.innerHTML += 'PLAYER SEEN<br>';
+      if (this.stateMachine.getState() !== this.chaseState) {
+        this.stateMachine.setState(this.chaseState, player);
+      }
       return;
     }
 
@@ -272,8 +287,6 @@ export class Enemy {
   spotsSearched = 0;
 
   searchEnter() {
-    // this.nextNode = this.currentNode.getPresentSiblings().find(node => node.hidingPlace)!;
-    // TEST CODE
     this.spotsSearched = 0;
   }
 
@@ -281,9 +294,9 @@ export class Enemy {
     tmpl.innerHTML += 'ENEMY STATE: SEARCH<br>';
 
     // If player comes out from hiding spot while searching, chase them
-    // if (!player.isHiding) {
-    //   this.stateMachine.setState(this.chaseState, player);
-    // }
+    if (!player.isHiding) {
+      this.stateMachine.setState(this.chaseState, player);
+    }
 
     if (this.nextNodeDistance > 0.5) {
       // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
@@ -299,7 +312,7 @@ export class Enemy {
 
         this.spotsSearched++;
         this.currentNode = this.nextNode;
-        this.nextNode = this.currentNode.getPresentSiblings()[0];
+        this.nextNode = this.currentNode.getPresentSiblings().find(node => node.hidingPlace)!
         this.updateNodeDistanceData();
         this.spotSearchFrameCount = 0;
 
@@ -327,6 +340,7 @@ export class Enemy {
   }
 
   fleeUpdate() {
+    tmpl.innerHTML += 'ENEMY STATE: FLEE<br>';
     if (this.nextNodeDistance > 1) {
       // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
       this.travelingDirection.lerp(this.nextNodeDirection, 1);
