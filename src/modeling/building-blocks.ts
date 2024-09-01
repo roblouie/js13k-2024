@@ -7,8 +7,6 @@ export const WallHeight = 12;
 export const DoorHeight = 9;
 export const DoorTopSegment = WallHeight - DoorHeight;
 
-export const mergeCubes = (cubes: MoldableCubeGeometry[]) => cubes.reduce((acc, curr) => acc.merge(curr));
-
 export function getAllWhite(): [Texture, Texture, Texture, Texture, Texture, Texture] {
   return [
     materials.potentialPlasterWall.texture!,
@@ -20,7 +18,7 @@ export function getAllWhite(): [Texture, Texture, Texture, Texture, Texture, Tex
   ]
 }
 
-export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide?: Texture[]): [MoldableCubeGeometry, number] {
+export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide: Texture[]): [MoldableCubeGeometry, number] {
   let geo: MoldableCubeGeometry;
   let totalWidth = 0;
   let runningSide = 0;

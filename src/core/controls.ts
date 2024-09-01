@@ -29,10 +29,10 @@ class Controls {
 
   queryController() {
     this.prevConfirm = this.isConfirm;
-    const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft')) ? -1 : 0;
-    const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight')) ? 1 : 0;
-    const upVal = (this.keyMap.get('KeyW') || this.keyMap.get('ArrowUp')) ? -1 : 0;
-    const downVal = (this.keyMap.get('KeyS') || this.keyMap.get('ArrowDown')) ? 1 : 0;
+    const leftVal = (this.keyMap.get('KeyA')) ? -1 : 0;
+    const rightVal = (this.keyMap.get('KeyD')) ? 1 : 0;
+    const upVal = (this.keyMap.get('KeyW')) ? -1 : 0;
+    const downVal = (this.keyMap.get('KeyS')) ? 1 : 0;
     this.inputDirection.x = (leftVal + rightVal);
     this.inputDirection.y = (upVal + downVal);
     this.isConfirm = !!this.keyMap.get('KeyE');

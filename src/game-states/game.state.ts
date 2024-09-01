@@ -74,9 +74,9 @@ export class GameState implements State {
 
     makeNavPoints(this.doors);
 
-    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[1])
+    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[0])
 
-    this.enemy = new Enemy(AiNavPoints[0]);
+    this.enemy = new Enemy(AiNavPoints[1]);
   }
 
   onEnter() {

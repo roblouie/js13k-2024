@@ -8,6 +8,8 @@ import { upyri } from '@/ai/enemy-model';
 import { controls } from '@/core/controls';
 import { audioContext, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { bassDrum1, playSong } from '@/sounds';
+import { AiNavPoints } from '@/ai/ai-nav-points';
+import { Path } from 'webpack-cli';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -15,6 +17,8 @@ export class Enemy {
   nextNode: PathNode;
   patrolState: State;
   chaseState: State;
+  searchState: State;
+  fleeState: State;
   killState: State;
   stateMachine: StateMachine;
   model_: Mesh;
@@ -50,6 +54,14 @@ export class Enemy {
       onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player),
       onLeave: () => clearInterval(this.songInterval),
     };
+    this.searchState = {
+      onEnter: () => this.searchEnter(),
+      onUpdate: (player: FirstPersonPlayer) => this.searchUpdate(player),
+    };
+    this.fleeState = {
+      onEnter: () => this.fleeEnter(),
+      onUpdate: () => this.fleeUpdate(),
+    };
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
     this.stateMachine = new StateMachine(this.patrolState);
     this.model_ = upyri();
@@ -67,10 +79,10 @@ export class Enemy {
     this.updateNodeDistanceData();
 
     if (controls.isConfirm && !controls.prevConfirm) {
-      if (this.stateMachine.getState() === this.patrolState) {
-        this.stateMachine.setState(this.chaseState, player);
+      if (this.stateMachine.getState() === this.chaseState) {
+        this.stateMachine.setState(this.searchState, player);
       } else {
-        this.stateMachine.setState(this.patrolState);
+        this.stateMachine.setState(this.chaseState, player);
       }
     }
 
@@ -143,11 +155,11 @@ export class Enemy {
 
   chaseEnter(player: FirstPersonPlayer) {
     // @ts-ignore
-    playSong();
-    this.songInterval = setInterval(playSong, 6000);
+    // playSong();
+    // this.songInterval = setInterval(playSong, 6000);
     this.pathCache = [];
     this.positionInPathCache = 0;
-    this.advancePathToPlayer(player);
+    this.advancePathToNode(player.closestNavPoint);
     this.nextNode = this.pathCache[0] ?? this.currentNode;
     this.positionInPathCache++;
     const direction = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position).normalize_();
@@ -155,7 +167,7 @@ export class Enemy {
   }
 
   chaseUpdate(player: FirstPersonPlayer) {
-    // tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+    tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
     this.checkVision(player);
 
     // Handle door opening, while door is opening, don't do anything else
@@ -171,7 +183,7 @@ export class Enemy {
     } else {
       this.moveInTravelingDirection();
       this.currentNode = this.nextNode;
-      this.advancePathToPlayer(player);
+      this.advancePathToNode(player.closestNavPoint);
       if (!this.nextNode) {
         this.nextNode = this.currentNode;
       }
@@ -179,8 +191,8 @@ export class Enemy {
 
   }
 
-  advancePathToPlayer(player: FirstPersonPlayer) {
-    if (this.lastPlayerNode === player.closestNavPoint && this.pathCache.length) {
+  advancePathToNode(node: PathNode) {
+    if (this.lastPlayerNode === node && this.pathCache.length) {
       this.nextNode = this.pathCache[this.positionInPathCache];
       if (this.positionInPathCache < this.pathCache.length - 1) {
         this.positionInPathCache++;
@@ -190,7 +202,7 @@ export class Enemy {
     }
 
     this.positionInPathCache = 0;
-    this.lastPlayerNode = player.closestNavPoint;
+    this.lastPlayerNode = node;
 
     const search = (start: PathNode, target?: PathNode) => {
       if (start === target) return [start];
@@ -216,7 +228,7 @@ export class Enemy {
       }
     }
 
-    this.pathCache = search(this.currentNode, player.closestNavPoint)!;
+    this.pathCache = search(this.currentNode, node)!;
   }
 
   killUpdate(player: FirstPersonPlayer) {
@@ -254,6 +266,82 @@ export class Enemy {
     || followPathToEnd(this.currentNode, 1)
     || followPathToEnd(this.currentNode, 2)
     || followPathToEnd(this.currentNode, 3);
+  }
+
+  spotSearchFrameCount = 0;
+  spotsSearched = 0;
+
+  searchEnter() {
+    // this.nextNode = this.currentNode.getPresentSiblings().find(node => node.hidingPlace)!;
+    // TEST CODE
+    this.spotsSearched = 0;
+  }
+
+  searchUpdate(player: FirstPersonPlayer) {
+    tmpl.innerHTML += 'ENEMY STATE: SEARCH<br>';
+
+    // If player comes out from hiding spot while searching, chase them
+    // if (!player.isHiding) {
+    //   this.stateMachine.setState(this.chaseState, player);
+    // }
+
+    if (this.nextNodeDistance > 0.5) {
+      // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
+      this.travelingDirection.lerp(this.nextNodeDirection, 1);
+      this.moveInTravelingDirection();
+    } else {
+      const searchSpotFor = 300;
+      if (this.spotSearchFrameCount <= searchSpotFor) {
+        this.model_.rotate_(0, this.spotSearchFrameCount > 100 ? 0.02 : -0.02, 0);
+        this.spotSearchFrameCount++;
+      } else {
+        // TODO: KIll player based on kill chanceaw
+
+        this.spotsSearched++;
+        this.currentNode = this.nextNode;
+        this.nextNode = this.currentNode.getPresentSiblings()[0];
+        this.updateNodeDistanceData();
+        this.spotSearchFrameCount = 0;
+
+        if (this.spotsSearched > 2 && Math.random() > 0.2) {
+          this.stateMachine.setState(this.fleeState);
+        }
+      }
+    }
+  }
+
+  farthestPoint = AiNavPoints[0];
+  fleeEnter() {
+    let longestDistance = 0;
+    const difference = new EnhancedDOMPoint();
+    AiNavPoints.forEach(node => {
+      const distance = difference.subtractVectors(this.position, node.position).magnitude;
+      if (distance > longestDistance) {
+        longestDistance = distance;
+        this.farthestPoint = node;
+      }
+    });
+    this.advancePathToNode(this.farthestPoint);
+    this.nextNode = this.pathCache[0];
+    this.updateNodeDistanceData();
+  }
+
+  fleeUpdate() {
+    if (this.nextNodeDistance > 1) {
+      // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
+      this.travelingDirection.lerp(this.nextNodeDirection, 1);
+      this.moveInTravelingDirection();
+    } else {
+      this.moveInTravelingDirection();
+      this.currentNode = this.nextNode;
+      this.advancePathToNode(this.farthestPoint);
+      if (!this.nextNode) {
+        this.nextNode = this.currentNode;
+      }
+      if (this.nextNode === this.farthestPoint) {
+        this.stateMachine.setState(this.patrolState);
+      }
+    }
   }
 }
 

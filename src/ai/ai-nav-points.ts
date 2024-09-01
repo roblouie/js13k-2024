@@ -124,6 +124,6 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   AiNavPoints.push(
     // Corners
-    LowerLeftCorner, BottomCenterEntrance
+    BottomCenterEntrance, LowerLeftCorner, LowerRightCorner, TopLeftCorner, TopRightCorner,
   )
 }
