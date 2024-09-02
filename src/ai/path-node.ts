@@ -12,11 +12,8 @@ export class PathNode {
   roomNumber?: number;
   hidingPlace?: HidingPlace;
 
-  name?: string;
-
-  constructor(position: EnhancedDOMPoint, door?: LeverDoorObject3d, roomNumber?: number, name?: string, hidingPlace?: HidingPlace) {
+  constructor(position: EnhancedDOMPoint, door?: LeverDoorObject3d, roomNumber?: number, hidingPlace?: HidingPlace) {
     this.position = position;
-    this.name = name;
     this.door = door;
     this.roomNumber = roomNumber;
     this.hidingPlace = hidingPlace;

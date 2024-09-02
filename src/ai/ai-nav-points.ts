@@ -6,7 +6,7 @@ import { HidingPlace } from '@/hiding-place';
 export const AiNavPoints: PathNode[] = [];
 
 function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, door: LeverDoorObject3d, isGoingRight?: boolean) {
-  const roomEntranceNode = new PathNode(roomPosition, door, roomNumber, `Room ${roomNumber} Entrance`);
+  const roomEntranceNode = new PathNode(roomPosition, door, roomNumber);
   const bathEntranceOffset = new EnhancedDOMPoint(12, 0, -1);
   const roomOffset = new EnhancedDOMPoint(27, 0, -3);
   const closetHidingPlaceOffset = new EnhancedDOMPoint(35.5, 0, -1);
@@ -22,14 +22,12 @@ function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, doo
     new EnhancedDOMPoint(roomPosition.x + bathEntranceOffset.x, roomPosition.y, roomPosition.z + bathEntranceOffset.z),
     door,
     roomNumber,
-    `Room ${roomNumber} Bath Entrance`,
     new HidingPlace(new EnhancedDOMPoint(roomPosition.x + showerHidingPlaceOffset.x, 5.5, roomPosition.z + showerHidingPlaceOffset.z), new EnhancedDOMPoint(0, isGoingRight ? 0 : 3.14))
   );
   const roomNode = new PathNode(
     new EnhancedDOMPoint(roomPosition.x + roomOffset.x, roomPosition.y, roomPosition.z + roomOffset.z),
     undefined,
     roomNumber,
-    `Room ${roomNumber} Room`,
     new HidingPlace(new EnhancedDOMPoint(roomPosition.x + closetHidingPlaceOffset.x, 5.5, roomPosition.z + closetHidingPlaceOffset.z), new EnhancedDOMPoint(0, isGoingRight ? -1.7 : 1.7))
   );
 
@@ -41,40 +39,40 @@ function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, doo
 export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   // OUTER CORNERS
-  const LowerLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 12), undefined, undefined, 'BL Corner');
-  const LowerRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 12),undefined, undefined, 'BR Corner');
-  const TopLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 118),undefined, undefined, 'TL Corner');
-  const TopRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 118),undefined, undefined, 'TR Corner');
+  const LowerLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 12));
+  const LowerRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 12));
+  const TopLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 118));
+  const TopRightCorner = new PathNode(new EnhancedDOMPoint(-44, 2.5, 118));
 
   // MIDDLE HALLWAY INTERSECTIONS
-  const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12), undefined, undefined, 'BC Hallway');
+  const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12));
   const Room1304Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 24), 1304, doors[3], true);
 
   const Room1305Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 36), 1305,  doors[4]);
 
 
-  const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5), undefined, undefined, 'LQC Hallway'); // 11.5 diff from prev
+  const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5)); // 11.5 diff from prev
   const Room1306Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5], true); // 11.5 diff from prev
   const Room1307Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 71), 1307, doors[6]); // 12 diff from prev
-  const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5), undefined, undefined, 'UQC Hallway');
+  const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
   const Room1308Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 94), 1308, doors[7], true) // 11.5 diff from prev
   const Room1309Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 106), 1309, doors[8]); // 12 diff from prev
-  const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5), undefined, undefined, 'TC Hallway'); // 11.5 diff from prev
+  const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5)); // 11.5 diff from prev
 
 
   // LEFT HALLWAY INTERSECTIONS
   const Room1301Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 36), 1301, doors[0]);
-  const LowerQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5), undefined, undefined, 'LQL Hallway');
+  const LowerQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
   const Room1302Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 71), 1302, doors[1]);
-  const UpperQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5), undefined, undefined, 'UQL Hallway');
+  const UpperQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5));
   const Room1303Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 106), 1303, doors[2]);
 
 
   // RIGHT HALLWAY
   const Room1310Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 24), 1310, doors[9], true);
-  const LowerQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5), undefined, undefined, 'LQR Hallway');
+  const LowerQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5));
   const Room1311Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 59), 1311, doors[10], true);
-  const UpperQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5), undefined, undefined, 'UQR Hallway');
+  const UpperQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5));
   const Room1312Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 94), 1312, doors[11], true); // 11.5 diff from prev
 
   // Connect corners

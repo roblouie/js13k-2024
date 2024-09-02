@@ -35,7 +35,6 @@ export class Enemy {
   nextNodeDirection = new EnhancedDOMPoint();
   currentNodeDifference = new EnhancedDOMPoint();
   songInterval = 0;
-  footstepInterval = 30;
   currentInterval = 0;
   footstepPlayer = new SimplestMidiRev2();
   pannerNode = new PannerNode(audioContext, {
@@ -112,15 +111,11 @@ export class Enemy {
   }
 
   getSpeed() {
-    return 0.2 + 0.2 * this.aggression;
+    return 0.15 + 0.2 * this.aggression;
   }
 
   getChanceOfFindingPlayer() {
     return this.aggression * 0.4;
-  }
-
-  getFootstepInterval() {
-    return 30 - 10 * this.aggression;
   }
 
   updateNodeDistanceData() {
@@ -135,20 +130,12 @@ export class Enemy {
     tmpl.innerHTML += `ENEMY AGRESSION: ${this.aggression}<br>`
     this.updateNodeDistanceData();
 
-    // if (controls.isConfirm && !controls.prevConfirm) {
-    //   if (this.stateMachine.getState() === this.chaseState) {
-    //     this.stateMachine.setState(this.searchState, player);
-    //   } else {
-    //     this.stateMachine.setState(this.chaseState, player);
-    //   }
-    // }
-
     this.stateMachine.getState().onUpdate(player);
     this.model_.position_.set(this.position);
   }
 
   patrolUpdate(player: FirstPersonPlayer) {
-    this.checkVision(player);
+    // this.checkVision(player);
 
     tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
@@ -177,24 +164,24 @@ export class Enemy {
     }
   }
 
+  footstepDebounce: number;
   moveInTravelingDirection() {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;
-      // if (this.currentNode !== this.nextNode) {
       this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.getSpeed()));
       this.model_.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
+      tmpl.innerHTML += `POS Y: ${this.position.y}`;
+      if (this.position.y < 2.402) {
+        clearTimeout(this.footstepDebounce);
+        this.footstepDebounce = setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 2, 50, footstep, audioContext.currentTime + 1), 40);
+      }
       this.currentInterval++;
       this.pannerNode.positionX.value = this.position.x;
       this.pannerNode.positionZ.value = this.position.z;
-      if (this.currentInterval >= this.getFootstepInterval()) {
-        this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 2, 50, footstep, audioContext.currentTime + 1);
-        this.currentInterval = 0;
-      }
     } else {
       this.position.set(this.nextNode.position);
     }
-    // tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
   }
 
   handleRoomEntering(player: FirstPersonPlayer, timeout: number) {
