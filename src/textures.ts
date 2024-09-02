@@ -11,7 +11,6 @@ export async function initTextures() {
   materials.wood = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(false, false))});
   materials.planks = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(false, true))});
   materials.face = new Material({ texture: textureLoader.load_(await face())});
-  materials.bloodCircle = new Material({ texture: textureLoader.load_(await drawBloodCircle()) });
   materials.silver = new Material({ texture: textureLoader.load_(await metals(1)) });
   materials.iron = new Material({ texture: textureLoader.load_(await metals(2)) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
@@ -215,18 +214,6 @@ function rockWoodFilter(isRock = true) {
 
 function bricksRocksPlanksWood(isRock = true, isPattern = true) {
   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">${isPattern ? getPattern( isRock ? 160 : 75, isRock ? 256 : 1) : ''}${rockWoodFilter(isRock)}<rect height="100%" width="100%" x="0" y="0" fill="${isPattern ? 'url(#p)' : ''}" filter="url(#rw)"/></svg>`);
-}
-
-export function drawBloodCircle() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">${bloodEffect(`<ellipse cx="256" cy="256" rx="220" ry="220" filter="url(#d)"/>`, 250, [0.03, 0.03])}</svg>`);
-}
-
-export function drawBloodText(x: number | string, y: number | string, style: string | undefined, textToDisplay: string, scale = 70) {
-  return bloodEffect(`<text x="${x}" y="${y}" style="${style ?? 'font-size: 360px; transform: scaleY(1.5);'}" filter="url(#d)">${textToDisplay}</text>`, scale)
-}
-
-export function bloodEffect(component: string, scale_ = 70, freq1: [number, number] = [0.13, 0.02], freq2 = 0.04) {
-  return `<filter id="d"><feTurbulence baseFrequency="${freq1}" numOctaves="1" type="fractalNoise" result="d"/><feDisplacementMap in="SourceGraphic" in2="d" scale="${scale_}"/></filter><filter id="b"><feTurbulence baseFrequency="${freq2}" numOctaves="1" type="fractalNoise"/><feColorMatrix values="0.4, 0.2, 0.2, 0, -0.1, 0, 2, 0, 0, -1.35, 0, 2, 0, 0, -1.35, 0, 0, 0, 0, 1"/><feComposite in2="SourceGraphic" operator="in"/></filter><g filter="url(#b)">${component}</g>`;
 }
 
 export function face() {

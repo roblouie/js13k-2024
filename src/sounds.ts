@@ -1,8 +1,5 @@
-
 const defaults = {output:0,w:"sine",t:1,f:0,v:0.5,a:0,h:0.01,d:0.01,s:0,r:0.05,p:1,q:1,k:0}
-export const bassDrum1 = [{ ...defaults, w:"triangle",t:0,f:88,v:1,d:0.05,h:0.03,p:0.5,q:0.1,},{ ...defaults, w:"n0",output:1,t:5,v:42,r:0.01,h:0,p:0,}];
 export const footstep = [{ ...defaults, w:"triangle",v:0.7,t:0.5,d:0.2,r:0.2,p:0.95,},{ ...defaults, w:"n1",v:9,output:1,d:0.2,r:0.2,}]
-
 export const violin = [{ ...defaults, w:"sawtooth",v:0.4,a:0.1,d:0.2,},{ ...defaults, w:"sine",v:5,d:0.2,s:0.2,output:1,}];
 export const frenchHorn = [{ ...defaults, w:"square",v:0.1,a:0.1,d:0.5,s:0.5,r:0.08,},{ ...defaults, w:"sine",v:1,d:0.1,s:4,output:1,}];
 export const doorOpening4 = [{...defaults, w:"sawtooth",v:0.4,a:0.1,d:1,p:-2,q:1.5,},{...defaults, output:1,w:"n1",v:0.5,f:11,d:11,s:0.2,}];

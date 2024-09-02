@@ -4,15 +4,14 @@ import { initTextures } from '@/textures';
 import { GameState } from '@/game-states/game.state';
 import { gameStates } from '@/game-states/game-states';
 import { MenuState } from '@/game-states/menu.state';
-import { drawFullScreenText } from '@/draw-helpers';
 
 let previousTime = 0;
 const interval = 1000 / 60;
 
 (async () => {
-  drawFullScreenText('CLICK TO START', 200);
+  tmpl.innerHTML = 'CLICK TO START';
   document.onclick = async () => {
-    drawFullScreenText('LOADING');
+    tmpl.innerHTML = 'LOADING';
 
     await initTextures();
 

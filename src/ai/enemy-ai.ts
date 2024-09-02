@@ -6,7 +6,7 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { bassDrum1, footstep, frenchHorn, song, violin } from '@/sounds';
+import { footstep, frenchHorn, song, violin } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
 
 export class Enemy {
@@ -127,7 +127,7 @@ export class Enemy {
 
 
   update_(player: FirstPersonPlayer) {
-    tmpl.innerHTML += `ENEMY AGRESSION: ${this.aggression}<br>`
+    // tmpl.innerHTML += `ENEMY AGRESSION: ${this.aggression}<br>`
     this.updateNodeDistanceData();
 
     this.stateMachine.getState().onUpdate(player);
@@ -137,7 +137,7 @@ export class Enemy {
   patrolUpdate(player: FirstPersonPlayer) {
     // this.checkVision(player);
 
-    tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
+    // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor(player)) {
       return;
@@ -171,7 +171,6 @@ export class Enemy {
       this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.getSpeed()));
       this.model_.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
-      tmpl.innerHTML += `POS Y: ${this.position.y}`;
       if (this.position.y < 2.402) {
         clearTimeout(this.footstepDebounce);
         this.footstepDebounce = setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 2, 50, footstep, audioContext.currentTime + 1), 40);
@@ -232,7 +231,7 @@ export class Enemy {
   }
 
   chaseUpdate(player: FirstPersonPlayer) {
-    tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+    // tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
 
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor(player)) {
@@ -326,8 +325,8 @@ export class Enemy {
           if (!player.isHiding && isPlayerCloseEnough && isEnemyCloseEnough) {
             const enemyPlayerDistance = new EnhancedDOMPoint().subtractVectors(player.feetCenter, this.position).magnitude;
             if (enemyPlayerDistance < 60) {
-              tmpl.innerHTML += `Distance: ${enemyPlayerDistance}`;
-              tmpl.innerHTML += 'PLAYER SEEN<br>';
+              // tmpl.innerHTML += `Distance: ${enemyPlayerDistance}`;
+              // tmpl.innerHTML += 'PLAYER SEEN<br>';
               this.unseenFrameCount = 0;
               if (this.stateMachine.getState() !== this.chaseState) {
                 this.stateMachine.setState(this.chaseState, player);
@@ -344,7 +343,7 @@ export class Enemy {
     const isPlayerCloseEnough = (Math.abs(player.differenceFromNavPoint.x) < 5.75) || (Math.abs(player.differenceFromNavPoint.z) < 5.75);
     const isEnemyCloseEnough = (Math.abs(this.currentNodeDifference.x) < 5.75) || (Math.abs(this.currentNodeDifference.z) < 5.75);
     if (!player.isHiding && this.currentNode === player.closestNavPoint && isPlayerCloseEnough && isEnemyCloseEnough) {
-      tmpl.innerHTML += 'PLAYER SEEN<br>';
+      // tmpl.innerHTML += 'PLAYER SEEN<br>';
       this.unseenFrameCount = 0;
       if (this.stateMachine.getState() !== this.chaseState) {
         this.stateMachine.setState(this.chaseState, player);
@@ -365,7 +364,7 @@ export class Enemy {
   }
 
   searchUpdate(player: FirstPersonPlayer) {
-    tmpl.innerHTML += 'ENEMY STATE: SEARCH<br>';
+    // tmpl.innerHTML += 'ENEMY STATE: SEARCH<br>';
 
     // If player comes out from hiding spot while searching, chase them
     if (!player.isHiding) {
@@ -416,7 +415,7 @@ export class Enemy {
   }
 
   fleeUpdate() {
-    tmpl.innerHTML += 'ENEMY STATE: FLEE<br>';
+    // tmpl.innerHTML += 'ENEMY STATE: FLEE<br>';
     if (this.nextNodeDistance > 1) {
       // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
       this.travelingDirection.lerp(this.nextNodeDirection, 1);
