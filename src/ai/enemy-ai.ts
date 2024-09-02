@@ -5,8 +5,8 @@ import { StateMachine } from '@/core/state-machine';
 import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
-import { audioContext, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { bassDrum1, playSong } from '@/sounds';
+import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
+import { bassDrum1, frenchHorn, playSong, song, violin } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
 
 export class Enemy {
@@ -46,18 +46,25 @@ export class Enemy {
   });
   unseenFrameCount = 0;
   aggression = 0;
+  songPlayer: SimplestMidiRev2;
 
   constructor(startingNode: PathNode) {
+    this.songPlayer = new SimplestMidiRev2();
+    this.songPlayer.volume_.connect(biquadFilter)
     this.footstepPlayer.volume_.connect(this.pannerNode).connect(compressor);
     this.currentNode = startingNode;
     this.position = new EnhancedDOMPoint().set(startingNode.position);
     const siblings = startingNode.getPresentSiblings();
     this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
-    this.patrolState = { onUpdate: (player: FirstPersonPlayer) => this.patrolUpdate(player) };
+    this.patrolState = {
+      onEnter: () => {
+        this.stopSong()
+      },
+      onUpdate: (player: FirstPersonPlayer) => this.patrolUpdate(player)
+    };
     this.chaseState = {
       onEnter: (player: FirstPersonPlayer) => this.chaseEnter(player),
       onUpdate: (player: FirstPersonPlayer) => this.chaseUpdate(player),
-      onLeave: () => clearInterval(this.songInterval),
     };
     this.searchState = {
       onEnter: () => this.searchEnter(),
@@ -70,6 +77,23 @@ export class Enemy {
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
     this.stateMachine = new StateMachine(this.patrolState);
     this.model_ = upyri();
+  }
+
+  playSong() {
+    const playSong = () => {
+      for (const note of song) {
+        this.songPlayer.playNote(audioContext.currentTime + note[2], note[1],  note[4], [violin, frenchHorn][note[0]], audioContext.currentTime + note[2] + note[3]);
+      }
+    }
+    this.songPlayer.volume_.gain.value = 1;
+    playSong();
+    // @ts-ignore
+    this.songInterval = setInterval(playSong, 6000);
+  }
+
+  stopSong() {
+    this.songPlayer.volume_.gain.linearRampToValueAtTime(0, audioContext.currentTime + 3);
+    clearInterval(this.songInterval);
   }
 
   increaseAggression() {
@@ -204,9 +228,7 @@ export class Enemy {
   }
 
   chaseEnter(player: FirstPersonPlayer) {
-    // @ts-ignore
-    // playSong();
-    // this.songInterval = setInterval(playSong, 6000);
+    this.playSong();
     this.pathCache = [];
     this.positionInPathCache = 0;
     this.advancePathToNode(player.closestNavPoint);
@@ -219,6 +241,12 @@ export class Enemy {
 
   chaseUpdate(player: FirstPersonPlayer) {
     tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+
+    // Handle door opening, while door is opening, don't do anything else
+    if (this.handleDoor(player)) {
+      return;
+    }
+
     this.unseenFrameCount++;
     this.checkVision(player);
 
@@ -232,11 +260,6 @@ export class Enemy {
     // entered the room while the player wasn't hidden, meaning they will die if they try to hide now.
     if (this.currentNode.hidingPlace && player.isHiding && player.closestNavPoint === this.currentNode) {
       // TODO: Kill player
-    }
-
-    // Handle door opening, while door is opening, don't do anything else
-    if (this.handleDoor(player)) {
-      return;
     }
 
     const nodeDistance = this.nextNode.door ? 1 : 6;
@@ -381,6 +404,7 @@ export class Enemy {
 
   farthestPoint = AiNavPoints[0];
   fleeEnter() {
+    this.stopSong();
     let longestDistance = 0;
     const difference = new EnhancedDOMPoint();
     AiNavPoints.forEach(node => {
