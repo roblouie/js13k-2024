@@ -5,11 +5,9 @@ import { StateMachine } from '@/core/state-machine';
 import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
-import { controls } from '@/core/controls';
 import { audioContext, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { bassDrum1, playSong } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
-import { Path } from 'webpack-cli';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -31,7 +29,6 @@ export class Enemy {
   pathCache: PathNode[] = [];
   positionInPathCache = 0;
   lastPlayerNode: PathNode;
-  speed_ = 0.2;
   travelingDirection = new EnhancedDOMPoint();
   nextNodeDifference = new EnhancedDOMPoint();
   nextNodeDistance = 0;
@@ -48,6 +45,7 @@ export class Enemy {
     coneOuterGain: 0.1
   });
   unseenFrameCount = 0;
+  aggression = 0;
 
   constructor(startingNode: PathNode) {
     this.footstepPlayer.volume_.connect(this.pannerNode).connect(compressor);
@@ -74,6 +72,28 @@ export class Enemy {
     this.model_ = upyri();
   }
 
+  increaseAggression() {
+    if (this.aggression <= 0.9) {
+      this.aggression += 0.1;
+    }
+  }
+
+  decreaseAggression() {
+    this.aggression *= 0.4;
+  }
+
+  getMaxUnseenFramesBeforeGivingUp() {
+    return 300 + 600 * this.aggression;
+  }
+
+  getSpeed() {
+    return 0.2 + 0.2 * this.aggression;
+  }
+
+  getChanceOfFindingPlayer() {
+    return this.aggression * 0.4;
+  }
+
   updateNodeDistanceData() {
     this.nextNodeDifference.subtractVectors(this.nextNode.position, this.position);
     this.nextNodeDistance = this.nextNodeDifference.magnitude;
@@ -83,6 +103,7 @@ export class Enemy {
 
 
   update_(player: FirstPersonPlayer) {
+    tmpl.innerHTML += `ENEMY AGRESSION: ${this.aggression}<br>`
     this.updateNodeDistanceData();
 
     // if (controls.isConfirm && !controls.prevConfirm) {
@@ -106,8 +127,8 @@ export class Enemy {
       return;
     }
 
-    if (this.nextNodeDistance > 6) {
-      this.travelingDirection.lerp(this.nextNodeDirection, 0.05);
+    if (this.nextNodeDistance > (6 - this.getSpeed() * 2)) {
+      this.travelingDirection.lerp(this.nextNodeDirection, (this.getSpeed() / 4));
       this.moveInTravelingDirection();
     } else {
       this.moveInTravelingDirection();
@@ -131,7 +152,7 @@ export class Enemy {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;
       // if (this.currentNode !== this.nextNode) {
-      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.speed_));
+      this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.getSpeed()));
       this.model_.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       this.currentInterval++;
@@ -141,6 +162,8 @@ export class Enemy {
         this.footstepPlayer.playNote(audioContext.currentTime, 72, 50, bassDrum1, audioContext.currentTime + 1);
         this.currentInterval = 0;
       }
+    } else {
+      this.position.set(this.nextNode.position);
     }
     // tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
   }
@@ -199,8 +222,9 @@ export class Enemy {
     this.unseenFrameCount++;
     this.checkVision(player);
 
-    if (this.unseenFrameCount >= 300) {
+    if (this.unseenFrameCount >= this.getMaxUnseenFramesBeforeGivingUp()) {
       this.stateMachine.setState(this.patrolState);
+      this.increaseAggression();
     }
 
     // If we're in chase mode and at the player hiding place. Kill the player. If the player was hidden
@@ -216,9 +240,8 @@ export class Enemy {
     }
 
     const nodeDistance = this.nextNode.door ? 1 : 6;
-    if (this.nextNodeDistance > nodeDistance) {
-      // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
-      this.travelingDirection.lerp(this.nextNodeDirection, 0.06);
+    if (this.nextNodeDistance > (nodeDistance - this.getSpeed() * 2)) {
+      this.travelingDirection.lerp(this.nextNodeDirection, (this.getSpeed() / 4));
       this.moveInTravelingDirection();
     } else {
       this.moveInTravelingDirection();
@@ -283,8 +306,8 @@ export class Enemy {
         // If our sightline caught the players node
         if (sibling === player.closestNavPoint) {
           // Make sure the player is close enough to it to actually be seen
-          const isPlayerCloseEnough = (directionIndex < 2 && Math.abs(player.differenceFromNavPoint.x) < 6) || (directionIndex > 1 && Math.abs(player.differenceFromNavPoint.z) < 6);
-          const isEnemyCloseEnough = (directionIndex < 2 && Math.abs(this.currentNodeDifference.x) < 6) || (directionIndex > 1 && Math.abs(this.currentNodeDifference.z) < 6);
+          const isPlayerCloseEnough = (directionIndex < 2 && Math.abs(player.differenceFromNavPoint.x) < 5.75) || (directionIndex > 1 && Math.abs(player.differenceFromNavPoint.z) < 5.75);
+          const isEnemyCloseEnough = (directionIndex < 2 && Math.abs(this.currentNodeDifference.x) < 5.75) || (directionIndex > 1 && Math.abs(this.currentNodeDifference.z) < 5.75);
           if (!player.isHiding && isPlayerCloseEnough && isEnemyCloseEnough) {
             tmpl.innerHTML += 'PLAYER SEEN<br>';
             this.unseenFrameCount = 0;
@@ -299,8 +322,8 @@ export class Enemy {
       }
     }
 
-    const isPlayerCloseEnough = (Math.abs(player.differenceFromNavPoint.x) < 7) || (Math.abs(player.differenceFromNavPoint.z) < 6);
-    const isEnemyCloseEnough = (Math.abs(this.currentNodeDifference.x) < 7) || (Math.abs(this.currentNodeDifference.z) < 6);
+    const isPlayerCloseEnough = (Math.abs(player.differenceFromNavPoint.x) < 5.75) || (Math.abs(player.differenceFromNavPoint.z) < 5.75);
+    const isEnemyCloseEnough = (Math.abs(this.currentNodeDifference.x) < 5.75) || (Math.abs(this.currentNodeDifference.z) < 5.75);
     if (!player.isHiding && this.currentNode === player.closestNavPoint && isPlayerCloseEnough && isEnemyCloseEnough) {
       tmpl.innerHTML += 'PLAYER SEEN<br>';
       this.unseenFrameCount = 0;
@@ -348,8 +371,9 @@ export class Enemy {
         this.updateNodeDistanceData();
         this.spotSearchFrameCount = 0;
 
-        if (this.spotsSearched > 2 && Math.random() > 0.2) {
+        if (this.spotsSearched >= 2 && Math.random() > 0.25) {
           this.stateMachine.setState(this.fleeState);
+          this.increaseAggression();
         }
       }
     }
