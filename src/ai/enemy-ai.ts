@@ -6,7 +6,7 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { bassDrum1, frenchHorn, playSong, song, violin } from '@/sounds';
+import { bassDrum1, footstep, frenchHorn, song, violin } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
 
 export class Enemy {
@@ -85,6 +85,7 @@ export class Enemy {
         this.songPlayer.playNote(audioContext.currentTime + note[2], note[1],  note[4], [violin, frenchHorn][note[0]], audioContext.currentTime + note[2] + note[3]);
       }
     }
+    this.songPlayer.volume_.gain.cancelScheduledValues(audioContext.currentTime);
     this.songPlayer.volume_.gain.value = 1;
     playSong();
     // @ts-ignore
@@ -116,6 +117,10 @@ export class Enemy {
 
   getChanceOfFindingPlayer() {
     return this.aggression * 0.4;
+  }
+
+  getFootstepInterval() {
+    return 30 - 10 * this.aggression;
   }
 
   updateNodeDistanceData() {
@@ -182,8 +187,8 @@ export class Enemy {
       this.currentInterval++;
       this.pannerNode.positionX.value = this.position.x;
       this.pannerNode.positionZ.value = this.position.z;
-      if (this.currentInterval === this.footstepInterval) {
-        this.footstepPlayer.playNote(audioContext.currentTime, 72, 50, bassDrum1, audioContext.currentTime + 1);
+      if (this.currentInterval >= this.getFootstepInterval()) {
+        this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 2, 50, footstep, audioContext.currentTime + 1);
         this.currentInterval = 0;
       }
     } else {
@@ -251,7 +256,7 @@ export class Enemy {
     this.checkVision(player);
 
     if (this.unseenFrameCount >= this.getMaxUnseenFramesBeforeGivingUp()) {
-      this.stateMachine.setState(this.patrolState);
+      this.stateMachine.setState(this.fleeState);
       this.increaseAggression();
     }
 
@@ -332,12 +337,16 @@ export class Enemy {
           const isPlayerCloseEnough = (directionIndex < 2 && Math.abs(player.differenceFromNavPoint.x) < 5.75) || (directionIndex > 1 && Math.abs(player.differenceFromNavPoint.z) < 5.75);
           const isEnemyCloseEnough = (directionIndex < 2 && Math.abs(this.currentNodeDifference.x) < 5.75) || (directionIndex > 1 && Math.abs(this.currentNodeDifference.z) < 5.75);
           if (!player.isHiding && isPlayerCloseEnough && isEnemyCloseEnough) {
-            tmpl.innerHTML += 'PLAYER SEEN<br>';
-            this.unseenFrameCount = 0;
-            if (this.stateMachine.getState() !== this.chaseState) {
-              this.stateMachine.setState(this.chaseState, player);
+            const enemyPlayerDistance = new EnhancedDOMPoint().subtractVectors(player.feetCenter, this.position).magnitude;
+            if (enemyPlayerDistance < 60) {
+              tmpl.innerHTML += `Distance: ${enemyPlayerDistance}`;
+              tmpl.innerHTML += 'PLAYER SEEN<br>';
+              this.unseenFrameCount = 0;
+              if (this.stateMachine.getState() !== this.chaseState) {
+                this.stateMachine.setState(this.chaseState, player);
+              }
+              return true;
             }
-            return true;
           }
         } else {
           followPathToEnd(sibling, directionIndex);

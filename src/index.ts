@@ -10,8 +10,8 @@ let previousTime = 0;
 const interval = 1000 / 60;
 
 (async () => {
-  // drawFullScreenText('CLICK TO START', 200);
-  // document.onclick = async () => {
+  drawFullScreenText('CLICK TO START', 200);
+  document.onclick = async () => {
     drawFullScreenText('LOADING');
 
     await initTextures();
@@ -24,7 +24,7 @@ const interval = 1000 / 60;
     draw(0);
 
     document.onclick = null;
-  // };
+  };
 
   function draw(currentTime: number) {
     const delta = currentTime - previousTime;
