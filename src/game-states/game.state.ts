@@ -128,6 +128,8 @@ export class GameState implements State {
           if (distance < 1 || direction > 0.77) {
             if (door.isLocked) {
               tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
+            } else if (this.enemy.currentNode.door === door) {
+              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🚫</div>`;
             } else {
               tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Door</div>`;
               if (controls.isConfirm) {

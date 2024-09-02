@@ -16,8 +16,14 @@ export class Enemy {
   currentNode: PathNode;
   nextNode: PathNode;
   patrolState: State;
+
+
   chaseState: State;
+
+
   searchState: State;
+  spotSearchFrameCount = 0;
+  spotsSearched = 0;
   fleeState: State;
   killState: State;
   stateMachine: StateMachine;
@@ -41,6 +47,7 @@ export class Enemy {
     rolloffFactor: 99,
     coneOuterGain: 0.1
   });
+  unseenFrameCount = 0;
 
   constructor(startingNode: PathNode) {
     this.footstepPlayer.volume_.connect(this.pannerNode).connect(compressor);
@@ -109,7 +116,7 @@ export class Enemy {
       let siblings = this.currentNode.getPresentSiblings();
       if (siblings.length > 1) {
         siblings = siblings.filter(p => {
-          const isGoingToEnterRoom = this.currentNode.door && p.door && this.currentNode.roomNumber === p.roomNumber && this.currentNode !== p;
+          const isGoingToEnterRoom = this.currentNode.door && p.door && this.currentNode.roomNumber === p.roomNumber && this.currentNode !== p && !this.currentNode.hidingPlace;
           return p !== lastNode && !isGoingToEnterRoom;
         });
       }
@@ -138,26 +145,37 @@ export class Enemy {
     // tmpl.innerHTML += `ENEMY Y: ${this.position.y}<br>`;
   }
 
+  handleRoomEntering(player: FirstPersonPlayer, timeout: number) {
+    if (this.currentNode.roomNumber === player.closestNavPoint.roomNumber) {
+      setTimeout(() => {
+        if (player.isHiding) {
+          this.stateMachine.setState(this.searchState, player);
+        } else {
+          if (this.stateMachine.getState() !== this.chaseState) {
+            this.stateMachine.setState(this.chaseState, player);
+          }
+        }
+      }, timeout);
+    }
+  }
+
   handleDoor(player: FirstPersonPlayer) {
     if (
       this.currentNode.door && this.nextNode.door
       && this.currentNode.roomNumber === this.nextNode.roomNumber
       && this.currentNode !== this.nextNode
-      && (this.currentNode.door.openClose === -1 || this.currentNode.door.isAnimating))
-    {
-      if (!this.currentNode.door.isAnimating) {
-        this.currentNode.door.pullLever(true);
-        if (this.currentNode.roomNumber === player.closestNavPoint.roomNumber) {
-          setTimeout(() => {
-            if (player.isHiding) {
-              this.stateMachine.setState(this.searchState, player);
-            } else {
-              this.stateMachine.setState(this.chaseState, player);
-            }
-          }, 1000);
+    ) {
+      if ((this.currentNode.door.openClose === -1 || this.currentNode.door.isAnimating)) {
+        if (!this.currentNode.door.isAnimating) {
+          this.currentNode.door.pullLever(true);
+          this.model_.lookAt(this.nextNode.position);
+          this.travelingDirection.set(this.nextNodeDirection);
+          this.handleRoomEntering(player, 2000);
         }
+        return true;
+      } else if (!this.currentNode.door.isAnimating) {
+        this.handleRoomEntering(player, 100);
       }
-      return true;
     }
     return false;
   }
@@ -169,25 +187,38 @@ export class Enemy {
     this.pathCache = [];
     this.positionInPathCache = 0;
     this.advancePathToNode(player.closestNavPoint);
-    this.nextNode = this.pathCache[0] ?? this.currentNode;
+    this.nextNode = this.pathCache[1] ?? this.currentNode;
     this.positionInPathCache++;
     const direction = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position).normalize_();
     this.travelingDirection.set(direction);
+    this.unseenFrameCount = 0;
   }
 
   chaseUpdate(player: FirstPersonPlayer) {
     tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+    this.unseenFrameCount++;
     this.checkVision(player);
+
+    if (this.unseenFrameCount >= 300) {
+      this.stateMachine.setState(this.patrolState);
+    }
+
+    // If we're in chase mode and at the player hiding place. Kill the player. If the player was hidden
+    // before the enemy entered the room, the enemy would be in search mode. So this means the enemy
+    // entered the room while the player wasn't hidden, meaning they will die if they try to hide now.
+    if (this.currentNode.hidingPlace && player.isHiding && player.closestNavPoint === this.currentNode) {
+      // TODO: Kill player
+    }
 
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor(player)) {
       return;
     }
 
-
-    if (this.nextNodeDistance > 6) {
+    const nodeDistance = this.nextNode.door ? 1 : 6;
+    if (this.nextNodeDistance > nodeDistance) {
       // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;
-      this.travelingDirection.lerp(this.nextNodeDirection, 0.05);
+      this.travelingDirection.lerp(this.nextNodeDirection, 0.06);
       this.moveInTravelingDirection();
     } else {
       this.moveInTravelingDirection();
@@ -256,6 +287,7 @@ export class Enemy {
           const isEnemyCloseEnough = (directionIndex < 2 && Math.abs(this.currentNodeDifference.x) < 6) || (directionIndex > 1 && Math.abs(this.currentNodeDifference.z) < 6);
           if (!player.isHiding && isPlayerCloseEnough && isEnemyCloseEnough) {
             tmpl.innerHTML += 'PLAYER SEEN<br>';
+            this.unseenFrameCount = 0;
             if (this.stateMachine.getState() !== this.chaseState) {
               this.stateMachine.setState(this.chaseState, player);
             }
@@ -271,6 +303,7 @@ export class Enemy {
     const isEnemyCloseEnough = (Math.abs(this.currentNodeDifference.x) < 7) || (Math.abs(this.currentNodeDifference.z) < 6);
     if (!player.isHiding && this.currentNode === player.closestNavPoint && isPlayerCloseEnough && isEnemyCloseEnough) {
       tmpl.innerHTML += 'PLAYER SEEN<br>';
+      this.unseenFrameCount = 0;
       if (this.stateMachine.getState() !== this.chaseState) {
         this.stateMachine.setState(this.chaseState, player);
       }
@@ -283,8 +316,7 @@ export class Enemy {
     || followPathToEnd(this.currentNode, 3);
   }
 
-  spotSearchFrameCount = 0;
-  spotsSearched = 0;
+
 
   searchEnter() {
     this.spotsSearched = 0;
@@ -358,4 +390,3 @@ export class Enemy {
     }
   }
 }
-
