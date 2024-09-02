@@ -7,7 +7,8 @@ import {
 } from '@/engine/physics/surface-collision';
 import { PathNode } from '@/ai/path-node';
 import { HidingPlace } from '@/hiding-place';
-import { audioContext } from '@/engine/audio/simplest-midi';
+import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
+import { hideSound } from '@/sounds';
 
 class Sphere {
   center: EnhancedDOMPoint;
@@ -32,8 +33,11 @@ export class FirstPersonPlayer {
   hidFrom = new EnhancedDOMPoint();
   differenceFromNavPoint = new EnhancedDOMPoint();
   listener: AudioListener;
+  sfxPlayer: SimplestMidiRev2;
 
   constructor(camera: Camera, startingPoint: PathNode) {
+    this.sfxPlayer = new SimplestMidiRev2();
+    this.sfxPlayer.volume_.connect(compressor);
     this.closestNavPoint = startingPoint;
     this.feetCenter.set(0, 10, -0);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
@@ -62,12 +66,14 @@ export class FirstPersonPlayer {
     this.isFrozen_ = true;
     this.camera.position_.set(hidingPlace.position);
     this.cameraRotation.set(hidingPlace.cameraRotation);
+    this.sfxPlayer.playNote(audioContext.currentTime, 30, 40, hideSound, audioContext.currentTime + 1);
   }
 
   unhide() {
     this.isHiding = false;
     this.isFrozen_ = false;
     this.feetCenter.set(this.hidFrom);
+    this.sfxPlayer.playNote(audioContext.currentTime, 38, 40, hideSound, audioContext.currentTime + 1);
   }
 
   update(gridFaces: Set<Face>[]) {

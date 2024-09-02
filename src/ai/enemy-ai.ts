@@ -81,7 +81,7 @@ export class Enemy {
   playSong() {
     const playSong = () => {
       for (const note of song) {
-        this.songPlayer.playNote(audioContext.currentTime + note[2], note[1],  note[4], [violin, frenchHorn][note[0]], audioContext.currentTime + note[2] + note[3]);
+        this.songPlayer.playNote(audioContext.currentTime + note[2], note[1],  note[4] - 10, [violin, frenchHorn][note[0]], audioContext.currentTime + note[2] + note[3]);
       }
     }
     this.songPlayer.volume_.gain.cancelScheduledValues(audioContext.currentTime);
@@ -135,7 +135,7 @@ export class Enemy {
   }
 
   patrolUpdate(player: FirstPersonPlayer) {
-    // this.checkVision(player);
+    this.checkVision(player);
 
     // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
