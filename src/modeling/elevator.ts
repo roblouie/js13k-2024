@@ -18,17 +18,8 @@ export function buildElevator() {
       .merge(new MoldableCubeGeometry(0.3, 0.5, 6).translate_(6, 4, 0))
       .done_()
     , materials.silver);
-
-  const texturesPerSide = [
-    materials.silver.texture!,
-    materials.silver.texture!,
-    materials.silver.texture!,
-    materials.silver.texture!,
-    materials.silver.texture!,
-    materials.elevatorPanel.texture!,
-  ]
   // @ts-ignore
-  const panel = new Mesh(new MoldableCubeGeometry(2, 2, 0.5).texturePerSide(...texturesPerSide).translate_(5.4, 5, 5.2).done_(), materials.elevatorPanel);
+  const panel = new Mesh(new MoldableCubeGeometry(2, 2, 0.5).translate_(5.4, 5, 5.2).done_(), materials.elevatorPanel);
   //
   const bfSegments = [1.25, 4, 0.5, 4, 0.5, 4, 1.25];
   const lrSegments = [0.5, 4, 0.5, 4, 0.5];
@@ -37,7 +28,7 @@ export function buildElevator() {
     buildSegmentedWall(bfSegments, 9, [0, 9, 0, 9, 0, 9, 0], [0]),
     buildSegmentedWall(lrSegments, 9, [0, 9, 0, 9, 0], [0]),
     buildSegmentedWall(lrSegments, 9, [0, 9, 0, 9, 0], [0]),
-  ).translate_(0, 1.25).done_(), materials.lighterWoodTest);
+  ).translate_(0, 1.25).done_(), materials.wood);
 
   const elevatorFloor = new Mesh(new MoldableCubeGeometry(15, 1.5, 10).spreadTextureCoords(5, 5), materials.marble);
   const elevatorRoof = new Mesh(new MoldableCubeGeometry(15, 1.5, 10).translate_(0, 12).done_().spreadTextureCoords(), materials.ceilingTiles)

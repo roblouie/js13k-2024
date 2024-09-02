@@ -82,7 +82,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
 
 
   const bedPlaceholder = new MoldableCubeGeometry(7, 2, 8)
-      .translate_(5, 2, -6.5)
+      .translate_(6, 2, -6.5)
       .texturePerSide(...getAllWhite())
       .done_();
 

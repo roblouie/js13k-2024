@@ -5,11 +5,7 @@ import { toImage } from '@/engine/svg-maker/svg-string-converters';
 export const materials: {[key: string]: Material} = {};
 
 export async function initTextures() {
-  materials.brickWall = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(true, true))});
-  materials.brickWall.texture?.textureRepeat.set(1.5, 1.5);
-  materials.stone = new Material({texture: textureLoader.load_(await bricksRocksPlanksWood(true, false))});
-  materials.wood = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(false, false))});
-  materials.planks = new Material({ texture: textureLoader.load_(await bricksRocksPlanksWood(false, true))});
+  materials.wood = new Material({ texture: textureLoader.load_(await wood())});
   materials.face = new Material({ texture: textureLoader.load_(await face())});
   materials.silver = new Material({ texture: textureLoader.load_(await metals(1)) });
   materials.iron = new Material({ texture: textureLoader.load_(await metals(2)) });
@@ -74,7 +70,7 @@ async function elevatorPanel() {
     content += button(percentX, percentY, i + 2);
   }
 
-  return metals(content);
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">${content}</svg>`)
 }
 
 function greenPlasterWall() {
@@ -204,16 +200,20 @@ function marbleFloor() {
 </svg>`)
 }
 
-function getPattern(width_ = 160, height_ = 256) {
-  return `<pattern id="p" width="${width_}" height="${height_}" patternUnits="userSpaceOnUse"><path d="m 0 246 h 148 V 125 H 0 V112 h72 V0 h15 v112 h 74 V 0 H 0"/></pattern>`;
-}
-
-function rockWoodFilter(isRock = true) {
-  return `<filter x="0" y="0" width="100%" height="100%" id="rw"><feDropShadow dx="${isRock ? 1 : 300}" dy="${isRock ? 1 : 930}" result="s"/><feTurbulence type="fractalNoise" baseFrequency="${isRock ? 0.007 : [0.1, 0.007]}" numOctaves="${isRock ? 9 : 6}" stitchTiles="stitch" /><feComposite in="s" operator="arithmetic" k2="0.5" k3="0.5" /><feComponentTransfer><feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4, .2, .4"/></feComponentTransfer><feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="2.5" lighting-color="${isRock ? '#ffd' : '#6e5e42'}"><feDistantLight azimuth="${isRock ? 265 : 110}" elevation="${isRock ? 4 : 10}"/></feDiffuseLighting></filter>`;
-}
-
-function bricksRocksPlanksWood(isRock = true, isPattern = true) {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">${isPattern ? getPattern( isRock ? 160 : 75, isRock ? 256 : 1) : ''}${rockWoodFilter(isRock)}<rect height="100%" width="100%" x="0" y="0" fill="${isPattern ? 'url(#p)' : ''}" filter="url(#rw)"/></svg>`);
+function wood() {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+    <filter x="0" y="0" width="100%" height="100%" id="rw">
+        <feTurbulence type="fractalNoise" baseFrequency="0.1, 0.007" numOctaves="6" stitchTiles="stitch" />
+        <feComposite in="s" operator="arithmetic" k2="0.5" k3="0.6" />
+        <feComponentTransfer>
+            <feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4"/>
+        </feComponentTransfer>
+        <feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="3" lighting-color="#4e2a1b">
+            <feDistantLight azimuth="110" elevation="28"/>
+        </feDiffuseLighting>
+    </filter>
+    <rect height="100%" width="100%" x="0" y="0" filter="url(#rw)"/>
+</svg>`)
 }
 
 export function face() {
