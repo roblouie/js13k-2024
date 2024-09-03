@@ -62,14 +62,14 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       materials.tinyTiles.texture!,
       materials.greenPlasterWall.texture!
     ]);
-  bathroomDoorWall.rotate_(0, Math.PI).translate_(-10).computeNormals();
+  bathroomDoorWall.rotate_(0, Math.PI).translate_(-10).spreadTextureCoords().computeNormals();
 
   const secondBathroomWall = new MoldableCubeGeometry(1, WallHeight, 11.5).texturePerSide(materials.tinyTiles.texture!,
     materials.tinyTiles.texture!,
     materials.greenPlasterWall.texture!,
     materials.tinyTiles.texture!,
     materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!).translate_(-4, 6, -6.25);
+    materials.tinyTiles.texture!).translate_(-4, 6, -6.25).spreadTextureCoords();
 
   const bathroomCornerColumn = new MoldableCubeGeometry(3, WallHeight, 4).texturePerSide(
     materials.tinyTiles.texture!,
@@ -178,6 +178,41 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       .done_()
     // new MoldableCubeGeometry(3, 8, 6)
 
+  const makePillow = () => {
+    return new MoldableCubeGeometry(1, 1, 1, 4, 3, 4)
+      .spherify(1)
+      .selectBy(v => Math.abs(v.x) > 0.8 || Math.abs(v.z) > 0.8)
+      .scale_(0.8, 1, 0.8)
+      .all_()
+      .scale_(2, 0.3)
+      .rotate_(0.5)
+      .translate_(0, 1.3, -3.5)
+      .texturePerSide(...getAllWhite())
+      .computeNormals(true)
+      .done_()
+  }
+
+  const bed =  new MoldableCubeGeometry(7, 2, 7, 5, 1, 5)
+    .selectBy(v => Math.hypot(v.x, v.z) > 4.5)
+    .scale_(0.9, 1, 0.9)
+    .selectBy(v => Math.hypot(v.x, v.z) > 3)
+    .scale_(1, 0.9, 1)
+    .all_()
+    .scale_(1, 1, 1.2)
+    .texturePerSide(...getAllWhite())
+    .merge(makePillow().translate_(-1.5))
+    .merge(makePillow().translate_(1.5))
+    .computeNormals(true)
+    .merge(
+      new MoldableCubeGeometry(7, 7, 0.5)
+        .translate_(0, 0, -4.5)
+        .texturePerSide(...allWood)
+        .merge(new MoldableCubeGeometry(7, 1, 8.5)
+          .translate_(0, -1.5).texturePerSide(...allWood)).computeNormals()
+    )
+    .translate_(6, 2, -6.5)
+    .done_()
+
   // TRIM
   function outerLargeTrimPiece() {
     return new MoldableCubeGeometry(1, 3.5, 3).texturePerSide(...getAllWhite()).translate_(-16.6, 2.5, 10)
@@ -221,9 +256,10 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       .merge(closet)
       .merge(counter)
       .merge(bath)
-      // TODO: REMOVE THESE
-      .merge(bedPlaceholder)
+      .merge(bed)
       // .merge(bathPlaceholder)
+      // TODO: REMOVE THESE
+
       .merge(toiletPlaceholder)
       // .merge(counterPlaceholder)
   } else {
