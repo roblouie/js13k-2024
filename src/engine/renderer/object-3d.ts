@@ -89,7 +89,7 @@ export class Object3d {
   }
 
   private right = new EnhancedDOMPoint();
-  private lookatUp = new EnhancedDOMPoint();
+  lookatUp = new EnhancedDOMPoint();
   forward = new EnhancedDOMPoint();
 
   lookAt(target: EnhancedDOMPoint) {

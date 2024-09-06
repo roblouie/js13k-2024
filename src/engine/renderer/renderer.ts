@@ -4,14 +4,15 @@ import { Camera } from "@/engine/renderer/camera";
 import { Scene } from '@/engine/renderer/scene';
 import { Mesh } from '@/engine/renderer/mesh';
 import {
-  emissive, lightPovMvp,
+  emissive, lightPovMvp, lightWorldPosition,
   modelviewProjection,
-  normalMatrix,
-  textureRepeat,
+  normalMatrix, shadowCubeMap,
+  textureRepeat, worldMatrix,
 } from '@/engine/shaders/shaders';
 import { createOrtho, Object3d } from '@/engine/renderer/object-3d';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { textureLoader } from '@/engine/renderer/texture-loader';
+import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
 
 // IMPORTANT! The index of a given buffer in the buffer array must match it's respective data location in the shader.
 // This allows us to use the index while looping through buffers to bind the attributes. So setting a buffer
@@ -27,42 +28,27 @@ export const enum AttributeLocation {
 
 gl.enable(gl.CULL_FACE);
 gl.enable(gl.DEPTH_TEST);
-gl.enable(gl.BLEND);
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+// gl.enable(gl.BLEND);
+// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+// gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+gl.getExtension('EXT_color_buffer_float');
+gl.getExtension('OES_texture_float_linear');
 const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelviewProjection)!;
 const normalMatrixLocation =  gl.getUniformLocation(lilgl.program, normalMatrix)!;
 const emissiveLocation = gl.getUniformLocation(lilgl.program, emissive)!;
 const textureRepeatLocation = gl.getUniformLocation(lilgl.program, textureRepeat)!;
 
-
-const origin = new EnhancedDOMPoint(0, 0, 0);
-
-const lightPovProjection = createOrtho(-60,60,-60,60,-80,80);
-
-const inverseLightDirection = new EnhancedDOMPoint(-0.8, 1.5, -1).normalize_();
-const lightPovView = new Object3d();
-lightPovView.position_.set(inverseLightDirection);
-lightPovView.lookAt(origin);
-lightPovView.rotationMatrix.invertSelf();
-
-const lightPovMvpMatrix = lightPovProjection.multiply(lightPovView.rotationMatrix);
-
+const worldMatrixDepth = gl.getUniformLocation(lilgl.depthProgram, worldMatrix);
+const lightPositionDepth = gl.getUniformLocation(lilgl.depthProgram, lightWorldPosition);
 const lightPovMvpDepthLocation = gl.getUniformLocation(lilgl.depthProgram, lightPovMvp);
-gl.useProgram(lilgl.depthProgram);
-gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.toFloat32Array());
 
-const textureSpaceConversion = new DOMMatrix([
-  0.5, 0.0, 0.0, 0.0,
-  0.0, 0.5, 0.0, 0.0,
-  0.0, 0.0, 0.5, 0.0,
-  0.5, 0.5, 0.5, 1.0
-]);
+const worldMatrixMain = gl.getUniformLocation(lilgl.program, worldMatrix);
+const lightPositionMain = gl.getUniformLocation(lilgl.program, lightWorldPosition);
+const shadowCubeMapMain = gl.getUniformLocation(lilgl.program, shadowCubeMap);
 
-const textureSpaceMvp = textureSpaceConversion.multiplySelf(lightPovMvpMatrix);
+
 const lightPovMvpRenderLocation = gl.getUniformLocation(lilgl.program, lightPovMvp);
 gl.useProgram(lilgl.program);
-gl.uniformMatrix4fv(lightPovMvpRenderLocation, false, textureSpaceMvp.toFloat32Array());
 
 const depthTextureSize = new DOMPoint(4096, 4096);
 const depthTexture = gl.createTexture();
@@ -73,10 +59,34 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTU
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, 0x812F); // gl.CLAMP_TO_EDGE
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, 0x812F); // gl.CLAMP_TO_EDGE
 
-const depthFramebuffer = gl.createFramebuffer();
-gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
-gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
+// const depthFramebuffer = gl.createFramebuffer();
+// gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
+// gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 
+
+const pointLightPosition = new EnhancedDOMPoint(0, 3, 0);
+const lightPerspective = new Camera(Math.PI / 2, 1, 0.1, 60);
+
+export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoint, up: EnhancedDOMPoint) {
+  const zAxis = new EnhancedDOMPoint().subtractVectors(target, position).normalize_(); //normalize(subtractVectors(target, position));
+  const xAxis = new EnhancedDOMPoint().crossVectors(zAxis, up).normalize_(); //normalize(crossVectors(zAxis, up));
+  const yAxis = new EnhancedDOMPoint().crossVectors(xAxis, zAxis); //crossVectors(xAxis, zAxis);
+
+  const invertedZ = new EnhancedDOMPoint(zAxis.x * -1, zAxis.y * -1, zAxis.z * -1);
+
+  return new DOMMatrix([
+    xAxis.x, yAxis.x, invertedZ.x, 0,
+    xAxis.y, yAxis.y, invertedZ.y, 0,
+    xAxis.z, yAxis.z, invertedZ.z, 0,
+    -xAxis.dot(position), -yAxis.dot(position), -invertedZ.dot(position), 1,
+  ]);
+}
+
+
+// gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+
+const cubeMap = new ShadowCubeMapFbo(1024);
+gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap.cubeMapTexture);
 
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
@@ -85,7 +95,6 @@ export function render(camera: Camera, scene: Scene) {
   const renderMesh = (mesh: Mesh, projection: DOMMatrix) => {
     // @ts-ignore
     gl.useProgram(lilgl.program);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     const modelViewProjectionMatrix = projection.multiply(mesh.worldMatrix);
 
     gl.uniform4fv(emissiveLocation, mesh.material.emissive);
@@ -97,25 +106,36 @@ export function render(camera: Camera, scene: Scene) {
 
     // @ts-ignore
     gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.color ? mesh.cachedMatrixData : mesh.worldMatrix.inverse().toFloat32Array());
+    gl.uniformMatrix4fv(worldMatrixMain, false, mesh.worldMatrix.toFloat32Array());
     gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
-    gl.uniformMatrix4fv(lightPovMvpRenderLocation, false, textureSpaceMvp.multiply(mesh.worldMatrix).toFloat32Array());
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
   };
 
   // Render shadow map to depth texture
   gl.useProgram(lilgl.depthProgram);
-  // gl.cullFace(gl.FRONT);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.viewport(0, 0, depthTextureSize.x, depthTextureSize.y);
 
-  scene.solidMeshes.forEach((mesh, index) => {
-    if (index > 0) { //TODO: REMOVE THIS, this is just to not include the roof in the old shadows
+  cubeMap.getSides().forEach(side => {
+    cubeMap.bindForWriting(side);
+
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    const lightView = createLookAt(pointLightPosition, new EnhancedDOMPoint().addVectors(pointLightPosition, side.target), side.up);
+    const lightViewProjectionMatrix = lightPerspective.projection.multiply(lightView);
+
+    gl.uniform3fv(lightPositionDepth, pointLightPosition.toArray());
+
+    scene.solidMeshes.forEach((mesh, index) => {
       gl.bindVertexArray(mesh.geometry.vao!);
-      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpMatrix.multiply(mesh.worldMatrix).toFloat32Array());
+      gl.uniformMatrix4fv(worldMatrixDepth, false, mesh.worldMatrix.toFloat32Array());
+      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightViewProjectionMatrix.multiply(mesh.worldMatrix).toFloat32Array());
       gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-    }
+    });
+
   });
+
+  gl.useProgram(lilgl.program);
+  gl.uniform3fv(lightPositionMain, pointLightPosition.toArray());
 
   // Render solid meshes first
   // gl.activeTexture(gl.TEXTURE0);
@@ -123,6 +143,8 @@ export function render(camera: Camera, scene: Scene) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.cullFace(gl.BACK);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // gl.uniform1i(shadowCubeMapMain, 2);
+
   scene.solidMeshes.forEach(mesh => renderMesh(mesh, viewProjectionMatrix));
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.

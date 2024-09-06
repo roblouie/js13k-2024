@@ -87,7 +87,7 @@ export class GameState implements State {
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
-    this.scene.add_(ceiling, floor, hotelRender, ...elevator, ...this.doors, this.enemy.model_);
+    this.scene.add_(ceiling, floor, hotelRender, ...elevator);
     this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision]));
     tmpl.innerHTML = '';
     tmpl.addEventListener('click', () => {

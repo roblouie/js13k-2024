@@ -1,13 +1,11 @@
 import {
-  allWhite,
   buildSegmentedWall,
   createBox, DoorHeight,
   DoorTopSegment, getAllWhite,
   WallHeight
 } from '@/modeling/building-blocks';
-import { getTextureForSide, MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
+import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { materials } from '@/textures';
-import { Texture } from '@/engine/renderer/texture';
 
 // Original elevator door width too big
 const NormalDoorWidth = 5;
@@ -51,7 +49,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
     materials.wallpaper.texture!,
     materials.wallpaper.texture!,
     materials.wallpaper.texture!,
-    materials.greenPlasterWall.texture!,
+    materials.wallpaper.texture!,
     materials.wallpaper.texture!,]);
 
   const [bathroomDoorWall] = buildSegmentedWall([4, NormalDoorWidth, 4], 12, [12, DoorTopSegment, 12], [], 1, 4, [
@@ -59,26 +57,37 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       materials.greenPlasterWall.texture!,
       materials.greenPlasterWall.texture!,
       materials.greenPlasterWall.texture!,
-      materials.tinyTiles.texture!,
+      materials.greenPlasterWall.texture!,
       materials.greenPlasterWall.texture!
     ]);
   bathroomDoorWall.rotate_(0, Math.PI).translate_(-10).spreadTextureCoords().computeNormals();
 
-  const secondBathroomWall = new MoldableCubeGeometry(1, WallHeight, 11.5).texturePerSide(materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!,
+  const secondBathroomWall = new MoldableCubeGeometry(1, WallHeight, 11.5).texturePerSide(materials.greenPlasterWall.texture!,
     materials.greenPlasterWall.texture!,
-    materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!).translate_(-4, 6, -6.25).spreadTextureCoords();
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!).translate_(-4, 6, -6.25).spreadTextureCoords();
 
   const bathroomCornerColumn = new MoldableCubeGeometry(3, WallHeight, 4).texturePerSide(
-    materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!,
-    materials.tinyTiles.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
   ).translate_(-6, 6, -9.5).spreadTextureCoords();
+
+  const aboveShowerWall = new MoldableCubeGeometry(9, 3, 1).texturePerSide(
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+    materials.greenPlasterWall.texture!,
+  ).merge(new MoldableCubeGeometry(12, 0.5, 1.5).translate_(2, 1.25).texturePerSide(...getAllWhite()))
+    .translate_(-12, 10, -8)
+    .spreadTextureCoords();
 
 
   const bedPlaceholder = new MoldableCubeGeometry(7, 2, 8)
@@ -159,7 +168,8 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
     .merge(
       new MoldableCubeGeometry(6, 7, 0.1, 8, 1, 1)
         .modifyEachVertex(vert => vert.z = Math.sin(vert.x * 3) * 0.3)
-        .translate_(-0.5, 3.5, 2.5)
+        .translate_(-0.5, 3.75, 2.5)
+        .rotate_(-0.1)
         .texturePerSide(...getAllWhite())
     )
     .translate_(-11.75, 1, -9.5)
@@ -211,7 +221,36 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
           .translate_(0, -1.5).texturePerSide(...allWood)).computeNormals()
     )
     .translate_(6, 2, -6.5)
-    .done_()
+    .done_();
+
+  const toilet = new MoldableCubeGeometry(2, 2,2, 4, 2, 4)
+    .cylindrify(1)
+    .scale_(1, 1, 1.2)
+    .selectBy(v => v.y === 0)
+    .scale_(0.7, 1, 0.7)
+    .translate_(0, -0.5)
+    .texturePerSide(...getAllWhite())
+    .merge(new MoldableCubeGeometry(2, 2, 1).translate_(0, 1.5, 1.5).texturePerSide(...getAllWhite()))
+    .all_()
+    .translate_(-14.5, 1.5, -2.25)
+    .done_();
+
+  function makeBedsideTable() {
+    const table = new MoldableCubeGeometry(3, 3, 2).texturePerSide(...allWood);
+    if (isIncludeDetails) {
+      table.merge(new MoldableCubeGeometry(1, 0.2).translate_(0, 1, 0.6).texturePerSide(...allSilver))
+    }
+    return table.computeNormals().done_();
+  }
+
+  const leftBedsideTable = makeBedsideTable().translate_(-0.25, 1.5, -9.5);
+  const rightBedsideTable = makeBedsideTable().translate_(12.25, 1.5, -9.5);
+
+  const desk = makeBedsideTable()
+    .merge(makeBedsideTable().translate_(3))
+    .merge(makeBedsideTable().translate_(-3))
+    .rotate_(0, 3.14)
+    .translate_(0, 1.5, 10);
 
   // TRIM
   function outerLargeTrimPiece() {
@@ -248,7 +287,8 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
   const walls = createBox(testWall3, testWall4, testWall2, testWall)
     .merge(bathroomDoorWall)
     .merge(secondBathroomWall)
-    .merge(bathroomCornerColumn);
+    .merge(bathroomCornerColumn)
+    .merge(aboveShowerWall);
 
   if (isIncludeDetails) {
     return walls.merge(trim)
@@ -257,11 +297,10 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       .merge(counter)
       .merge(bath)
       .merge(bed)
-      // .merge(bathPlaceholder)
-      // TODO: REMOVE THESE
-
-      .merge(toiletPlaceholder)
-      // .merge(counterPlaceholder)
+      .merge(toilet)
+      .merge(leftBedsideTable)
+      .merge(rightBedsideTable)
+      .merge(desk)
   } else {
     return walls
       .merge(bedPlaceholder)
@@ -269,6 +308,9 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       .merge(counterPlaceholder)
       .merge(toiletPlaceholder)
       .merge(bathPlaceholder)
+      .merge(leftBedsideTable)
+      .merge(rightBedsideTable)
+      .merge(desk)
   }
 }
 
