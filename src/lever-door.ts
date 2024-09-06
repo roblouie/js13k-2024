@@ -26,12 +26,12 @@ export class LeverDoorObject3d extends Object3d {
 
   constructor(position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
     const mesh = new Mesh(
-      new MoldableCubeGeometry(5, 8, 0.5)
+      new MoldableCubeGeometry(5, 7.75, 0.25)
         .texturePerSide(...getAllWhite())
         .merge(
           new MoldableCubeGeometry(1, 1, 1, 4, 4)
             .cylindrify(0.2, 'z')
-            .translate_(2 * swapHingeSideX, -0.5)
+            .translate_(2 * swapHingeSideX, 0.5)
             .texturePerSide(materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!)
         )
         .done_(),

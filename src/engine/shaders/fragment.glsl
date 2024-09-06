@@ -68,7 +68,7 @@ void main() {
     vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : vec3(1.0, 1.0, 1.0);
 
     float diffuse = max(0.0, dot(direction2, normalize(correctedNormal)));
-    float attenuation = quadraticLinearConstant(distance, 0.008, 0.01, 0.4);
+    float attenuation = quadraticLinearConstant(distance, 0.005, 0.001, 0.4);
     float brightness = diffuse * attenuation;
 
     vec4 vColor = vec4(litColor.rgb  * clamp(brightness * ShadowFactor, 0.05, 1.0), 1.0);

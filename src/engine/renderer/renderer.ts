@@ -13,6 +13,7 @@ import { createOrtho, Object3d } from '@/engine/renderer/object-3d';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
+import { lightInfo } from '@/light-info';
 
 // IMPORTANT! The index of a given buffer in the buffer array must match it's respective data location in the shader.
 // This allows us to use the index while looping through buffers to bind the attributes. So setting a buffer
@@ -64,7 +65,6 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, 0x812F); // gl.CLAMP_TO_EDGE
 // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 
 
-const pointLightPosition = new EnhancedDOMPoint(0, 6, 0);
 const lightPerspective = new Camera(Math.PI / 2, 1, 0.1, 60);
 
 export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoint, up: EnhancedDOMPoint) {
@@ -91,10 +91,47 @@ export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewProjectionMatrix = camera.projection.multiply(viewMatrix);
 
-  const renderMesh = (mesh: Mesh, projection: DOMMatrix) => {
+  // Render shadow map to depth texture
+  gl.useProgram(lilgl.depthProgram);
+  gl.disable(gl.BLEND);
+  gl.uniform3fv(lightPositionDepth, lightInfo.pointLightPosition.toArray());
+
+  cubeMap.getSides().forEach(side => {
+    cubeMap.bindForWriting(side);
+
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    const lightView = createLookAt(lightInfo.pointLightPosition, new EnhancedDOMPoint().addVectors(lightInfo.pointLightPosition, side.target), side.up);
+    const lightViewProjectionMatrix = lightPerspective.projection.multiply(lightView);
+
+    scene.solidMeshes.forEach((mesh, index) => {
+      gl.bindVertexArray(mesh.geometry.vao!);
+      gl.uniformMatrix4fv(worldMatrixDepth, false, mesh.worldMatrix.toFloat32Array());
+      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightViewProjectionMatrix.multiply(mesh.worldMatrix).toFloat32Array());
+      gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
+    });
+  });
+
+  gl.useProgram(lilgl.program);
+  gl.enable(gl.BLEND);
+  gl.uniform3fv(lightPositionMain, lightInfo.pointLightPosition.toArray());
+
+  // Render solid meshes first
+  gl.activeTexture(gl.TEXTURE0);
+  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.cullFace(gl.BACK);
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // gl.uniform1i(shadowCubeMapMain, 2);
+
+  scene.solidMeshes.forEach(mesh => {
     // @ts-ignore
     gl.useProgram(lilgl.program);
-    const modelViewProjectionMatrix = projection.multiply(mesh.worldMatrix);
+    const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
 
     gl.uniform4fv(emissiveLocation, mesh.material.emissive);
     gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material.texture?.id ?? -1.0);
@@ -108,47 +145,7 @@ export function render(camera: Camera, scene: Scene) {
     gl.uniformMatrix4fv(worldMatrixMain, false, mesh.worldMatrix.toFloat32Array());
     gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-  };
-
-  // Render shadow map to depth texture
-  gl.useProgram(lilgl.depthProgram);
-  gl.disable(gl.BLEND);
-  gl.uniform3fv(lightPositionDepth, pointLightPosition.toArray());
-
-  cubeMap.getSides().forEach(side => {
-    cubeMap.bindForWriting(side);
-
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    const lightView = createLookAt(pointLightPosition, new EnhancedDOMPoint().addVectors(pointLightPosition, side.target), side.up);
-    const lightViewProjectionMatrix = lightPerspective.projection.multiply(lightView);
-
-    scene.solidMeshes.forEach((mesh, index) => {
-      gl.bindVertexArray(mesh.geometry.vao!);
-      gl.uniformMatrix4fv(worldMatrixDepth, false, mesh.worldMatrix.toFloat32Array());
-      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightViewProjectionMatrix.multiply(mesh.worldMatrix).toFloat32Array());
-      gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
-    });
-
   });
-
-  gl.useProgram(lilgl.program);
-  gl.enable(gl.BLEND);
-  gl.uniform3fv(lightPositionMain, pointLightPosition.toArray());
-
-  // Render solid meshes first
-  gl.activeTexture(gl.TEXTURE0);
-  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  gl.cullFace(gl.BACK);
-  gl.clearColor(0.0, 0.0, 0.0, 0.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  // gl.uniform1i(shadowCubeMapMain, 2);
-
-  scene.solidMeshes.forEach(mesh => renderMesh(mesh, viewProjectionMatrix));
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.
   // In theory this isn't necessary but avoids bugs.

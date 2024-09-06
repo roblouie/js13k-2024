@@ -8,6 +8,7 @@ import { upyri } from '@/ai/enemy-model';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { footstep, frenchHorn, song, violin } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
+import { lightInfo } from '@/light-info';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -129,13 +130,16 @@ export class Enemy {
   update_(player: FirstPersonPlayer) {
     // tmpl.innerHTML += `ENEMY AGRESSION: ${this.aggression}<br>`
     this.updateNodeDistanceData();
+    // lightInfo.pointLightPosition.set(this.position);
+    // lightInfo.pointLightPosition.y = 1.5;
+    // lightInfo.pointLightPosition.z = 23;
 
     this.stateMachine.getState().onUpdate(player);
     this.model_.position_.set(this.position);
   }
 
   patrolUpdate(player: FirstPersonPlayer) {
-    this.checkVision(player);
+    // this.checkVision(player);
 
     // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else

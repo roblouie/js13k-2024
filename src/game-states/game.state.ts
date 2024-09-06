@@ -40,7 +40,7 @@ export class GameState implements State {
       new LeverDoorObject3d(new EnhancedDOMPoint(47.75, 4.5, 103.75), -1, -1, true),
 
       // 1304 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-3.75, 4.5, 26.25), 1, 1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-3.75, 4.75, 26.25), 1, 1, true),
 
       // 1305 door
       new LeverDoorObject3d(new EnhancedDOMPoint(3.75, 4.5, 33.75), -1, -1, true),
