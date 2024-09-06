@@ -83,7 +83,6 @@ export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoin
 }
 
 
-gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
 const cubeMap = new ShadowCubeMapFbo(1024);
 gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap.cubeMapTexture);
@@ -114,6 +113,7 @@ export function render(camera: Camera, scene: Scene) {
   // Render shadow map to depth texture
   gl.useProgram(lilgl.depthProgram);
   gl.disable(gl.BLEND);
+  gl.uniform3fv(lightPositionDepth, pointLightPosition.toArray());
 
   cubeMap.getSides().forEach(side => {
     cubeMap.bindForWriting(side);
@@ -123,8 +123,6 @@ export function render(camera: Camera, scene: Scene) {
 
     const lightView = createLookAt(pointLightPosition, new EnhancedDOMPoint().addVectors(pointLightPosition, side.target), side.up);
     const lightViewProjectionMatrix = lightPerspective.projection.multiply(lightView);
-
-    gl.uniform3fv(lightPositionDepth, pointLightPosition.toArray());
 
     scene.solidMeshes.forEach((mesh, index) => {
       gl.bindVertexArray(mesh.geometry.vao!);
@@ -140,7 +138,9 @@ export function render(camera: Camera, scene: Scene) {
   gl.uniform3fv(lightPositionMain, pointLightPosition.toArray());
 
   // Render solid meshes first
-  // gl.activeTexture(gl.TEXTURE0);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.cullFace(gl.BACK);
