@@ -29,8 +29,8 @@ export const enum AttributeLocation {
 gl.enable(gl.CULL_FACE);
 gl.enable(gl.DEPTH_TEST);
 // gl.enable(gl.BLEND);
-// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-// gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 gl.getExtension('EXT_color_buffer_float');
 gl.getExtension('OES_texture_float_linear');
 const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelviewProjection)!;
@@ -64,7 +64,7 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, 0x812F); // gl.CLAMP_TO_EDGE
 // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 
 
-const pointLightPosition = new EnhancedDOMPoint(0, 3, 0);
+const pointLightPosition = new EnhancedDOMPoint(0, 6, 0);
 const lightPerspective = new Camera(Math.PI / 2, 1, 0.1, 60);
 
 export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoint, up: EnhancedDOMPoint) {
@@ -83,7 +83,7 @@ export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoin
 }
 
 
-// gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
 const cubeMap = new ShadowCubeMapFbo(1024);
 gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap.cubeMapTexture);
@@ -113,6 +113,7 @@ export function render(camera: Camera, scene: Scene) {
 
   // Render shadow map to depth texture
   gl.useProgram(lilgl.depthProgram);
+  gl.disable(gl.BLEND);
 
   cubeMap.getSides().forEach(side => {
     cubeMap.bindForWriting(side);
@@ -135,6 +136,7 @@ export function render(camera: Camera, scene: Scene) {
   });
 
   gl.useProgram(lilgl.program);
+  gl.enable(gl.BLEND);
   gl.uniform3fv(lightPositionMain, pointLightPosition.toArray());
 
   // Render solid meshes first
@@ -142,6 +144,7 @@ export function render(camera: Camera, scene: Scene) {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.cullFace(gl.BACK);
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // gl.uniform1i(shadowCubeMapMain, 2);
 

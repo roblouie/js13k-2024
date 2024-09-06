@@ -59,22 +59,19 @@ void main() {
     float ShadowFactor = 0.0;
 
     if (SampledDistance + bias < distance)
-        ShadowFactor = 0.25;
+        ShadowFactor = 0.0;
     else
         ShadowFactor = 1.0;
 
     vec3 correctedNormal = normalize(mat3(vNormalMatrix) * vNormal);
-    vec3 normalizedLightPosition = normalize(light_direction);
-    float litPercent = max(dot(normalizedLightPosition, correctedNormal) * visibility, ambientLight);
 
-
-    vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : (litPercent * vec3(1.0, 1.0, 1.0));
+    vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : vec3(1.0, 1.0, 1.0);
 
     float diffuse = max(0.0, dot(direction2, normalize(correctedNormal)));
     float attenuation = quadraticLinearConstant(distance, 0.008, 0.01, 0.4);
     float brightness = diffuse * attenuation;
 
-    vec4 vColor = vec4(litColor.rgb  * brightness * ShadowFactor, 1.0);
+    vec4 vColor = vec4(litColor.rgb  * clamp(brightness * ShadowFactor, 0.05, 1.0), 1.0);
 
     // TODO: Probably remove this check if all my surfaces have textures, which i beleive they will?
     if (vDepth < 0.0) {

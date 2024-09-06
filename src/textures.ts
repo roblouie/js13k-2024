@@ -70,7 +70,7 @@ async function elevatorPanel() {
     content += button(percentX, percentY, i + 2);
   }
 
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">${content}</svg>`)
+  return metals(content);
 }
 
 function greenPlasterWall() {

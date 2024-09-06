@@ -19,7 +19,7 @@ export function buildElevator() {
       .done_()
     , materials.silver);
   // @ts-ignore
-  const panel = new Mesh(new MoldableCubeGeometry(2, 2, 0.5).translate_(5.4, 5, 5.2).done_(), materials.elevatorPanel);
+  const panel = new Mesh(new MoldableCubeGeometry(1.5, 2, 0.5).translate_(5.4, 5, 5.2).spreadTextureCoords(-2, 2, 0.2).computeNormals().done_(), materials.elevatorPanel);
   //
   const bfSegments = [1.25, 4, 0.5, 4, 0.5, 4, 1.25];
   const lrSegments = [0.5, 4, 0.5, 4, 0.5];
