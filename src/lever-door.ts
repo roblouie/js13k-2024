@@ -31,7 +31,7 @@ export class LeverDoorObject3d extends Object3d {
         .merge(
           new MoldableCubeGeometry(1, 1, 1, 4, 4)
             .cylindrify(0.2, 'z')
-            .translate_(2 * swapHingeSideX)
+            .translate_(2 * swapHingeSideX, -0.5)
             .texturePerSide(materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!)
         )
         .done_(),

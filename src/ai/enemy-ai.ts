@@ -405,7 +405,7 @@ export class Enemy {
     } else {
       const searchSpotFor = 300;
       if (this.spotSearchFrameCount <= searchSpotFor) {
-        this.model_.rotate_(0, this.spotSearchFrameCount > 100 ? 0.02 : -0.02, 0);
+        this.model_.rotate_(0, this.spotSearchFrameCount > 100 ? -0.02 : 0.02, 0);
         this.spotSearchFrameCount++;
       } else {
         // TODO: KIll player based on kill chanceaw
