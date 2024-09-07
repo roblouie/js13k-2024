@@ -12,12 +12,3 @@ html, body {
     place-items: center;
     height: 100%;
 }
-
-#Fullscreen,#Start {
-    fill: #666;
-    cursor: pointer;
-}
-
-#Fullscreen:hover,#Start:hover {
-    fill: red;
-}

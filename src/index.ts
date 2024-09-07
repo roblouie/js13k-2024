@@ -1,9 +1,6 @@
-import { createGameStateMachine, gameStateMachine } from './game-state-machine';
 import { controls } from '@/core/controls';
 import { initTextures } from '@/textures';
 import { GameState } from '@/game-states/game.state';
-import { gameStates } from '@/game-states/game-states';
-import { MenuState } from '@/game-states/menu.state';
 
 let previousTime = 0;
 const interval = 1000 / 60;
@@ -15,10 +12,8 @@ const interval = 1000 / 60;
 
     await initTextures();
 
-    gameStates.gameState = new GameState();
-    gameStates.menuState = new MenuState();
-
-    createGameStateMachine(gameStates.gameState);
+    const gameState = new GameState();
+    gameState.onEnter();
 
     draw(0);
 
@@ -32,7 +27,7 @@ const interval = 1000 / 60;
       previousTime = currentTime - (delta % interval);
 
       controls.queryController();
-      gameStateMachine.getState().onUpdate(delta);
+      gameState.onUpdate();
     }
     requestAnimationFrame(draw);
   }
