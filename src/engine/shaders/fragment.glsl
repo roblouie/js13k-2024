@@ -14,38 +14,27 @@ in vec3 worldPosition;
 uniform vec2 textureRepeat;
 uniform vec4 emissive;
 uniform vec3 lightWorldPosition;
+vec4 pointLightColor = vec4(1.0, 1.0, 1.0, 1.0);
 uniform mediump sampler2DArray uSampler;
 uniform mediump sampler2DShadow shadowMap;
 uniform mediump samplerCube shadowCubeMap;
 
+vec3 spotlightPosition = vec3(0.0, 8.0, 40.0);
+vec3 spotlightDirection = normalize(vec3(0.0, -1.0, 0.0));
+vec4 spotlightColor = vec4(1.0, 1.0, 0.8, 1.0);
+float lightInnerCutoff = 1.0;
+float lightOuterCutoff = 0.85;
+
+vec4 ambientLight = vec4(0.05, 0.05, 0.05, 1.0);
+
 out vec4 outColor;
-
-vec3 light_direction = vec3(-1, 1.5, -1);
-
-float ambientLight = 0.2f;
-float maxLit = 1.0f;
-
-vec2 adjacentPixels[5] = vec2[](
-  vec2(0, 0),
-  vec2(-1, 0),
-  vec2(1, 0),
-  vec2(0, 1),
-  vec2(0, -1)
-);
-
-float visibility = 1.0;
-float shadowSpread = 4200.0;
 
 float quadraticLinearConstant(float distance, float a, float b, float c) {
     return 1.0 / (distance * distance * a +distance * b + c);
 }
 
 void main() {
-//    for (int i = 0; i < 5; i++) {
-//        vec3 samplePosition = vec3(positionFromLightPov.xy + adjacentPixels[i]/shadowSpread, positionFromLightPov.z - 0.001);
-//        float hitByLight = texture(shadowMap, samplePosition);
-//        visibility *= max(hitByLight, 0.87);
-//    }
+
 
     vec3 lightWorldDir = worldPosition - lightWorldPosition;
     vec3 offset = lightWorldPosition - worldPosition;
@@ -67,11 +56,19 @@ void main() {
 
     vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : vec3(1.0, 1.0, 1.0);
 
-    float diffuse = max(0.0, dot(direction2, normalize(correctedNormal)));
+    float diffuse = max(0.0, dot(direction2, correctedNormal));
     float attenuation = quadraticLinearConstant(distance, 0.005, 0.001, 0.4);
-    float brightness = diffuse * attenuation;
+    vec4 pointLightBrightness = pointLightColor * diffuse * attenuation * ShadowFactor;
 
-    vec4 vColor = vec4(litColor.rgb  * clamp(brightness * ShadowFactor, 0.05, 1.0), 1.0);
+    // Spotlight
+    vec3 spotlightOffset = spotlightPosition - worldPosition;
+    vec3 spotlightSurfaceToLight = normalize(spotlightOffset);
+    float spotlightDiffuse = max(0.0, dot(spotlightSurfaceToLight, correctedNormal));
+    float angleToSurface = dot(spotlightDirection, -spotlightSurfaceToLight);
+    float spot = smoothstep(lightOuterCutoff, lightInnerCutoff, angleToSurface);
+    vec4 spotlight = spotlightColor * diffuse * spot;
+
+    vec4 vColor = clamp(ambientLight + pointLightBrightness + spotlight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
 
     // TODO: Probably remove this check if all my surfaces have textures, which i beleive they will?
     if (vDepth < 0.0) {
