@@ -391,7 +391,7 @@ export class Enemy {
 
   searchUpdate(player: FirstPersonPlayer) {
     // tmpl.innerHTML += 'ENEMY STATE: SEARCH<br>';
-    this.updateLight(3, 9);
+    this.updateLight(5, 5);
 
     // If player comes out from hiding spot while searching, chase them
     if (!player.isHiding) {
@@ -442,6 +442,8 @@ export class Enemy {
   }
 
   fleeUpdate() {
+    this.updateLight(3, 9);
+
     // tmpl.innerHTML += 'ENEMY STATE: FLEE<br>';
     if (this.nextNodeDistance > 1) {
       // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;

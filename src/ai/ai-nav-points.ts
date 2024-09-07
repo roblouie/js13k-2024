@@ -9,7 +9,7 @@ function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, doo
   const roomEntranceNode = new PathNode(roomPosition, door, roomNumber);
   const bathEntranceOffset = new EnhancedDOMPoint(12, 0, -1);
   const roomOffset = new EnhancedDOMPoint(27, 0, -3);
-  const closetHidingPlaceOffset = new EnhancedDOMPoint(35.5, 0, -1);
+  const closetHidingPlaceOffset = new EnhancedDOMPoint(35.5, 0, 0.5);
   const showerHidingPlaceOffset = new EnhancedDOMPoint(12.75, 0, -15);
   if (isGoingRight) {
     bathEntranceOffset.scale_(-1);
