@@ -9,6 +9,7 @@ import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engi
 import { footstep, frenchHorn, song, violin } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
 import { lightInfo } from '@/light-info';
+import { Object3d } from '@/engine/renderer/object-3d';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -47,6 +48,7 @@ export class Enemy {
   unseenFrameCount = 0;
   aggression = 0;
   songPlayer: SimplestMidiRev2;
+  lightObject = new Object3d();
 
   constructor(startingNode: PathNode) {
     this.songPlayer = new SimplestMidiRev2();
@@ -77,6 +79,7 @@ export class Enemy {
     this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
     this.stateMachine = new StateMachine(this.patrolState);
     this.model_ = upyri();
+    this.model_.add_(this.lightObject);
   }
 
   playSong() {
@@ -128,18 +131,26 @@ export class Enemy {
 
 
   update_(player: FirstPersonPlayer) {
-    // tmpl.innerHTML += `ENEMY AGRESSION: ${this.aggression}<br>`
+    // this.lightObject.position_.z = -4;
+    // tmpl.innerHTML += `ENEMY AGRESSION: ${this.lightPosition.worldMatrix}<br>`
     this.updateNodeDistanceData();
-    // lightInfo.pointLightPosition.set(this.position);
-    // lightInfo.pointLightPosition.y = 1.5;
+    //lightInfo.pointLightPosition.set(this.position);
     // lightInfo.pointLightPosition.z = 23;
 
     this.stateMachine.getState().onUpdate(player);
     this.model_.position_.set(this.position);
+    this.model_.updateWorldMatrix();
+    const test = this.model_.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 8));
+    lightInfo.pointLightPosition.x = test.x;
+    lightInfo.pointLightPosition.y = 9;
+    lightInfo.pointLightPosition.z = test.z;
+
+    // tmpl.innerHTML += `LIGHT POS: ${test.x}, ${test.y}, ${test.z}<br>`;
+    // tmpl.innerHTML += `ENEMY POS: ${this.position.x}, ${this.position.y}, ${this.position.z}`;
   }
 
   patrolUpdate(player: FirstPersonPlayer) {
-    // this.checkVision(player);
+    this.checkVision(player);
 
     // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
