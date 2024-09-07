@@ -8,7 +8,7 @@ import {
 import { PathNode } from '@/ai/path-node';
 import { HidingPlace } from '@/hiding-place';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { hideSound } from '@/sounds';
+import { flashlightSound, hideSound } from '@/sounds';
 import { lightInfo } from '@/light-info';
 
 class Sphere {
@@ -141,6 +141,7 @@ export class FirstPersonPlayer {
     this.velocity.x = depthMovementX + sidestepX;
 
     if (controls.isFlashlight && !controls.prevFlash) {
+      this.sfxPlayer.playNote(audioContext.currentTime, 31 + (this.isFlashlightOn ? 0 : 10), 20, flashlightSound, audioContext.currentTime + 1);
       this.isFlashlightOn = !this.isFlashlightOn;
     }
   }

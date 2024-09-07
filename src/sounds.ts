@@ -4,6 +4,7 @@ export const violin = [{ ...defaults, w:"sawtooth",v:0.4,a:0.1,d:0.2,},{ ...defa
 export const frenchHorn = [{ ...defaults, w:"square",v:0.1,a:0.1,d:0.5,s:0.5,r:0.08,},{ ...defaults, w:"sine",v:1,d:0.1,s:4,output:1,}];
 export const doorOpening4 = [{...defaults, w:"sawtooth",v:0.4,a:0.1,d:1,p:2,q:1.5,},{...defaults, output:1,w:"n1",v:0.5,f:11,d:11,s:0.2,}];
 export const hideSound = [{...defaults, w:"n0",v:0.2,a:0.05,h:0.02,d:0.02,r:0.02,}];
+export const flashlightSound = [{...defaults, w:"n0",p:0,r:0.01,h:0,v:0.3,}];
 
 export const song = expandSong('2P(322P*322P,322P.322Q0322P2322P4322Q6322R8322R:322R<322R>322S@322RB322RD322SF322MH322MJ322ML322MN322NP322MR322MT322NV3235(B<32(B<3/(B<3/8B<3,8B<3)8B<36HB<33HB<30HB<');
 
