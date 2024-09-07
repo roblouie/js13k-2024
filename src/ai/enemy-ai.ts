@@ -131,7 +131,7 @@ export class Enemy {
 
 
   update_(player: FirstPersonPlayer) {
-    // this.lightObject.position_.z = -4;
+    this.lightObject.position_.z = 8;
     // tmpl.innerHTML += `ENEMY AGRESSION: ${this.lightPosition.worldMatrix}<br>`
     this.updateNodeDistanceData();
     //lightInfo.pointLightPosition.set(this.position);
@@ -140,10 +140,8 @@ export class Enemy {
     this.stateMachine.getState().onUpdate(player);
     this.model_.position_.set(this.position);
     this.model_.updateWorldMatrix();
-    const test = this.model_.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 8));
-    lightInfo.pointLightPosition.x = test.x;
+    lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
     lightInfo.pointLightPosition.y = 9;
-    lightInfo.pointLightPosition.z = test.z;
 
     // tmpl.innerHTML += `LIGHT POS: ${test.x}, ${test.y}, ${test.z}<br>`;
     // tmpl.innerHTML += `ENEMY POS: ${this.position.x}, ${this.position.y}, ${this.position.z}`;
