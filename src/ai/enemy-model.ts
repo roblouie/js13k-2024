@@ -18,10 +18,10 @@ export function upyri() {
         materials.face.texture!,
         materials.face.texture!,
       )
-      .computeNormals(true)
       .all_()
       .rotate_(Math.PI)
       .translate_(0, 5)
+      .computeNormals(true)
       .done_()
     , materials.face);
 

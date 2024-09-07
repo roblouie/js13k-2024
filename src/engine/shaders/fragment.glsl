@@ -19,8 +19,8 @@ uniform mediump sampler2DArray uSampler;
 uniform mediump sampler2DShadow shadowMap;
 uniform mediump samplerCube shadowCubeMap;
 
-vec3 spotlightPosition = vec3(0.0, 8.0, 40.0);
-vec3 spotlightDirection = normalize(vec3(0.0, -1.0, 0.0));
+uniform vec3 spotlightPosition;
+uniform vec3 spotlightDirection;
 vec4 spotlightColor = vec4(1.0, 1.0, 0.8, 1.0);
 float lightInnerCutoff = 1.0;
 float lightOuterCutoff = 0.85;
@@ -63,10 +63,12 @@ void main() {
     // Spotlight
     vec3 spotlightOffset = spotlightPosition - worldPosition;
     vec3 spotlightSurfaceToLight = normalize(spotlightOffset);
+    float spotlightDistance = length(spotlightOffset);
     float spotlightDiffuse = max(0.0, dot(spotlightSurfaceToLight, correctedNormal));
     float angleToSurface = dot(spotlightDirection, -spotlightSurfaceToLight);
     float spot = smoothstep(lightOuterCutoff, lightInnerCutoff, angleToSurface);
-    vec4 spotlight = spotlightColor * diffuse * spot;
+    float spotlightAttenuation = quadraticLinearConstant(spotlightDistance, 0.005, 0.001, 0.4);
+    vec4 spotlight = spotlightColor * spotlightDiffuse * spot * spotlightAttenuation;
 
     vec4 vColor = clamp(ambientLight + pointLightBrightness + spotlight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
 

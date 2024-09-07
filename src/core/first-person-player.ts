@@ -9,6 +9,7 @@ import { PathNode } from '@/ai/path-node';
 import { HidingPlace } from '@/hiding-place';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { hideSound } from '@/sounds';
+import { lightInfo } from '@/light-info';
 
 class Sphere {
   center: EnhancedDOMPoint;
@@ -34,6 +35,7 @@ export class FirstPersonPlayer {
   differenceFromNavPoint = new EnhancedDOMPoint();
   listener: AudioListener;
   sfxPlayer: SimplestMidiRev2;
+  isFlashlightOn = false;
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.sfxPlayer = new SimplestMidiRev2();
@@ -106,20 +108,25 @@ export class FirstPersonPlayer {
 
       this.camera.position_.set(this.feetCenter);
       this.camera.position_.y += 3.5;
+
     } else if (controls.isConfirm && !controls.prevConfirm) {
       this.unhide();
     }
 
     this.camera.setRotation_(...this.cameraRotation.toArray());
 
-    this.normal.set(0, 0, 1);
+    this.normal.set(0, 0, -1);
     this.normal.set(this.camera.rotationMatrix.transformPoint(this.normal));
+    lightInfo.spotLightPosition.set(this.camera.position_);
+    lightInfo.spotLightDirection.set(this.normal);
+
+    if (!this.isFlashlightOn || this.isHiding) {
+      lightInfo.spotLightPosition.y = -100;
+    }
 
     this.camera.updateWorldMatrix();
     this.updateAudio();
   }
-
-  isJumping = false;
 
   protected updateVelocityFromControls() {
     const speed = 0.24;
@@ -132,6 +139,10 @@ export class FirstPersonPlayer {
 
     this.velocity.z = depthMovementZ + sidestepZ;
     this.velocity.x = depthMovementX + sidestepX;
+
+    if (controls.isFlashlight && !controls.prevFlash) {
+      this.isFlashlightOn = !this.isFlashlightOn;
+    }
   }
 
   private updateAudio() {

@@ -31,40 +31,40 @@ export class GameState implements State {
 
     this.doors = [
       // 1301 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(47.75, 4.5, 33.75), -1, -1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(48, 4.5, 33.75), -1, -1, true),
 
       // 1302 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(47.75, 4.5, 68.75), -1, -1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(48, 4.5, 68.75), -1, -1, true),
 
       // 1303 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(47.75, 4.5, 103.75), -1, -1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(48, 4.5, 103.75), -1, -1, true),
 
       // 1304 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-3.75, 4.75, 26.25), 1, 1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-4, 4.75, 26.25), 1, 1, true),
 
       // 1305 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(3.75, 4.5, 33.75), -1, -1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(4, 4.5, 33.75), -1, -1, true),
 
       // 1306 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-3.75, 4.5, 61.25), 1, 1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-4, 4.5, 61.25), 1, 1, true),
 
       // 1307 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(3.75, 4.5, 68.75), -1, -1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(4, 4.5, 68.75), -1, -1, true),
 
       // 1308 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-3.75, 4.5, 96.25), 1, 1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-4, 4.5, 96.25), 1, 1, true),
 
       // 1309 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(3.75, 4.5, 103.75), -1, -1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(4, 4.5, 103.75), -1, -1, true),
 
       // 1310 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-47.75, 4.5, 26.25), 1, 1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-48, 4.5, 26.25), 1, 1, true),
 
       // 1311 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-47.75, 4.5, 61.25), 1, 1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-48, 4.5, 61.25), 1, 1, true),
 
       // 1312 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-47.75, 4.5, 96.25), 1, 1, true),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-48, 4.5, 96.25), 1, 1, true),
 
       // 1313 Door Left
       new LeverDoorObject3d(new EnhancedDOMPoint(3, 4.5, 124), -1, -1, false),
@@ -124,8 +124,8 @@ export class GameState implements State {
           // tmpl.innerHTML += `DISTANCE ${i}: ${distance}<br/>`
 
           const direction = this.player.normal.dot(this.playerDoorDifference.normalize_());
-          // tmpl.innerHTML += `DIRECTION ${i}: ${direction}<br/>`
-          if (distance < 1 || direction > 0.77) {
+          tmpl.innerHTML += `DIRECTION: ${direction}<br/>`
+          if (distance < 1 || direction < -0.77) {
             if (door.isLocked) {
               tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
             } else if (this.enemy.currentNode.door === door) {
@@ -153,7 +153,7 @@ export class GameState implements State {
         // tmpl.innerHTML += `HIDING PLACE DISTANCE: ${distance}`;
         if (distance < 8) {
           const direction = this.player.normal.dot(this.playerHidingPlaceDifference.normalize_());
-          if (direction > 0.77 && !this.player.isHiding) {
+          if (direction < -0.77 && !this.player.isHiding) {
             tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 HIDE</div>`;
             if (controls.isConfirm && !controls.prevConfirm) {
               this.player.hide(hidingPlace);

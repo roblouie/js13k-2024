@@ -6,7 +6,7 @@ import { Mesh } from '@/engine/renderer/mesh';
 import {
   emissive, lightPovMvp, lightWorldPosition,
   modelviewProjection,
-  normalMatrix, shadowCubeMap,
+  normalMatrix, shadowCubeMap, spotlightDirection, spotlightPosition,
   textureRepeat, worldMatrix,
 } from '@/engine/shaders/shaders';
 import { createOrtho, Object3d } from '@/engine/renderer/object-3d';
@@ -38,6 +38,8 @@ const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelvi
 const normalMatrixLocation =  gl.getUniformLocation(lilgl.program, normalMatrix)!;
 const emissiveLocation = gl.getUniformLocation(lilgl.program, emissive)!;
 const textureRepeatLocation = gl.getUniformLocation(lilgl.program, textureRepeat)!;
+const spotlightPositionLocation = gl.getUniformLocation(lilgl.program, spotlightPosition)!;
+const spotlightDirectionLocation = gl.getUniformLocation(lilgl.program, spotlightDirection)!;
 
 const worldMatrixDepth = gl.getUniformLocation(lilgl.depthProgram, worldMatrix);
 const lightPositionDepth = gl.getUniformLocation(lilgl.depthProgram, lightWorldPosition);
@@ -45,7 +47,7 @@ const lightPovMvpDepthLocation = gl.getUniformLocation(lilgl.depthProgram, light
 
 const worldMatrixMain = gl.getUniformLocation(lilgl.program, worldMatrix);
 const lightPositionMain = gl.getUniformLocation(lilgl.program, lightWorldPosition);
-const shadowCubeMapMain = gl.getUniformLocation(lilgl.program, shadowCubeMap);
+// const shadowCubeMapMain = gl.getUniformLocation(lilgl.program, shadowCubeMap);
 
 
 const lightPovMvpRenderLocation = gl.getUniformLocation(lilgl.program, lightPovMvp);
@@ -116,6 +118,8 @@ export function render(camera: Camera, scene: Scene) {
   gl.useProgram(lilgl.program);
   gl.enable(gl.BLEND);
   gl.uniform3fv(lightPositionMain, lightInfo.pointLightPosition.toArray());
+  gl.uniform3fv(spotlightPositionLocation, lightInfo.spotLightPosition.toArray());
+  gl.uniform3fv(spotlightDirectionLocation, lightInfo.spotLightDirection.toArray());
 
   // Render solid meshes first
   gl.activeTexture(gl.TEXTURE0);
