@@ -129,9 +129,14 @@ export class Enemy {
     this.currentNodeDifference.subtractVectors(this.currentNode.position, this.position);
   }
 
+  updateLight(followDistance: number, height: number) {
+    this.lightObject.position_.z = followDistance;
+    lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
+    lightInfo.pointLightPosition.y = height;
+  }
+
 
   update_(player: FirstPersonPlayer) {
-    this.lightObject.position_.z = 8;
     // tmpl.innerHTML += `ENEMY AGRESSION: ${this.lightPosition.worldMatrix}<br>`
     this.updateNodeDistanceData();
     //lightInfo.pointLightPosition.set(this.position);
@@ -140,8 +145,8 @@ export class Enemy {
     this.stateMachine.getState().onUpdate(player);
     this.model_.position_.set(this.position);
     this.model_.updateWorldMatrix();
-    lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
-    lightInfo.pointLightPosition.y = 9;
+    // lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
+    // lightInfo.pointLightPosition.y = 9;
 
     // tmpl.innerHTML += `LIGHT POS: ${test.x}, ${test.y}, ${test.z}<br>`;
     // tmpl.innerHTML += `ENEMY POS: ${this.position.x}, ${this.position.y}, ${this.position.z}`;
@@ -149,6 +154,12 @@ export class Enemy {
 
   patrolUpdate(player: FirstPersonPlayer) {
     this.checkVision(player);
+
+    if (player.closestNavPoint.hidingPlace) {
+      this.updateLight(4, 2);
+    } else {
+      this.updateLight(8, 9);
+    }
 
     // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
@@ -232,6 +243,7 @@ export class Enemy {
   }
 
   chaseEnter(player: FirstPersonPlayer) {
+    this.stopSong();
     this.playSong();
     this.pathCache = [];
     this.positionInPathCache = 0;
@@ -245,6 +257,7 @@ export class Enemy {
 
   chaseUpdate(player: FirstPersonPlayer) {
     // tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+    this.updateLight(8, 9);
 
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor(player)) {
@@ -378,6 +391,7 @@ export class Enemy {
 
   searchUpdate(player: FirstPersonPlayer) {
     // tmpl.innerHTML += 'ENEMY STATE: SEARCH<br>';
+    this.updateLight(3, 9);
 
     // If player comes out from hiding spot while searching, chase them
     if (!player.isHiding) {

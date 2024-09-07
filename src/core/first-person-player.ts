@@ -141,7 +141,7 @@ export class FirstPersonPlayer {
     this.velocity.x = depthMovementX + sidestepX;
 
     if (controls.isFlashlight && !controls.prevFlash) {
-      this.sfxPlayer.playNote(audioContext.currentTime, 31 + (this.isFlashlightOn ? 0 : 10), 20, flashlightSound, audioContext.currentTime + 1);
+      this.sfxPlayer.playNote(audioContext.currentTime, 31 + (this.isFlashlightOn ? 0 : 10), 40, flashlightSound, audioContext.currentTime + 1);
       this.isFlashlightOn = !this.isFlashlightOn;
     }
   }
