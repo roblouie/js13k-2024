@@ -42,7 +42,7 @@ export class FirstPersonPlayer {
     this.sfxPlayer = new SimplestMidiRev2();
     this.sfxPlayer.volume_.connect(compressor);
     this.closestNavPoint = startingPoint;
-    this.feetCenter.set(0, 10, -0);
+    this.feetCenter.set(2, 2.5, -2);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
     this.listener = audioContext.listener;

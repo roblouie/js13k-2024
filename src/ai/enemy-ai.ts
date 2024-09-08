@@ -49,6 +49,8 @@ export class Enemy {
   aggression = 0;
   songPlayer: SimplestMidiRev2;
   lightObject = new Object3d();
+  footstepDebounce = 0;
+  isSpawned = false;
 
   constructor(startingNode: PathNode) {
     this.songPlayer = new SimplestMidiRev2();
@@ -137,6 +139,10 @@ export class Enemy {
 
 
   update_(player: FirstPersonPlayer) {
+    if (!this.isSpawned) {
+      this.position.y = -1000;
+      return;
+    }
     // tmpl.innerHTML += `ENEMY AGRESSION: ${this.lightPosition.worldMatrix}<br>`
     this.updateNodeDistanceData();
     //lightInfo.pointLightPosition.set(this.position);
@@ -188,7 +194,6 @@ export class Enemy {
     }
   }
 
-  footstepDebounce: number;
   moveInTravelingDirection() {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;

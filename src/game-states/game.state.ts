@@ -96,11 +96,11 @@ export class GameState implements State {
     tmpl.addEventListener('click', () => {
       tmpl.requestPointerLock();
     });
-    this.player.cameraRotation.set(0, 90, 0);
+    this.player.cameraRotation.set(0, Math.PI, 0);
 
     setTimeout(() => {
       this.elevator.isOpenTriggered = true;
-    }, 5_000);
+    }, 7_000);
   }
 
   playerDoorDifference = new EnhancedDOMPoint();
