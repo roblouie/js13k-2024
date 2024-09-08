@@ -18,8 +18,8 @@ import { AiNavPoints, items, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
 import { lightInfo } from '@/light-info';
 import { PathNode } from '@/ai/path-node';
-import { audioContext } from '@/engine/audio/simplest-midi';
-import { elevatorDoor1, elevatorMotionRev1 } from '@/sounds';
+import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
+import { baseDrum, elevatorDoor1, elevatorDoorTest, elevatorMotionRev1 } from '@/sounds';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -35,7 +35,10 @@ export class GameState implements State {
   hasPlayerLeftElevator = false;
   hasEnemySpawned = false;
 
+  sfxPlayer = new SimplestMidiRev2();
+
   constructor() {
+    this.sfxPlayer.volume_.connect(biquadFilter);
     this.scene = new Scene();
     //this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500));
 
@@ -104,12 +107,13 @@ export class GameState implements State {
       tmpl.requestPointerLock();
     });
     this.player.cameraRotation.set(0, Math.PI, 0);
-    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 80, elevatorMotionRev1, audioContext.currentTime + 5.8);
+    // this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 80, elevatorMotionRev1, audioContext.currentTime + 6);
 
     setTimeout(() => {
       this.elevator.isOpenTriggered = true;
       this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
-    }, 7_000);
+      this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
+    }, 0);
   }
 
   playerDoorDifference = new EnhancedDOMPoint();
@@ -232,6 +236,7 @@ export class GameState implements State {
         this.hasPlayerLeftElevator = true;
         this.elevator.isCloseTriggered = true;
         this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
+        this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
         setTimeout(() => {
           const bathNode = this.firstNodeRef.getPresentSiblings().find(node => node.hidingPlace);
           const roomNode = bathNode?.getPresentSiblings().find(node => node.hidingPlace);
