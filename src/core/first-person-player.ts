@@ -35,15 +35,12 @@ export class FirstPersonPlayer {
   differenceFromNavPoint = new EnhancedDOMPoint();
   listener: AudioListener;
   sfxPlayer: SimplestMidiRev2;
-  sfxPlayerRaw: SimplestMidiRev2;
   isFlashlightOn = false;
   heldKeyRoomNumber?: number;
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.sfxPlayer = new SimplestMidiRev2();
-    this.sfxPlayerRaw = new SimplestMidiRev2();
     this.sfxPlayer.volume_.connect(compressor);
-    this.sfxPlayerRaw.volume_.connect(audioContext.destination);
     this.closestNavPoint = startingPoint;
     this.feetCenter.set(2, 2.5, -2);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
