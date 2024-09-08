@@ -6,7 +6,7 @@ import { Mesh } from '@/engine/renderer/mesh';
 import {
   emissive, lightPovMvp, lightWorldPosition,
   modelviewProjection,
-  normalMatrix, shadowCubeMap, spotlightDirection, spotlightPosition,
+  normalMatrix, pointLightAttenuation, shadowCubeMap, spotlightDirection, spotlightPosition,
   textureRepeat, worldMatrix,
 } from '@/engine/shaders/shaders';
 import { createOrtho, Object3d } from '@/engine/renderer/object-3d';
@@ -38,6 +38,7 @@ const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelvi
 const normalMatrixLocation =  gl.getUniformLocation(lilgl.program, normalMatrix)!;
 const emissiveLocation = gl.getUniformLocation(lilgl.program, emissive)!;
 const textureRepeatLocation = gl.getUniformLocation(lilgl.program, textureRepeat)!;
+const pointLightAttenuationLocation = gl.getUniformLocation(lilgl.program, pointLightAttenuation);
 const spotlightPositionLocation = gl.getUniformLocation(lilgl.program, spotlightPosition)!;
 const spotlightDirectionLocation = gl.getUniformLocation(lilgl.program, spotlightDirection)!;
 
@@ -120,6 +121,7 @@ export function render(camera: Camera, scene: Scene) {
   gl.uniform3fv(lightPositionMain, lightInfo.pointLightPosition.toArray());
   gl.uniform3fv(spotlightPositionLocation, lightInfo.spotLightPosition.toArray());
   gl.uniform3fv(spotlightDirectionLocation, lightInfo.spotLightDirection.toArray());
+  gl.uniform3fv(pointLightAttenuationLocation, lightInfo.pointLightAttenuation.toArray());
 
   // Render solid meshes first
   gl.activeTexture(gl.TEXTURE0);

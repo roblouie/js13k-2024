@@ -16,6 +16,8 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { LeverDoorObject3d } from '@/lever-door';
 import { AiNavPoints, items, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
+import { lightInfo } from '@/light-info';
+import { PathNode } from '@/ai/path-node';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -26,7 +28,10 @@ export class GameState implements State {
   enemy: Enemy;
 
   elevator: Elevator;
+  firstNodeRef: PathNode;
+
   hasPlayerLeftElevator = false;
+  hasEnemySpawned = false;
 
   constructor() {
     this.scene = new Scene();
@@ -75,7 +80,7 @@ export class GameState implements State {
       new LeverDoorObject3d(new EnhancedDOMPoint(-3, 4.75, 124), 1, -1, false, true),
     ];
 
-    makeNavPoints(this.doors);
+    this.firstNodeRef = makeNavPoints(this.doors);
 
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[0])
 
@@ -206,6 +211,11 @@ export class GameState implements State {
               this.scene.remove_(item.mesh);
               if (item.roomNumber) {
                 this.player.heldKeyRoomNumber = item.roomNumber;
+                if (!this.hasEnemySpawned) {
+                  this.hasEnemySpawned = true;
+                  lightInfo.pointLightAttenuation.set(0.005, 0.001, 0.4);
+                  // TODO: Spawn enemy;
+                }
               }
             }
           }
@@ -215,7 +225,15 @@ export class GameState implements State {
     // Only really have a couple of events so handle them with booleans even though it kind of sucks
     if (!this.hasPlayerLeftElevator) {
       if (new EnhancedDOMPoint().subtractVectors(this.player.feetCenter, AiNavPoints[0].position).magnitude > 25) {
+        this.hasPlayerLeftElevator = true;
         this.elevator.isCloseTriggered = true;
+        setTimeout(() => {
+          const bathNode = this.firstNodeRef.getPresentSiblings().find(node => node.hidingPlace);
+          const roomNode = bathNode?.getPresentSiblings().find(node => node.hidingPlace);
+          lightInfo.pointLightPosition.set(roomNode!.position);
+          lightInfo.pointLightPosition.y = 8;
+          bathNode!.door!.pullLever(true);
+        } ,3_000)
       }
     }
   }

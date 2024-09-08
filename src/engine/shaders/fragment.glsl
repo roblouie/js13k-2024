@@ -14,6 +14,7 @@ in vec3 worldPosition;
 uniform vec2 textureRepeat;
 uniform vec4 emissive;
 uniform vec3 lightWorldPosition;
+uniform vec3 pointLightAttenuation;
 vec4 pointLightColor = vec4(1.0, 1.0, 1.0, 1.0);
 uniform mediump sampler2DArray uSampler;
 uniform mediump sampler2DShadow shadowMap;
@@ -34,8 +35,6 @@ float quadraticLinearConstant(float distance, float a, float b, float c) {
 }
 
 void main() {
-
-
     vec3 lightWorldDir = worldPosition - lightWorldPosition;
     vec3 offset = lightWorldPosition - worldPosition;
     float distance = length(lightWorldDir);
@@ -57,7 +56,7 @@ void main() {
     vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : vec3(1.0, 1.0, 1.0);
 
     float diffuse = max(0.0, dot(direction2, correctedNormal));
-    float attenuation = quadraticLinearConstant(distance, 0.005, 0.001, 0.4);
+    float attenuation = quadraticLinearConstant(distance, pointLightAttenuation.x, pointLightAttenuation.y, pointLightAttenuation.z);
     vec4 pointLightBrightness = pointLightColor * diffuse * attenuation * ShadowFactor;
 
     // Spotlight

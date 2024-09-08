@@ -56,9 +56,6 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   let roomsWorkingCopy = [...roomEntrances];
   const firstNode = roomEntrances[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
-  setTimeout(() => {
-    firstNode.door?.pullLever(true);
-  }, 10_000); // TODO: Adjust this
 
   placeKeys(firstNode);
 
@@ -171,5 +168,7 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   AiNavPoints.push(
     // Corners
     BottomCenterEntrance, LowerLeftCorner, LowerRightCorner, TopLeftCorner, TopRightCorner,
-  )
+  );
+
+  return firstNode;
 }

@@ -52,8 +52,8 @@ export class Elevator {
 
     this.openDoors = () => {
       if (elevatorRightDoor.position_.x > -5) {
-        elevatorRightDoor.position_.x -= 0.04;
-        elevatorLeftDoor.position_.x += 0.04;
+        elevatorRightDoor.position_.x -= 0.02;
+        elevatorLeftDoor.position_.x += 0.02;
       } else {
         this.isOpenTriggered = false;
       }
@@ -62,8 +62,8 @@ export class Elevator {
 
     this.closeDoors = () => {
       if (elevatorRightDoor.position_.x < 0) {
-        elevatorRightDoor.position_.x += 0.04;
-        elevatorLeftDoor.position_.x -= 0.04;
+        elevatorRightDoor.position_.x += 0.05;
+        elevatorLeftDoor.position_.x -= 0.05;
       } else {
         this.isCloseTriggered = false;
       }
