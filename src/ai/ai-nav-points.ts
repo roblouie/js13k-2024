@@ -60,18 +60,39 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   function placeKeys(activeNode: PathNode) {
     roomsWorkingCopy = roomsWorkingCopy.filter(node => node !== activeNode);
+    let nextNode: PathNode;
+    let longestDistance = 0;
+    const difference = new EnhancedDOMPoint();
+    roomsWorkingCopy.forEach(node => {
+      const distance = difference.subtractVectors(activeNode.position, node.position).magnitude;
+      if (distance > longestDistance) {
+        longestDistance = distance;
+        nextNode = node;
+      }
+    });
+
+    if (Math.random() <= 0.3) {
+      nextNode = roomEntrances[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
+    }
+
+    nextNode!.door!.isLocked = true;
+
     const bathNode = activeNode.getPresentSiblings().find(node => node.hidingPlace)!;
     const roomNode = bathNode.getPresentSiblings().find(node => node.hidingPlace)!;
     if (Math.random() < 0.5) {
-      bathNode.item = new Item(bathNode.position);
+      bathNode.item = new Item(bathNode.position, nextNode!.roomNumber);
       bathNode.item.mesh.position_.y += 3;
       items.push(bathNode.item);
       console.log(bathNode.roomNumber);
     } else {
-      roomNode.item = new Item(roomNode.position);
+      roomNode.item = new Item(roomNode.position, nextNode!.roomNumber);
       roomNode.item.mesh.position_.y += 3;
       items.push(roomNode.item);
       console.log(roomNode.roomNumber);
+    }
+
+    if (roomsWorkingCopy.length > 3) {
+      placeKeys(nextNode!);
     }
   }
 
