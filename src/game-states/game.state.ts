@@ -14,7 +14,7 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { makeHotel } from '@/modeling/hotel';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { DoorData, LeverDoorObject3d } from '@/lever-door';
-import { AiNavPoints, makeNavPoints } from '@/ai/ai-nav-points';
+import { AiNavPoints, items, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
 
 export class GameState implements State {
@@ -87,7 +87,7 @@ export class GameState implements State {
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
     const elevator = buildElevator();
 
-    this.scene.add_(ceiling, floor, hotelRender, ...elevator, ...this.doors, this.enemy.model_);
+    this.scene.add_(ceiling, floor, hotelRender, ...elevator, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
     this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision]));
     tmpl.addEventListener('click', () => {
       tmpl.requestPointerLock();
@@ -156,6 +156,20 @@ export class GameState implements State {
             tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 HIDE</div>`;
             if (controls.isConfirm && !controls.prevConfirm) {
               this.player.hide(hidingPlace);
+            }
+          }
+        }
+      }
+
+      const item = this.player.closestNavPoint.item;
+      if (item) {
+        const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position_, item.mesh.position_).magnitude;
+        if (distance < 6) {
+          const direction = this.player.normal.dot( this.playerHidingPlaceDifference.normalize_());
+          if (direction < -0.9) {
+            tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 TAKE</div>`;
+            if (controls.isConfirm && !controls.prevConfirm) {
+              this.scene.remove_(item.mesh);
             }
           }
         }

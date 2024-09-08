@@ -2,8 +2,10 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { PathNode } from '@/ai/path-node';
 import { LeverDoorObject3d } from '@/lever-door';
 import { HidingPlace } from '@/hiding-place';
+import { Item } from '@/item';
 
 export const AiNavPoints: PathNode[] = [];
+export const items: Item[] = [];
 
 function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, door: LeverDoorObject3d, isGoingRight?: boolean) {
   const roomEntranceNode = new PathNode(roomPosition, door, roomNumber);
@@ -37,6 +39,41 @@ function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, doo
 }
 
 export function makeNavPoints(doors: LeverDoorObject3d[]) {
+  const roomEntrances = [
+    createRoomNodes(new EnhancedDOMPoint(44, 2.5, 36), 1301, doors[0]),
+    createRoomNodes(new EnhancedDOMPoint(44, 2.5, 71), 1302, doors[1]),
+    createRoomNodes(new EnhancedDOMPoint(44, 2.5, 106), 1303, doors[2]),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 24), 1304, doors[3], true),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 36), 1305,  doors[4]),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5], true),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 71), 1307, doors[6]),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 94), 1308, doors[7], true),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 106), 1309, doors[8]),
+    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 24), 1310, doors[9], true),
+    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 59), 1311, doors[10], true),
+    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 94), 1312, doors[11], true),
+  ];
+
+  let roomsWorkingCopy = [...roomEntrances];
+  const firstNode = roomEntrances[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
+  placeKeys(firstNode);
+
+  function placeKeys(activeNode: PathNode) {
+    roomsWorkingCopy = roomsWorkingCopy.filter(node => node !== activeNode);
+    const bathNode = activeNode.getPresentSiblings().find(node => node.hidingPlace)!;
+    const roomNode = bathNode.getPresentSiblings().find(node => node.hidingPlace)!;
+    if (Math.random() < 0.5) {
+      bathNode.item = new Item(bathNode.position);
+      bathNode.item.mesh.position_.y += 3;
+      items.push(bathNode.item);
+      console.log(bathNode.roomNumber);
+    } else {
+      roomNode.item = new Item(roomNode.position);
+      roomNode.item.mesh.position_.y += 3;
+      items.push(roomNode.item);
+      console.log(roomNode.roomNumber);
+    }
+  }
 
   // OUTER CORNERS
   const LowerLeftCorner = new PathNode(new EnhancedDOMPoint(44, 2.5, 12));
@@ -46,34 +83,22 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   // MIDDLE HALLWAY INTERSECTIONS
   const BottomCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 12));
-  const Room1304Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 24), 1304, doors[3], true);
 
-  const Room1305Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 36), 1305,  doors[4]);
 
 
   const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5)); // 11.5 diff from prev
-  const Room1306Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5], true); // 11.5 diff from prev
-  const Room1307Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 71), 1307, doors[6]); // 12 diff from prev
   const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
-  const Room1308Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 94), 1308, doors[7], true) // 11.5 diff from prev
-  const Room1309Entrance = createRoomNodes(new EnhancedDOMPoint(0, 2.5, 106), 1309, doors[8]); // 12 diff from prev
   const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5)); // 11.5 diff from prev
 
 
   // LEFT HALLWAY INTERSECTIONS
-  const Room1301Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 36), 1301, doors[0]);
   const LowerQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 47.5));
-  const Room1302Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 71), 1302, doors[1]);
   const UpperQuarterLeftIntersection = new PathNode(new EnhancedDOMPoint(44, 2.5, 82.5));
-  const Room1303Entrance = createRoomNodes(new EnhancedDOMPoint(44, 2.5, 106), 1303, doors[2]);
 
 
   // RIGHT HALLWAY
-  const Room1310Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 24), 1310, doors[9], true);
   const LowerQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 47.5));
-  const Room1311Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 59), 1311, doors[10], true);
   const UpperQuarterRightIntersection = new PathNode(new EnhancedDOMPoint(-44, 2.5, 82.5));
-  const Room1312Entrance = createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 94), 1312, doors[11], true); // 11.5 diff from prev
 
   // Connect corners
   TopLeftCorner.rightSibling = TopRightCorner;
@@ -101,24 +126,24 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   UpperQuarterRightIntersection.attachThisLeftToOtherRight(UpperQuarterCenterIntersection);
 
   // Connect Left Rooms
-  Room1301Entrance.insertBetweenVert(LowerQuarterLeftIntersection, LowerLeftCorner);
-  Room1302Entrance.insertBetweenVert(UpperQuarterLeftIntersection, LowerQuarterLeftIntersection);
-  Room1303Entrance.insertBetweenVert(TopLeftCorner, UpperQuarterLeftIntersection);
+  roomEntrances[0].insertBetweenVert(LowerQuarterLeftIntersection, LowerLeftCorner);
+  roomEntrances[1].insertBetweenVert(UpperQuarterLeftIntersection, LowerQuarterLeftIntersection);
+  roomEntrances[2].insertBetweenVert(TopLeftCorner, UpperQuarterLeftIntersection);
 
   // Connect Right Rooms
-  Room1310Entrance.insertBetweenVert(LowerQuarterRightIntersection, LowerRightCorner);
-  Room1311Entrance.insertBetweenVert(UpperQuarterRightIntersection, LowerQuarterRightIntersection);
-  Room1312Entrance.insertBetweenVert(TopRightCorner, UpperQuarterRightIntersection);
+  roomEntrances[9].insertBetweenVert(LowerQuarterRightIntersection, LowerRightCorner);
+  roomEntrances[10].insertBetweenVert(UpperQuarterRightIntersection, LowerQuarterRightIntersection);
+  roomEntrances[11].insertBetweenVert(TopRightCorner, UpperQuarterRightIntersection);
 
   // Connect Center Rooms
-  Room1304Entrance.insertBetweenVert(LowerQuarterCenterIntersection, BottomCenterEntrance);
-  Room1305Entrance.insertBetweenVert(LowerQuarterCenterIntersection, Room1304Entrance);
+  roomEntrances[3].insertBetweenVert(LowerQuarterCenterIntersection, BottomCenterEntrance);
+  roomEntrances[4].insertBetweenVert(LowerQuarterCenterIntersection, roomEntrances[3]);
 
-  Room1306Entrance.insertBetweenVert(UpperQuarterCenterIntersection, LowerQuarterCenterIntersection);
-  Room1307Entrance.insertBetweenVert(UpperQuarterCenterIntersection, Room1306Entrance);
+  roomEntrances[5].insertBetweenVert(UpperQuarterCenterIntersection, LowerQuarterCenterIntersection);
+  roomEntrances[6].insertBetweenVert(UpperQuarterCenterIntersection, roomEntrances[5]);
 
-  Room1308Entrance.insertBetweenVert(TopCenterEntrance, UpperQuarterCenterIntersection);
-  Room1309Entrance.insertBetweenVert(TopCenterEntrance, Room1308Entrance);
+  roomEntrances[7].insertBetweenVert(TopCenterEntrance, UpperQuarterCenterIntersection);
+  roomEntrances[8].insertBetweenVert(TopCenterEntrance, roomEntrances[7]);
 
   AiNavPoints.push(
     // Corners
