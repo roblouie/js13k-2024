@@ -6,7 +6,7 @@ export const doorOpening4 = [{...defaults, w:"sawtooth",v:0.4,a:0.1,d:1,p:2,q:1.
 export const hideSound = [{...defaults, w:"n0",v:0.2,a:0.05,h:0.02,d:0.02,r:0.02,}];
 export const flashlightSound = [{...defaults, w:"n0",p:0,r:0.01,h:0,v:0.3,}];
 export const elevatorDoor1 = [{...defaults, w:"sine",f:1651,v:0.15,d:0.2,r:0.2,h:0,t:0,},{...defaults, w:"sawtooth",output:1,t:1.21,v:7.2,d:0.1,r:11,h:1,},{...defaults, output:1,w:"n0",v:3.1,t:0.152,d:0.002,r:0.002,}];
-export const elevatorMotionRev1 = [{...defaults, w:"sine",t:0,f:200,a:0.2,d:1,r:0.25,s:1,q:7,},{...defaults, output:1,w:"n1",v:1,t:0.9,d:1,s:1,r:1,f:20,}];
+export const elevatorMotionRev1 = [{...defaults, w:"sine",t:0,f:200,a:0.2,d:1,r:2,s:1,q:7,},{...defaults, output:1,w:"n1",v:0.6,t:0.9,d:1,s:1,r:1.5,f:20,}];
 
 export const song = expandSong('2P(322P*322P,322P.322Q0322P2322P4322Q6322R8322R:322R<322R>322S@322RB322RD322SF322MH322MJ322ML322MN322NP322MR322MT322NV3235(B<32(B<3/(B<3/8B<3,8B<3)8B<36HB<33HB<30HB<');
 

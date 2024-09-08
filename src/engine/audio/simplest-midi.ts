@@ -132,7 +132,7 @@ export class SimplestMidiRev2 {
 
       // Stop oscillators when they finish
       for(let k=g.length-1;k>=0;--k){
-        g[k].gain.cancelScheduledValues(duration);
+        g[k].gain.cancelScheduledValues(instrumentInfo.d + duration);
         this._setParamTarget(g[k].gain,0,duration,instrumentInfo.d);
         o[i].stop(duration + instrumentInfo.d);
       }
