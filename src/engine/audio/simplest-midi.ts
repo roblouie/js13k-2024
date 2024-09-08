@@ -35,8 +35,10 @@ for(let i=0;i<blen;++i){
   noiseBuf.n0.getChannelData(0)[i]=Math.random()*2-1;
 }
 for(let jj=0;jj<64;++jj){
+  const r1=Math.random()*10+1;
+  const r2=Math.random()*10+1;
   for(let i=0;i<blen;++i){
-    const dd=Math.sin((i/blen)*2*Math.PI*440*(Math.random()*10+1))*Math.sin((i/blen)*2*Math.PI*440*(Math.random()*10+1));
+    const dd=Math.sin((i/blen)*2*Math.PI*440*r1)*Math.sin((i/blen)*2*Math.PI*440*r2);
     noiseBuf.n1.getChannelData(0)[i]+=dd/8;
   }
 }
