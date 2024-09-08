@@ -107,13 +107,13 @@ export class GameState implements State {
       tmpl.requestPointerLock();
     });
     this.player.cameraRotation.set(0, Math.PI, 0);
-    // this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 80, elevatorMotionRev1, audioContext.currentTime + 6);
+    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 80, elevatorMotionRev1, audioContext.currentTime + 6);
 
     setTimeout(() => {
       this.elevator.isOpenTriggered = true;
       this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
       this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
-    }, 0);
+    }, 7_000);
   }
 
   playerDoorDifference = new EnhancedDOMPoint();
