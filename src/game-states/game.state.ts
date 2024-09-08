@@ -9,11 +9,11 @@ import { Mesh } from '@/engine/renderer/mesh';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { build2dGrid, findWallCollisionsFromList } from '@/engine/physics/surface-collision';
 import { render } from '@/engine/renderer/renderer';
-import { buildElevator, ElevatorDepth } from '@/modeling/elevator';
+import { Elevator } from '@/modeling/elevator';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { makeHotel } from '@/modeling/hotel';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { DoorData, LeverDoorObject3d } from '@/lever-door';
+import { LeverDoorObject3d } from '@/lever-door';
 import { AiNavPoints, items, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
 
@@ -24,6 +24,9 @@ export class GameState implements State {
 
   doors: LeverDoorObject3d[];
   enemy: Enemy;
+
+  elevator: Elevator;
+  hasPlayerLeftElevator = false;
 
   constructor() {
     this.scene = new Scene();
@@ -77,6 +80,8 @@ export class GameState implements State {
     this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[0])
 
     this.enemy = new Enemy(AiNavPoints[1]);
+
+    this.elevator = new Elevator();
   }
 
   onEnter() {
@@ -85,14 +90,17 @@ export class GameState implements State {
     // Move hotel layout to just outside the elevator
     const hotelRender = new Mesh(makeHotel(true).translate_(0, 0, 6).done_(), materials.wallpaper);
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
-    const elevator = buildElevator();
 
-    this.scene.add_(ceiling, floor, hotelRender, ...elevator, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
-    this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision]));
+    this.scene.add_(ceiling, floor, hotelRender, ...this.elevator.meshes, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
+    this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]));
     tmpl.addEventListener('click', () => {
       tmpl.requestPointerLock();
     });
     this.player.cameraRotation.set(0, 90, 0);
+
+    setTimeout(() => {
+      this.elevator.isOpenTriggered = true;
+    }, 5_000);
   }
 
   playerDoorDifference = new EnhancedDOMPoint();
@@ -104,12 +112,17 @@ export class GameState implements State {
 
     this.player.update(this.gridFaces);
     this.enemy.update_(this.player);
+    this.elevator.update();
     this.scene.updateWorldMatrix();
     render(this.player.camera, this.scene);
 
     // tmpl.innerHTML += `PLAYER NAV: ${this.player.closestNavPoint.name}<br/>`
     // tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
     // tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
+
+    if (!this.elevator.isOpen) {
+      findWallCollisionsFromList(this.elevator.doorCollision, this.player);
+    }
 
       [this.player.closestNavPoint.door, this.doors[12], this.doors[13]].forEach((door, i) => {
       if (door) {
@@ -198,5 +211,14 @@ export class GameState implements State {
           }
         }
       }
+
+    // Only really have a couple of events so handle them with booleans even though it kind of sucks
+    if (!this.hasPlayerLeftElevator) {
+      if (new EnhancedDOMPoint().subtractVectors(this.player.feetCenter, AiNavPoints[0].position).magnitude > 25) {
+        this.elevator.isCloseTriggered = true;
+      }
+    }
   }
+
+
 }

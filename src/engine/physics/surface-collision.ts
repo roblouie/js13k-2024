@@ -56,7 +56,6 @@ export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPerson
       // Slightly sketch way of dealing with gravity on a sloped surface, but it does work
       if (wall.normal.y >= 0.6 && player.velocity.y < 0) {
         player.velocity.y = 0;
-        player.isJumping = false;
       } else if (wall.normal.y <= -0.6 && player.velocity.y > 0) {
         player.velocity.y = 0;
       }
