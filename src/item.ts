@@ -6,14 +6,12 @@ import { materials } from '@/textures';
 export class Item {
   roomNumber?: number;
   isTaken = false;
-  position_: EnhancedDOMPoint;
   mesh: Mesh;
 
   constructor(position_: EnhancedDOMPoint, roomNumber?: number) {
-    this.position_ = position_;
     this.roomNumber = roomNumber;
 
     this.mesh = new Mesh(new MoldableCubeGeometry(2, 1, 0.5), materials.silver);
-    this.mesh.position_ = position_;
+    this.mesh.position_.set(position_);
   }
 }

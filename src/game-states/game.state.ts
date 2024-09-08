@@ -67,9 +67,9 @@ export class GameState implements State {
       new LeverDoorObject3d(new EnhancedDOMPoint(-48, 4.75, 96.25), 1, 1, true),
 
       // 1313 Door Left
-      new LeverDoorObject3d(new EnhancedDOMPoint(3, 4.75, 124), -1, -1, false),
+      new LeverDoorObject3d(new EnhancedDOMPoint(3, 4.75, 124), -1, -1, false, true),
       // 1313 Door Right
-      new LeverDoorObject3d(new EnhancedDOMPoint(-3, 4.75, 124), 1, -1, false),
+      new LeverDoorObject3d(new EnhancedDOMPoint(-3, 4.75, 124), 1, -1, false, true),
     ];
 
     makeNavPoints(this.doors);
@@ -111,7 +111,7 @@ export class GameState implements State {
     // tmpl.innerHTML += `ENEMY AT: ${this.enemy.currentNode.name}<br/>`
     // tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
 
-      const door = this.player.closestNavPoint.door;
+      [this.player.closestNavPoint.door, this.doors[12], this.doors[13]].forEach((door, i) => {
       if (door) {
         const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, door.placedPosition).magnitude;
         if (door.openClose === -1 && !door.isAnimating && distance < 7) {
@@ -126,7 +126,22 @@ export class GameState implements State {
           // tmpl.innerHTML += `DIRECTION: ${direction}<br/>`
           if (distance < 1 || direction < -0.77) {
             if (door.isLocked) {
-              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
+              if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
+                tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Unlock and Open</div>`;
+                if (controls.isConfirm) {
+                  door.pullLever();
+                  door.isLocked = false;
+                  this.player.heldKeyRoomNumber = undefined;
+                  if (i > 0) {
+                    this.doors[12].pullLever();
+                    this.doors[12].isLocked = false;
+                    this.doors[13].pullLever();
+                    this.doors[13].isLocked = false;
+                  }
+                }
+              } else {
+                tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
+              }
             } else if (this.enemy.currentNode.door === door) {
               tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🚫</div>`;
             } else {
@@ -138,6 +153,7 @@ export class GameState implements State {
           }
         }
       }
+      });
 
      this.doors.forEach(door => {
         if (door.isAnimating) {
@@ -162,14 +178,22 @@ export class GameState implements State {
       }
 
       const item = this.player.closestNavPoint.item;
-      if (item) {
+      if (item && !item.isTaken) {
         const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position_, item.mesh.position_).magnitude;
         if (distance < 6) {
           const direction = this.player.normal.dot( this.playerHidingPlaceDifference.normalize_());
           if (direction < -0.9) {
-            tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 TAKE</div>`;
+            if (item.roomNumber) {
+              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 Take Room ${item.roomNumber} Key</div>`;
+            } else {
+              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 Use Health Pack</div>`;
+            }
             if (controls.isConfirm && !controls.prevConfirm) {
+              item.isTaken = true;
               this.scene.remove_(item.mesh);
+              if (item.roomNumber) {
+                this.player.heldKeyRoomNumber = item.roomNumber;
+              }
             }
           }
         }

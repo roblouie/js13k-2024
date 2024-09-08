@@ -56,6 +56,10 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   let roomsWorkingCopy = [...roomEntrances];
   const firstNode = roomEntrances[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
+  setTimeout(() => {
+    firstNode.door?.pullLever(true);
+  }, 10_000); // TODO: Adjust this
+
   placeKeys(firstNode);
 
   function placeKeys(activeNode: PathNode) {
@@ -72,26 +76,24 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
     });
 
     if (Math.random() <= 0.3) {
-      nextNode = roomEntrances[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
+      nextNode = roomsWorkingCopy[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
     }
-
-    nextNode!.door!.isLocked = true;
 
     const bathNode = activeNode.getPresentSiblings().find(node => node.hidingPlace)!;
     const roomNode = bathNode.getPresentSiblings().find(node => node.hidingPlace)!;
-    if (Math.random() < 0.5) {
-      bathNode.item = new Item(bathNode.position, nextNode!.roomNumber);
-      bathNode.item.mesh.position_.y += 3;
-      items.push(bathNode.item);
-      console.log(bathNode.roomNumber);
-    } else {
-      roomNode.item = new Item(roomNode.position, nextNode!.roomNumber);
-      roomNode.item.mesh.position_.y += 3;
-      items.push(roomNode.item);
-      console.log(roomNode.roomNumber);
-    }
+    const nodeToPlaceItemIn = [bathNode, roomNode][Math.floor(Math.random() * 2)];
+    nodeToPlaceItemIn.item = new Item(nodeToPlaceItemIn.position);
+    nodeToPlaceItemIn.item.mesh.position_.y += 3;
+    items.push(nodeToPlaceItemIn.item);
 
     if (roomsWorkingCopy.length > 3) {
+      nodeToPlaceItemIn.item.roomNumber = nextNode!.roomNumber;
+      nextNode!.door!.isLocked = true;
+    } else if (roomsWorkingCopy.length > 2) {
+      nodeToPlaceItemIn.item.roomNumber = 1313;
+    }
+
+    if (roomsWorkingCopy.length >= 1) {
       placeKeys(nextNode!);
     }
   }
@@ -109,7 +111,7 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5)); // 11.5 diff from prev
   const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
-  const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5)); // 11.5 diff from prev
+  const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5), undefined, 1313); // 11.5 diff from prev
 
 
   // LEFT HALLWAY INTERSECTIONS

@@ -36,6 +36,7 @@ export class FirstPersonPlayer {
   listener: AudioListener;
   sfxPlayer: SimplestMidiRev2;
   isFlashlightOn = false;
+  heldKeyRoomNumber?: number;
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.sfxPlayer = new SimplestMidiRev2();
@@ -79,6 +80,10 @@ export class FirstPersonPlayer {
   }
 
   update(gridFaces: Set<Face>[]) {
+    if (this.heldKeyRoomNumber) {
+      tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 40px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
+    }
+
     let smallestDistance = Infinity;
     [this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()].forEach(point => {
       const difference = new EnhancedDOMPoint().subtractVectors(this.feetCenter, point.position);

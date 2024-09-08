@@ -24,7 +24,7 @@ export class LeverDoorObject3d extends Object3d {
   sfxPlayer = new SimplestMidiRev2();
   sfxPlayer2 = new SimplestMidiRev2();
 
-  constructor(position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean) {
+  constructor(position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean, isLocked?: boolean) {
     const mesh = new Mesh(
       new MoldableCubeGeometry(5, 7.75, 0.25)
         .texturePerSide(...getAllWhite())
@@ -38,6 +38,7 @@ export class LeverDoorObject3d extends Object3d {
       materials.potentialPlasterWall
     )
     super(mesh);
+    this.isLocked = !!isLocked;
     this.placedPosition = new EnhancedDOMPoint(position_.x - (swapOpenClosed ? 2 * swapHingeSideX : 0), position_.y, position_.z - (swapOpenClosed ? 2 * swapHingeSideX : 0));
     this.swapHingeSideX = swapHingeSideX;
     this.swapHingeSideZ = swapHingeSideZ;
