@@ -160,12 +160,9 @@ export class FirstPersonPlayer {
       this.listener.positionY.value = this.camera.position.y;
       this.listener.positionZ.value = this.camera.position.z;
 
-      const lookingDirection = new EnhancedDOMPoint(0, 0, -1);
-      const result_ = this.camera.rotationMatrix.transformPoint(lookingDirection);
-
-      this.listener.forwardX.value = result_.x;
-      this.listener.forwardY.value = result_.y;
-      this.listener.forwardZ.value = result_.z;
+      this.listener.forwardX.value = this.normal.x;
+      this.listener.forwardY.value = this.normal.y;
+      this.listener.forwardZ.value = this.normal.z;
     }
   }
 }
