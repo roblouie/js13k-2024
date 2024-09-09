@@ -112,9 +112,9 @@ export class Enemy {
     clearInterval(this.songInterval);
   }
 
-  increaseAggression() {
+  increaseAggression(amountToIncrease?: number) {
     if (this.aggression <= 0.9) {
-      this.aggression += 0.1;
+      this.aggression += (amountToIncrease ?? 0.1);
     }
   }
 
@@ -123,7 +123,7 @@ export class Enemy {
   }
 
   getMaxUnseenFramesBeforeGivingUp() {
-    return 500 + 600 * this.aggression;
+    return 600 + 600 * this.aggression;
   }
 
   getSpeed() {

@@ -218,7 +218,7 @@ export class GameState implements State {
               this.scene.remove_(item.mesh);
               if (item.roomNumber) {
                 this.player.heldKeyRoomNumber = item.roomNumber;
-                this.enemy.aggression += 0.08;
+                this.enemy.increaseAggression(0.08);
                 if (!this.hasEnemySpawned) {
                   this.enemy.aggression = 0;
                   this.hasEnemySpawned = true;
