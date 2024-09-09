@@ -123,7 +123,7 @@ export class Enemy {
   }
 
   getMaxUnseenFramesBeforeGivingUp() {
-    return 300 + 600 * this.aggression;
+    return 500 + 600 * this.aggression;
   }
 
   getSpeed() {

@@ -102,7 +102,7 @@ export class FirstPersonPlayer {
     }
 
     if (!this.isHiding) {
-      this.velocity.y -= 0.008; // gravity
+      // this.velocity.y -= 0.008; // gravity
 
       const playerGridPositions = getGridPositionWithNeighbors(this.feetCenter, gridFaces.length);
 

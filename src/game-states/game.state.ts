@@ -111,10 +111,7 @@ export class GameState implements State {
 
     setTimeout(() => {
       this.elevator.isOpenTriggered = true;
-      this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
-      this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 4);
-      this.player.sfxPlayer.playNote(audioContext.currentTime + 1.5, 60, 70, footstep, audioContext.currentTime + 4);
-      this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
+      this.playElevatorSound();
     }, 7_000);
   }
 
@@ -221,7 +218,9 @@ export class GameState implements State {
               this.scene.remove_(item.mesh);
               if (item.roomNumber) {
                 this.player.heldKeyRoomNumber = item.roomNumber;
+                this.enemy.aggression += 0.08;
                 if (!this.hasEnemySpawned) {
+                  this.enemy.aggression = 0;
                   this.hasEnemySpawned = true;
                   this.enemy.spawn();
                 }
@@ -233,24 +232,29 @@ export class GameState implements State {
 
     // Only really have a couple of events so handle them with booleans even though it kind of sucks
     if (!this.hasPlayerLeftElevator) {
-      if (new EnhancedDOMPoint().subtractVectors(this.player.feetCenter, AiNavPoints[0].position).magnitude > 25) {
+      if (new EnhancedDOMPoint().subtractVectors(this.player.feetCenter, AiNavPoints[0].position).magnitude > 17) {
         this.hasPlayerLeftElevator = true;
         this.elevator.isCloseTriggered = true;
-        this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
-        this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 4);
-        this.player.sfxPlayer.playNote(audioContext.currentTime + 1.8, 60, 70, footstep, audioContext.currentTime + 4);
-        this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
+        this.playElevatorSound();
         setTimeout(() => {
           const bathNode = this.firstNodeRef.getPresentSiblings().find(node => node.hidingPlace);
           const roomNode = bathNode?.getPresentSiblings().find(node => node.hidingPlace);
           lightInfo.pointLightPosition.set(roomNode!.position);
           lightInfo.pointLightPosition.y = 8;
           lightInfo.pointLightAttenuation.set(0.002, 0.001, 0.4);
-          bathNode!.door!.pullLever(true);
-        } ,4_000)
+          if (bathNode!.door!.openClose === -1) {
+            bathNode!.door!.pullLever(true);
+          }
+        } ,3_000)
       }
     }
   }
 
+  playElevatorSound() {
+    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
+    this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 2.5);
+    this.player.sfxPlayer.playNote(audioContext.currentTime + 1.8, 60, 70, footstep, audioContext.currentTime + 2.5);
+    this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
+  }
 
 }
