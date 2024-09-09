@@ -10,7 +10,6 @@ in mat4 vNormalMatrix;
 in vec4 positionFromLightPov;
 in vec3 worldPosition;
 
-uniform vec2 textureRepeat;
 uniform vec4 emissive;
 uniform vec3 lightWorldPosition;
 uniform vec3 pointLightAttenuation;
@@ -68,5 +67,5 @@ void main() {
 
     vec4 vColor = clamp(ambientLight + pointLightBrightness + spotlight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
 
-    outColor = texture(uSampler, vec3(vTexCoord * textureRepeat, vDepth)) * vColor;
+    outColor = texture(uSampler, vec3(vTexCoord, vDepth)) * vColor;
 }

@@ -163,6 +163,9 @@ export class FirstPersonPlayer {
       this.listener.forwardX.value = this.normal.x;
       this.listener.forwardY.value = this.normal.y;
       this.listener.forwardZ.value = this.normal.z;
+    } else {
+      this.listener.setPosition(...this.camera.position.toArray());
+      this.listener.setOrientation(this.normal.x, this.normal.y, this.normal.z, 0, 1, 0);
     }
   }
 }

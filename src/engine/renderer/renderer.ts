@@ -5,8 +5,7 @@ import { Scene } from '@/engine/renderer/scene';
 import {
   lightPovMvp, lightWorldPosition,
   modelviewProjection,
-  normalMatrix, pointLightAttenuation, spotlightDirection, spotlightPosition,
-  textureRepeat, worldMatrix,
+  normalMatrix, pointLightAttenuation, spotlightDirection, spotlightPosition, worldMatrix,
 } from '@/engine/shaders/shaders';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
@@ -33,7 +32,6 @@ gl.getExtension('EXT_color_buffer_float');
 gl.getExtension('OES_texture_float_linear');
 const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelviewProjection)!;
 const normalMatrixLocation =  gl.getUniformLocation(lilgl.program, normalMatrix)!;
-const textureRepeatLocation = gl.getUniformLocation(lilgl.program, textureRepeat)!;
 const pointLightAttenuationLocation = gl.getUniformLocation(lilgl.program, pointLightAttenuation);
 const spotlightPositionLocation = gl.getUniformLocation(lilgl.program, spotlightPosition)!;
 const spotlightDirectionLocation = gl.getUniformLocation(lilgl.program, spotlightDirection)!;
@@ -136,9 +134,6 @@ export function render(camera: Camera, scene: Scene) {
     const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
 
     gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material.texture?.id ?? -1.0);
-    const textureRepeat = [mesh.material.texture!.textureRepeat.x, mesh.material.texture!.textureRepeat.y];
-    gl.uniform2fv(textureRepeatLocation, textureRepeat);
-
     gl.bindVertexArray(mesh.geometry.vao!);
 
     // @ts-ignore
