@@ -135,6 +135,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
 
   const bathroomFloor = new MoldableCubeGeometry(10, 2, 8)
     .translate_(-11, -0.4, -4)
+    .spreadTextureCoords(6, 6, -0.03)
     .texturePerSide(...allMarble)
 
   const counter = new MoldableCubeGeometry(3, 1, 7, 12, 1, 12)

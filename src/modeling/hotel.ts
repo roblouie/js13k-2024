@@ -1,5 +1,5 @@
 import { buildRoom, RoomDepth, RoomWidth } from '@/modeling/room';
-import { buildSegmentedWall } from '@/modeling/building-blocks';
+import { buildSegmentedWall, DoorHeight, DoubleDoorWidth, getAllWhite } from '@/modeling/building-blocks';
 import { materials } from '@/textures';
 
 const HallwayWidth = 10;
@@ -41,6 +41,9 @@ export function makeHotel(isIncludingDetails = false) {
     // Draw back wall
     .merge(
       buildSegmentedWall([45, 11, 45], 12, [12, 3, 12], [], 1, 4, wallpapered)[0]
+        .merge(
+          buildSegmentedWall([0.5, 10, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, getAllWhite())[0]
+        )
         .translate_(0, 0, 118)
     )
 

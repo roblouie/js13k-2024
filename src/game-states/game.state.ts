@@ -78,9 +78,9 @@ export class GameState implements State {
       new LeverDoorObject3d(-48, 4.75, 96.25, 1, 1, true),
 
       // 1313 Door Left
-      new LeverDoorObject3d(3, 4.75, 124, -1, -1, false, false),
+      new LeverDoorObject3d(2.5, 4.75, 124, -1, -1, false, false),
       // 1313 Door Right
-      new LeverDoorObject3d(-3, 4.75, 124, 1, -1, false, false),
+      new LeverDoorObject3d(-2.5, 4.75, 124, 1, -1, false, false),
     ];
 
 
