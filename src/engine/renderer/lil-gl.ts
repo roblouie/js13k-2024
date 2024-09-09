@@ -41,11 +41,10 @@ export class LilGl {
     this.gl.attachShader(program, fragmentShader);
     this.gl.linkProgram(program);
 
-    // TODO: Delete this for release
-    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
-      console.log(this.gl.getShaderInfoLog(vertexShader));
-      console.log(this.gl.getShaderInfoLog(fragmentShader));
-    }
+    // if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
+    //   console.log(this.gl.getShaderInfoLog(vertexShader));
+    //   console.log(this.gl.getShaderInfoLog(fragmentShader));
+    // }
 
     return program;
   }

@@ -39,8 +39,8 @@ export class FreeCam {
     this.updateVelocityFromControls();
     this.feetCenter.add_(this.velocity);
 
-    this.camera.position_.set(this.feetCenter);
-    this.camera.position_.y += 3.5;
+    this.camera.position.set(this.feetCenter);
+    this.camera.position.y += 3.5;
 
     this.camera.setRotation_(...this.cameraRotation.toArray());
 

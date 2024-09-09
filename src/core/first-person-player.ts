@@ -22,13 +22,13 @@ class Sphere {
 }
 
 export class FirstPersonPlayer {
-  feetCenter = new EnhancedDOMPoint(0, 0, 0);
-  velocity = new EnhancedDOMPoint(0, 0, 0);
+  feetCenter = new EnhancedDOMPoint();
+  velocity = new EnhancedDOMPoint();
   isFrozen_ = false;
   closestNavPoint: PathNode;
 
   camera: Camera;
-  cameraRotation = new EnhancedDOMPoint(0, 0, 0);
+  cameraRotation = new EnhancedDOMPoint();
   collisionSphere: Sphere;
   isHiding = false;
   hidFrom = new EnhancedDOMPoint();
@@ -37,12 +37,16 @@ export class FirstPersonPlayer {
   sfxPlayer: SimplestMidiRev2;
   isFlashlightOn = false;
   heldKeyRoomNumber?: number;
+  normal = new EnhancedDOMPoint();
+
+  health = 100;
+  sprint = 100;
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.sfxPlayer = new SimplestMidiRev2();
     this.sfxPlayer.volume_.connect(compressor);
     this.closestNavPoint = startingPoint;
-    this.feetCenter.set(2, 2.5, -2);
+    this.feetCenter.set(2, 2.5, 6);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
     this.listener = audioContext.listener;
@@ -58,16 +62,13 @@ export class FirstPersonPlayer {
     });
   }
 
-  private isFootstepsStopped = true;
-
-  normal = new EnhancedDOMPoint();
 
 
   hide(hidingPlace: HidingPlace) {
     this.hidFrom.set(this.feetCenter);
     this.isHiding = true;
     this.isFrozen_ = true;
-    this.camera.position_.set(hidingPlace.position);
+    this.camera.position.set(hidingPlace.position);
     this.cameraRotation.set(hidingPlace.cameraRotation);
     this.sfxPlayer.playNote(audioContext.currentTime, 30, 40, hideSound, audioContext.currentTime + 1);
   }
@@ -111,8 +112,8 @@ export class FirstPersonPlayer {
       //findWallCollisionsFromList(faces, this);
       this.feetCenter.add_(this.velocity);
 
-      this.camera.position_.set(this.feetCenter);
-      this.camera.position_.y += 3.5;
+      this.camera.position.set(this.feetCenter);
+      this.camera.position.y += 3.5;
 
     } else if (controls.isConfirm && !controls.prevConfirm) {
       this.unhide();
@@ -122,7 +123,7 @@ export class FirstPersonPlayer {
 
     this.normal.set(0, 0, -1);
     this.normal.set(this.camera.rotationMatrix.transformPoint(this.normal));
-    lightInfo.spotLightPosition.set(this.camera.position_);
+    lightInfo.spotLightPosition.set(this.camera.position);
     lightInfo.spotLightDirection.set(this.normal);
 
     if (!this.isFlashlightOn || this.isHiding) {
@@ -153,9 +154,9 @@ export class FirstPersonPlayer {
 
   private updateAudio() {
     if (this.listener.positionX) {
-      this.listener.positionX.value = this.camera.position_.x;
-      this.listener.positionY.value = this.camera.position_.y;
-      this.listener.positionZ.value = this.camera.position_.z;
+      this.listener.positionX.value = this.camera.position.x;
+      this.listener.positionY.value = this.camera.position.y;
+      this.listener.positionZ.value = this.camera.position.z;
 
       const lookingDirection = new EnhancedDOMPoint(0, 0, -1);
       const result_ = this.camera.rotationMatrix.transformPoint(lookingDirection);
@@ -165,6 +166,4 @@ export class FirstPersonPlayer {
       this.listener.forwardZ.value = result_.z;
     }
   }
-
-
 }

@@ -7,17 +7,16 @@ export const materials: {[key: string]: Material} = {};
 export async function initTextures() {
   materials.wood = new Material({ texture: textureLoader.load_(await wood())});
   materials.face = new Material({ texture: textureLoader.load_(await face())});
-  materials.silver = new Material({ texture: textureLoader.load_(await metals(1)) });
-  materials.iron = new Material({ texture: textureLoader.load_(await metals(2)) });
+  materials.silver = new Material({ texture: textureLoader.load_(await metals('', 30)) });
+  materials.iron = new Material({ texture: textureLoader.load_(await metals()) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
-  materials.tinyTiles = new Material({ texture: textureLoader.load_(await tinyTiles())});
-  materials.lighterWoodTest = new Material({ texture: textureLoader.load_(await lighterWoodTest())});
   materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
   materials.elevatorPanel = new Material({ texture: textureLoader.load_(await elevatorPanel())});
   materials.redCarpet = new Material({ texture: textureLoader.load_(await redCarpet())});
   materials.potentialPlasterWall = new Material({ texture: textureLoader.load_(await potentialPlasterWall())});
   materials.wallpaper = new Material({ texture: textureLoader.load_(await wallpaper())});
   materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await greenPlasterWall())});
+  materials.white = new Material({ texture: textureLoader.load_(await color('#FFF'))});
 
   for (let i = 1; i <= 13; i++) {
     materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});
@@ -42,8 +41,6 @@ function wallpaper() {
             <feDistantLight azimuth="120" elevation="50"/>
         </feDiffuseLighting>
         <feBlend in="SourceGraphic" mode="difference"/>
-       
-
     </filter>
     <rect x="0" y="0" width="100%" height="100%"  filter="url(#filter)" fill="url(#pattern)"></rect>
   
@@ -70,7 +67,7 @@ async function elevatorPanel() {
     content += button(percentX, percentY, i + 2);
   }
 
-  return metals(content);
+  return metals(content, 30);
 }
 
 function greenPlasterWall() {
@@ -80,7 +77,7 @@ function greenPlasterWall() {
         <feComponentTransfer result="n">
             <feFuncA type="gamma" exponent="4"/>
         </feComponentTransfer>
-        <feDiffuseLighting lighting-color="#97a58f" surfaceScale="2" result="d">
+        <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#97a58f" surfaceScale="2" result="d">
             <feDistantLight azimuth="90" elevation="45"/>
         </feDiffuseLighting>
         
@@ -120,22 +117,6 @@ function redCarpet() {
 </svg>`)
 }
 
-function lighterWoodTest() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <filter x="0" y="0" width="100%" height="100%" id="rw">
-        <feTurbulence type="fractalNoise" baseFrequency="0.1,0.007" numOctaves="7" stitchTiles="stitch"/>
-        <feComposite in="s" operator="arithmetic" k2="0.5" k3="0.5"/>
-        <feComponentTransfer>
-            <feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4, .2, .4"/>
-        </feComponentTransfer>
-        <feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="1.5" lighting-color="#a88d5e">
-            <feDistantLight azimuth="110" elevation="50"/>
-        </feDiffuseLighting>
-    </filter>
-    <rect height="100%" width="100%" x="0" y="0" fill="" filter="url(#rw)"/>
-</svg>`)
-}
-
 function ceilingTiles() {
   return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
  <pattern id="p2" width="512" height="256" patternUnits="userSpaceOnUse">
@@ -156,27 +137,6 @@ function ceilingTiles() {
     </filter>
     <rect width="100%" height="100%" filter="url(#filter)" fill="url(#p2)"/>
 </svg>`)
-}
-
-function tinyTiles() {
-  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <pattern id="p" width="30" height="30" patternUnits="userSpaceOnUse">
-       <rect x="5" y="5" width="20" height="20" />
-    </pattern>
-    <filter x="0" y="0" width="100%" height="100%" id="rw">
-        <feDropShadow dx="1" dy="1" result="s"/>
-       
-        <feComposite in="s" operator="arithmetic" k2="0.5" k3="0.5"/>
-        <feComponentTransfer>
-            <feFuncA type="table" tableValues="0, .1, .2, .3, .4, .2, .4, .2, .4"/>
-        </feComponentTransfer>
-        <feDiffuseLighting color-interpolation-filters="sRGB" surfaceScale="2.5" lighting-color="#9f8">
-            <feDistantLight azimuth="180" elevation="34"/>
-        </feDiffuseLighting>
-    </filter>
-    <rect height="100%" width="100%" x="0" y="0" fill="url(#p)" filter="url(#rw)"/>
-</svg>
-`);
 }
 
 
@@ -220,22 +180,28 @@ export function face() {
   return toImage(`<svg style="filter: invert()" width="512" height="512" xmlns="http://www.w3.org/2000/svg"><filter id="filter" x="-0.01%" primitiveUnits="objectBoundingBox" width="100%" height="100%"><feTurbulence seed="7" type="fractalNoise" baseFrequency="0.005" numOctaves="5" result="n"/><feComposite in="SourceAlpha" operator="in"/><feDisplacementMap in2="n" scale="0.9"/></filter><rect x="0" y="-14" width="100%" height="100%" id="l" filter="url(#filter)"/><rect fill="#fff" width="100%" height="100%"/><use href="#l" x="22%" y="42" transform="scale(2.2, 1.2)"></use><use href="#l" x="-22%" y="42" transform="rotate(.1) scale(-2.2 1.2)"></use><rect fill="#777" x="220" y="230" width="50" height="50"/></svg>`);
 }
 
-export function metals(content: string) {
+export function metals(content = '', brightnessModifier = 1) {
+  const value = 0.01 * brightnessModifier;
   return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
 <filter id="b">
 <feTurbulence baseFrequency="0.01,0.0008" numOctaves="2" seed="23" type="fractalNoise" stitchTiles="stitch" />
 <feColorMatrix values="
-0.2, 0.2, 0.2, 0,
--0.01, 0.2, 0.2, 0.2,
-0, -0.01, 0.2 ,0.2,
-0.2,0,-0.01,0.2,
-0,0,0,1"/>
+ ${value}, ${value}, ${value}, 0, 0,
+    ${value}, ${value}, ${value}, 0, 0,
+    ${value}, ${value}, ${value}, 0, 0,
+    0, 0, 0, 0, 1,"/>
 </filter>
 <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
-${ content ? content : '' }
-</svg>`, 1);
+${ content }
+</svg>`);
 }
 
 function roomSign(roomNumber: string) {
-  return metals(`<text x="21%" y="42%" font-size="150px" style="transform: scaleY(1.5)">${roomNumber}</text>`)
+  return metals(`<text x="21%" y="42%" font-size="150px" style="transform: scaleY(1.5)">${roomNumber}</text>`, 30)
+}
+
+function color(color: string | number) {
+  return toImage(`<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+<rect x="0" y="0" width="100%" height="100%" fill="${color}"/>
+</svg>`)
 }

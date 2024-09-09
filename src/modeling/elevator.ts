@@ -29,8 +29,7 @@ export class Elevator {
         .done_()
       , materials.silver);
     // @ts-ignore
-    const panel = new Mesh(new MoldableCubeGeometry(1.5, 2, 0.5).translate_(5.4, 5, 5.2).spreadTextureCoords(-2, 2, 0.2).computeNormals().done_(), materials.elevatorPanel);
-    //
+    const panel = new Mesh(new MoldableCubeGeometry(1.5, 2, 1).translate_(5.4, 5, 5.2).spreadTextureCoords(-2, 2, 0.2).translate_(0, 0, 0.2).computeNormals().done_(), materials.elevatorPanel);    //
     const bfSegments = [1.25, 4, 0.5, 4, 0.5, 4, 1.25];
     const lrSegments = [0.5, 4, 0.5, 4, 0.5];
     const elevatorWoodTest = new Mesh(createBox(
@@ -51,23 +50,23 @@ export class Elevator {
     this.meshes = [elevatorBody, elevatorRail, elevatorFloor, elevatorRoof, elevatorWoodTest, panel, elevatorRightDoor, elevatorLeftDoor];
 
     this.openDoors = () => {
-      if (elevatorRightDoor.position_.x > -5) {
-        elevatorRightDoor.position_.x -= 0.05;
-        elevatorLeftDoor.position_.x += 0.05;
+      if (elevatorRightDoor.position.x > -5) {
+        elevatorRightDoor.position.x -= 0.035;
+        elevatorLeftDoor.position.x += 0.035;
       } else {
         this.isOpenTriggered = false;
       }
-      this.isOpen = elevatorRightDoor.position_.x < -1;
+      this.isOpen = elevatorRightDoor.position.x < -1;
     }
 
     this.closeDoors = () => {
-      if (elevatorRightDoor.position_.x < 0) {
-        elevatorRightDoor.position_.x += 0.05;
-        elevatorLeftDoor.position_.x -= 0.05;
+      if (elevatorRightDoor.position.x < 0) {
+        elevatorRightDoor.position.x += 0.04;
+        elevatorLeftDoor.position.x -= 0.04;
       } else {
         this.isCloseTriggered = false;
       }
-      this.isOpen = elevatorRightDoor.position_.x < -1;
+      this.isOpen = elevatorRightDoor.position.x < -1;
     }
   }
 

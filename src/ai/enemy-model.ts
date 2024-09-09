@@ -16,7 +16,7 @@ export function upyri() {
         materials.iron.texture!,
         materials.iron.texture!,
         materials.face.texture!,
-        materials.face.texture!,
+        materials.iron.texture!,
       )
       .all_()
       .rotate_(Math.PI)
@@ -25,7 +25,7 @@ export function upyri() {
       .done_()
     , materials.face);
 
-  obj.position_.set(0, 54, 2);
+  obj.position.set(0, 54, 2);
 
   return obj;
 }

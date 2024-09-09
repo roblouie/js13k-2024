@@ -3,7 +3,6 @@
 //[
 precision highp float;
 //]
-in vec4 vColor;
 in vec2 vTexCoord;
 in float vDepth;
 in vec3 vNormal;
@@ -53,8 +52,6 @@ void main() {
 
     vec3 correctedNormal = normalize(mat3(vNormalMatrix) * vNormal);
 
-    vec3 litColor = length(emissive) > 0.0 ? emissive.rgb : vec3(1.0, 1.0, 1.0);
-
     float diffuse = max(0.0, dot(direction2, correctedNormal));
     float attenuation = quadraticLinearConstant(distance, pointLightAttenuation.x, pointLightAttenuation.y, pointLightAttenuation.z);
     vec4 pointLightBrightness = pointLightColor * diffuse * attenuation * ShadowFactor;
@@ -71,10 +68,5 @@ void main() {
 
     vec4 vColor = clamp(ambientLight + pointLightBrightness + spotlight, ambientLight, vec4(1.0, 1.0, 1.0, 1.0));
 
-    // TODO: Probably remove this check if all my surfaces have textures, which i beleive they will?
-    if (vDepth < 0.0) {
-        outColor = vColor;
-    } else {
-        outColor = texture(uSampler, vec3(vTexCoord * textureRepeat, vDepth)) * vColor;
-    }
+    outColor = texture(uSampler, vec3(vTexCoord * textureRepeat, vDepth)) * vColor;
 }

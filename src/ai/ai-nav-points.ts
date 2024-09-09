@@ -7,7 +7,10 @@ import { Item } from '@/item';
 export const AiNavPoints: PathNode[] = [];
 export const items: Item[] = [];
 
-function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, door: LeverDoorObject3d, isGoingRight?: boolean) {
+const rightFacingRoomNumbers = [1304, 1306, 1308, 1310, 1311, 1312];
+
+function createRoomNodes(roomPosition: EnhancedDOMPoint, roomNumber: number, door: LeverDoorObject3d) {
+  const isGoingRight = rightFacingRoomNumbers.includes(roomNumber);
   const roomEntranceNode = new PathNode(roomPosition, door, roomNumber);
   const bathEntranceOffset = new EnhancedDOMPoint(12, 0, -1);
   const roomOffset = new EnhancedDOMPoint(27, 0, -3);
@@ -55,11 +58,47 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   ];
 
   let roomsWorkingCopy = [...roomEntrances];
-  const firstNode = roomEntrances[Math.floor(3 + Math.random() * 4)];
+  const firstNode = roomsWorkingCopy[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
+  firstNode.door!.isLocked = true;
 
   placeKeys(firstNode);
 
   function placeKeys(activeNode: PathNode) {
+    const scaler = rightFacingRoomNumbers.includes(activeNode.roomNumber!) ? -1 : 1;
+
+    const itemSpots = [
+      // Bathroom
+      [
+        {
+          position: new EnhancedDOMPoint(4.25 * scaler, 1.75, -7 * scaler),
+          rotation_: new EnhancedDOMPoint(0, Math.PI / 4),
+        },
+        {
+          position: new EnhancedDOMPoint(-4.5 * scaler, 0.5, -7.5 * scaler),
+          rotation_: new EnhancedDOMPoint(0, -Math.PI / 2),
+        },
+        {
+          position: new EnhancedDOMPoint(-5.5 * scaler, 0.75, -12.75 * scaler),
+          rotation_: new EnhancedDOMPoint(0, 0, Math.PI / 2),
+        }
+      ],
+      // Bedroom
+      [
+        {
+          position: new EnhancedDOMPoint(5.25 * scaler, -0.75, -12 * scaler),
+          rotation_: new EnhancedDOMPoint(0, 0, Math.PI / 2),
+        },
+        {
+          position: new EnhancedDOMPoint(-1 * scaler, -0.5, 8.4 * scaler),
+          rotation_: new EnhancedDOMPoint(0, 0, -Math.PI / 2),
+        },
+        {
+          position: new EnhancedDOMPoint(-1.5 * scaler, 0.8, -13.5 * scaler),
+          rotation_: new EnhancedDOMPoint(Math.PI / 3 * -scaler, 0, 0),
+        },
+      ]
+    ];
+
     roomsWorkingCopy = roomsWorkingCopy.filter(node => node !== activeNode);
     let nextNode: PathNode;
     let longestDistance = 0;
@@ -78,17 +117,20 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
     const bathNode = activeNode.getPresentSiblings().find(node => node.hidingPlace)!;
     const roomNode = bathNode.getPresentSiblings().find(node => node.hidingPlace)!;
-    const nodeToPlaceItemIn = [bathNode, roomNode][Math.floor(Math.random() * 2)];
-    nodeToPlaceItemIn.item = new Item(nodeToPlaceItemIn.position);
-    nodeToPlaceItemIn.item.mesh.position_.y += 3;
-    items.push(nodeToPlaceItemIn.item);
+    const itemRoomIndex = Math.floor(Math.random() * 2);
+    const itemSpotIndex = Math.floor(Math.random() * 3);
+    const nodeToPlaceItemIn = [bathNode, roomNode][itemRoomIndex];
 
     if (roomsWorkingCopy.length > 3) {
-      nodeToPlaceItemIn.item.roomNumber = nextNode!.roomNumber;
-      nextNode!.door!.isLocked = true;
+      nodeToPlaceItemIn.item = new Item(new EnhancedDOMPoint().addVectors(nodeToPlaceItemIn.position, itemSpots[itemRoomIndex][itemSpotIndex].position), itemSpots[itemRoomIndex][itemSpotIndex].rotation_, nextNode!.roomNumber);
+      // nextNode!.door!.isLocked = true;
     } else if (roomsWorkingCopy.length > 2) {
-      nodeToPlaceItemIn.item.roomNumber = 1313;
+      nodeToPlaceItemIn.item = new Item(new EnhancedDOMPoint().addVectors(nodeToPlaceItemIn.position, itemSpots[itemRoomIndex][itemSpotIndex].position), itemSpots[itemRoomIndex][itemSpotIndex].rotation_, 1313);
+    } else {
+      nodeToPlaceItemIn.item = new Item(new EnhancedDOMPoint().addVectors(nodeToPlaceItemIn.position, itemSpots[itemRoomIndex][itemSpotIndex].position), itemSpots[itemRoomIndex][itemSpotIndex].rotation_);
     }
+
+    items.push(nodeToPlaceItemIn.item);
 
     if (roomsWorkingCopy.length >= 1) {
       placeKeys(nextNode!);

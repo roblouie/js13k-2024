@@ -24,7 +24,7 @@ export class LeverDoorObject3d extends Object3d {
   sfxPlayer = new SimplestMidiRev2();
   sfxPlayer2 = new SimplestMidiRev2();
 
-  constructor(position_: EnhancedDOMPoint, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean, isLocked?: boolean) {
+  constructor(x: number, y: number, z: number, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean, isLocked?: boolean) {
     const mesh = new Mesh(
       new MoldableCubeGeometry(5, 7.75, 0.25)
         .texturePerSide(...getAllWhite())
@@ -39,18 +39,18 @@ export class LeverDoorObject3d extends Object3d {
     )
     super(mesh);
     this.isLocked = !!isLocked;
-    this.placedPosition = new EnhancedDOMPoint(position_.x - (swapOpenClosed ? 2 * swapHingeSideX : 0), position_.y, position_.z - (swapOpenClosed ? 2 * swapHingeSideX : 0));
+    this.placedPosition = new EnhancedDOMPoint(x - (swapOpenClosed ? 2 * swapHingeSideX : 0), y, z - (swapOpenClosed ? 2 * swapHingeSideX : 0));
     this.swapHingeSideX = swapHingeSideX;
     this.swapHingeSideZ = swapHingeSideZ;
     this.sfxPlayer.volume_.connect(compressor);
     this.sfxPlayer2.volume_.connect(biquadFilter);
 
-    this.position_.set(position_.x - 2 * swapHingeSideX, position_.y, position_.z);
-    this.children_[0].position_.x = 2 * swapHingeSideX;
+    this.position.set(x - 2 * swapHingeSideX, y, z);
+    this.children_[0].position.x = 2 * swapHingeSideX;
 
     this.collisionMesh = new Mesh(
       new MoldableCubeGeometry(swapOpenClosed ? 1 : 4, 7, swapOpenClosed ? 4 :1)
-        .translate_(position_.x - (swapOpenClosed ? 2 * swapHingeSideX : 0), position_.y, position_.z - (swapOpenClosed ? 2 * swapHingeSideX : 0))
+        .translate_(x - (swapOpenClosed ? 2 * swapHingeSideX : 0), y, z - (swapOpenClosed ? 2 * swapHingeSideX : 0))
         .done_()
       , new Material());
 
@@ -71,7 +71,6 @@ export class LeverDoorObject3d extends Object3d {
       this.isAnimating = true;
       this.openClose *= -1;
       this.sfxPlayer.playNote(audioContext.currentTime, 10, 40, baseDrum, audioContext.currentTime + 1);
-      // this.sfxPlayer2.playNote(audioContext.currentTime, 38, 50, hideSound, audioContext.currentTime + 1);
 
       if (isEnemy) {
         this.sfxPlayer2.playNote(audioContext.currentTime, 72, 30, doorOpening4, audioContext.currentTime + 1);

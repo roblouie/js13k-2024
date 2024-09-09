@@ -18,7 +18,7 @@ export function getAllWhite(): [Texture, Texture, Texture, Texture, Texture, Tex
   ]
 }
 
-export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide: Texture[]): [MoldableCubeGeometry, number] {
+export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide?: Texture[]): [MoldableCubeGeometry, number] {
   let geo: MoldableCubeGeometry;
   let totalWidth = 0;
   let runningSide = 0;

@@ -142,7 +142,7 @@ export class Enemy {
   }
 
   updateLight(followDistance: number, height: number) {
-    this.lightObject.position_.z = followDistance;
+    this.lightObject.position.z = followDistance;
     lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
     lightInfo.pointLightPosition.y = height;
   }
@@ -159,7 +159,7 @@ export class Enemy {
     // lightInfo.pointLightPosition.z = 23;
 
     this.stateMachine.getState().onUpdate(player);
-    this.model_.position_.set(this.position);
+    this.model_.position.set(this.position);
     this.model_.updateWorldMatrix();
     // lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
     // lightInfo.pointLightPosition.y = 9;

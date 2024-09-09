@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css"/>
-</head>
-<html>
-<body>
-<canvas id="c3d" width="1920" height="1080"></canvas>
-<div id="tmpl"></div>
+<body style="margin: 0;background-color: black;display: grid;place-items: center;height: 100%;">
+<canvas id="c3d" width="1920" height="1080" style="width: min(100vw, calc(100vh * 16/9));position: absolute;aspect-ratio: 16/9;color: white;"></canvas>
+<div id="tmpl" style="width: min(100vw, calc(100vh * 16/9));position: absolute;aspect-ratio: 16/9;color: white;"></div>
 <script type="module" src="/src/index.ts"></script>
 </body>
-</html>

@@ -2,16 +2,13 @@ import { gl, lilgl } from "@/engine/renderer/lil-gl";
 import { Camera } from "@/engine/renderer/camera";
 
 import { Scene } from '@/engine/renderer/scene';
-import { Mesh } from '@/engine/renderer/mesh';
 import {
-  emissive, lightPovMvp, lightWorldPosition,
+  lightPovMvp, lightWorldPosition,
   modelviewProjection,
-  normalMatrix, pointLightAttenuation, shadowCubeMap, spotlightDirection, spotlightPosition,
+  normalMatrix, pointLightAttenuation, spotlightDirection, spotlightPosition,
   textureRepeat, worldMatrix,
 } from '@/engine/shaders/shaders';
-import { createOrtho, Object3d } from '@/engine/renderer/object-3d';
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { textureLoader } from '@/engine/renderer/texture-loader';
 import { ShadowCubeMapFbo } from '@/engine/renderer/cube-buffer-2';
 import { lightInfo } from '@/light-info';
 
@@ -36,7 +33,6 @@ gl.getExtension('EXT_color_buffer_float');
 gl.getExtension('OES_texture_float_linear');
 const modelviewProjectionLocation = gl.getUniformLocation(lilgl.program, modelviewProjection)!;
 const normalMatrixLocation =  gl.getUniformLocation(lilgl.program, normalMatrix)!;
-const emissiveLocation = gl.getUniformLocation(lilgl.program, emissive)!;
 const textureRepeatLocation = gl.getUniformLocation(lilgl.program, textureRepeat)!;
 const pointLightAttenuationLocation = gl.getUniformLocation(lilgl.program, pointLightAttenuation);
 const spotlightPositionLocation = gl.getUniformLocation(lilgl.program, spotlightPosition)!;
@@ -139,9 +135,8 @@ export function render(camera: Camera, scene: Scene) {
     gl.useProgram(lilgl.program);
     const modelViewProjectionMatrix = viewProjectionMatrix.multiply(mesh.worldMatrix);
 
-    gl.uniform4fv(emissiveLocation, mesh.material.emissive);
     gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material.texture?.id ?? -1.0);
-    const textureRepeat = [mesh.material.texture?.textureRepeat.x ?? 1, mesh.material.texture?.textureRepeat.y ?? 1];
+    const textureRepeat = [mesh.material.texture!.textureRepeat.x, mesh.material.texture!.textureRepeat.y];
     gl.uniform2fv(textureRepeatLocation, textureRepeat);
 
     gl.bindVertexArray(mesh.geometry.vao!);

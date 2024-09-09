@@ -17,9 +17,8 @@ import { LeverDoorObject3d } from '@/lever-door';
 import { AiNavPoints, items, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
 import { lightInfo } from '@/light-info';
-import { PathNode } from '@/ai/path-node';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { baseDrum, elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep } from '@/sounds';
+import { elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep } from '@/sounds';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -30,7 +29,6 @@ export class GameState implements State {
   enemy: Enemy;
 
   elevator: Elevator;
-  firstNodeRef: PathNode;
 
   hasPlayerLeftElevator = false;
   hasEnemySpawned = false;
@@ -44,52 +42,53 @@ export class GameState implements State {
 
     this.doors = [
       // 1301 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(48, 4.75, 33.75), -1, -1, true),
+      new LeverDoorObject3d(48, 4.75, 33.75, -1, -1, true),
 
       // 1302 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(48, 4.75, 68.75), -1, -1, true),
+      new LeverDoorObject3d(48, 4.75, 68.75, -1, -1, true),
 
       // 1303 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(48, 4.75, 103.75), -1, -1, true),
+      new LeverDoorObject3d(48, 4.75, 103.75, -1, -1, true),
 
       // 1304 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-4, 4.75, 26.25), 1, 1, true),
+      new LeverDoorObject3d(-4, 4.75, 26.25, 1, 1, true),
 
       // 1305 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(4, 4.75, 33.75), -1, -1, true),
+      new LeverDoorObject3d(4, 4.75, 33.75, -1, -1, true),
 
       // 1306 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-4, 4.75, 61.25), 1, 1, true),
+      new LeverDoorObject3d(-4, 4.75, 61.25, 1, 1, true),
 
       // 1307 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(4, 4.75, 68.75), -1, -1, true),
+      new LeverDoorObject3d(4, 4.75, 68.75, -1, -1, true),
 
       // 1308 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-4, 4.75, 96.25), 1, 1, true),
+      new LeverDoorObject3d(-4, 4.75, 96.25, 1, 1, true),
 
       // 1309 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(4, 4.75, 103.75), -1, -1, true),
+      new LeverDoorObject3d(4, 4.75, 103.75, -1, -1, true),
 
       // 1310 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-48, 4.75, 26.25), 1, 1, true),
+      new LeverDoorObject3d(-48, 4.75, 26.25, 1, 1, true),
 
       // 1311 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-48, 4.75, 61.25), 1, 1, true),
+      new LeverDoorObject3d(-48, 4.75, 61.25, 1, 1, true),
 
       // 1312 door
-      new LeverDoorObject3d(new EnhancedDOMPoint(-48, 4.75, 96.25), 1, 1, true),
+      new LeverDoorObject3d(-48, 4.75, 96.25, 1, 1, true),
 
       // 1313 Door Left
-      new LeverDoorObject3d(new EnhancedDOMPoint(3, 4.75, 124), -1, -1, false, true),
+      new LeverDoorObject3d(3, 4.75, 124, -1, -1, false, true),
       // 1313 Door Right
-      new LeverDoorObject3d(new EnhancedDOMPoint(-3, 4.75, 124), 1, -1, false, true),
+      new LeverDoorObject3d(-3, 4.75, 124, 1, -1, false, true),
     ];
 
-    this.firstNodeRef = makeNavPoints(this.doors);
 
-    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[0])
+    const firstKeyRoomNum = makeNavPoints(this.doors).roomNumber;
+    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[0]);
+    this.player.heldKeyRoomNumber = firstKeyRoomNum;
 
-    this.enemy = new Enemy(AiNavPoints[1]);
+    this.enemy = new Enemy();
 
     this.elevator = new Elevator();
   }
@@ -101,7 +100,7 @@ export class GameState implements State {
     const hotelRender = new Mesh(makeHotel(true).translate_(0, 0, 6).done_(), materials.wallpaper);
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
 
-    this.scene.add_(ceiling, floor, hotelRender, ...this.elevator.meshes, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
+    this.scene.add_(...this.elevator.meshes, ceiling, floor, hotelRender, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
     this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]));
     tmpl.addEventListener('click', () => {
       tmpl.requestPointerLock();
@@ -152,7 +151,7 @@ export class GameState implements State {
           if (distance < 1 || direction < -0.77) {
             if (door.isLocked) {
               if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
-                tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Unlock and Open</div>`;
+                tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Unlock and Open 🗝</div>`;
                 if (controls.isConfirm) {
                   door.pullLever();
                   door.isLocked = false;
@@ -188,7 +187,7 @@ export class GameState implements State {
 
       const hidingPlace = this.player.closestNavPoint.hidingPlace;
       if (hidingPlace) {
-        const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position_, hidingPlace.position).magnitude;
+        const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position, hidingPlace.position).magnitude;
         // tmpl.innerHTML += `PLAYER POS: ${this.player.camera.position_.x}, ${this.player.camera.position_.y}, ${this.player.camera.position_.z}<br>`
         // tmpl.innerHTML += `HIDING PLACE DISTANCE: ${distance}`;
         if (distance < 8) {
@@ -204,12 +203,12 @@ export class GameState implements State {
 
       const item = this.player.closestNavPoint.item;
       if (item && !item.isTaken) {
-        const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position_, item.mesh.position_).magnitude;
+        const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position, item.mesh.position).magnitude;
         if (distance < 6) {
           const direction = this.player.normal.dot( this.playerHidingPlaceDifference.normalize_());
           if (direction < -0.9) {
             if (item.roomNumber) {
-              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 Take Room ${item.roomNumber} Key</div>`;
+              tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 Take Room ${item.roomNumber} Key 🗝</div>`;
             } else {
               tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 Use Health Pack</div>`;
             }
@@ -220,6 +219,7 @@ export class GameState implements State {
                 this.player.heldKeyRoomNumber = item.roomNumber;
                 this.enemy.increaseAggression(0.08);
                 if (!this.hasEnemySpawned) {
+                  lightInfo.pointLightAttenuation.set(0.002, 0.001, 0.4);
                   this.enemy.aggression = 0;
                   this.hasEnemySpawned = true;
                   this.enemy.spawn();
@@ -236,16 +236,6 @@ export class GameState implements State {
         this.hasPlayerLeftElevator = true;
         this.elevator.isCloseTriggered = true;
         this.playElevatorSound();
-        setTimeout(() => {
-          const bathNode = this.firstNodeRef.getPresentSiblings().find(node => node.hidingPlace);
-          const roomNode = bathNode?.getPresentSiblings().find(node => node.hidingPlace);
-          lightInfo.pointLightPosition.set(roomNode!.position);
-          lightInfo.pointLightPosition.y = 8;
-          lightInfo.pointLightAttenuation.set(0.002, 0.001, 0.4);
-          if (bathNode!.door!.openClose === -1) {
-            bathNode!.door!.pullLever(true);
-          }
-        } ,3_000)
       }
     }
   }
