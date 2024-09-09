@@ -82,7 +82,7 @@ export class FirstPersonPlayer {
 
   update(gridFaces: Set<Face>[]) {
     if (this.heldKeyRoomNumber) {
-      tmpl.innerHTML += `<div style="font-size: 20px; text-align: center; position: absolute; bottom: 40px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
+      tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 40px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
     }
 
     let smallestDistance = Infinity;
@@ -98,7 +98,9 @@ export class FirstPersonPlayer {
 
     // tmpl.innerHTML += `PLAYER NODE DIFF: ${this.differenceFromNavPoint.x}, ${this.differenceFromNavPoint.z}<br>`;
 
-    if (!this.isFrozen_) {
+    if (this.isFrozen_) {
+      this.velocity.set(0, 0, 0);
+    } else {
       this.updateVelocityFromControls();
     }
 

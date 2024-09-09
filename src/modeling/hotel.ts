@@ -1,6 +1,7 @@
 import { buildRoom, RoomDepth, RoomWidth } from '@/modeling/room';
-import { buildSegmentedWall, DoorHeight, DoubleDoorWidth, getAllWhite } from '@/modeling/building-blocks';
+import { buildSegmentedWall, createBox, DoorHeight, DoubleDoorWidth, getAllWhite } from '@/modeling/building-blocks';
 import { materials } from '@/textures';
+import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 
 const HallwayWidth = 10;
 
@@ -41,8 +42,28 @@ export function makeHotel(isIncludingDetails = false) {
     // Draw back wall
     .merge(
       buildSegmentedWall([45, 11, 45], 12, [12, 3, 12], [], 1, 4, wallpapered)[0]
+        // Door frame
         .merge(
           buildSegmentedWall([0.5, 10, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, getAllWhite())[0]
+        )
+        // room number card
+        .merge(new MoldableCubeGeometry(2, 1.5).texturePerSide(
+          materials[13].texture!,
+          materials[13].texture!,
+          materials[13].texture!,
+          materials[13].texture!,
+          materials[13].texture!,
+          materials[13].texture!,
+        ).translate_(0, 10, -0.1))
+        //
+        .merge(
+          createBox(
+            [new MoldableCubeGeometry(20, 12, 0.5).spreadTextureCoords(6, 6), 20],
+            [undefined, 20],
+            [new MoldableCubeGeometry(19.5, 12, 0.5).spreadTextureCoords(6, 6), 19],
+            [new MoldableCubeGeometry(19.5, 12, 0.5).spreadTextureCoords(6, 6), 19]
+          ).texturePerSide(...wallpapered)
+            .translate_(0, 6, 10)
         )
         .translate_(0, 0, 118)
     )
