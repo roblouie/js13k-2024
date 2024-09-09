@@ -78,9 +78,9 @@ export class GameState implements State {
       new LeverDoorObject3d(-48, 4.75, 96.25, 1, 1, true),
 
       // 1313 Door Left
-      new LeverDoorObject3d(3, 4.75, 124, -1, -1, false, true),
+      new LeverDoorObject3d(3, 4.75, 124, -1, -1, false, false),
       // 1313 Door Right
-      new LeverDoorObject3d(-3, 4.75, 124, 1, -1, false, true),
+      new LeverDoorObject3d(-3, 4.75, 124, 1, -1, false, false),
     ];
 
 
@@ -95,7 +95,7 @@ export class GameState implements State {
 
   onEnter() {
     const floor = new Mesh(new MoldableCubeGeometry(180, 1, 180, 20, 1, 20).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
-    const ceiling = new Mesh(new MoldableCubeGeometry(170, 1, 120).translate_(0, 12, 65).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
+    const ceiling = new Mesh(new MoldableCubeGeometry(170, 1, 160).translate_(0, 12, 65).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
     // Move hotel layout to just outside the elevator
     const hotelRender = new Mesh(makeHotel(true).translate_(0, 0, 6).done_(), materials.wallpaper);
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);

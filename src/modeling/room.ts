@@ -124,6 +124,19 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
     materials.silver.texture!,
   ];
 
+  const allMarble = [
+    materials.marble.texture!,
+    materials.marble.texture!,
+    materials.marble.texture!,
+    materials.marble.texture!,
+    materials.marble.texture!,
+    materials.marble.texture!,
+  ];
+
+  const bathroomFloor = new MoldableCubeGeometry(10, 2, 8)
+    .translate_(-11, -0.4, -4)
+    .texturePerSide(...allMarble)
+
   const counter = new MoldableCubeGeometry(3, 1, 7, 12, 1, 12)
     .selectBy(pos => pos.y > 0 && Math.hypot(pos.x, pos.z) < 1)
     .spherify(1)
@@ -273,6 +286,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       .merge(bathroomDoorTrim[0].rotate_(0, Math.PI).translate_(-10))
       .merge(bathroomWallTrim[0].rotate_(0, Math.PI / 2).translate_(-4, 0, -5.25))
       .merge(doorTrim[0].rotate_(0, Math.PI / 2).translate_(-16.5, 0, 6))
+      .merge(bathroomFloor)
       .merge(outerLargeTrimPiece()).computeNormals().done_();
 
   const doorNumberPlate = new MoldableCubeGeometry(1, 1).texturePerSide(
