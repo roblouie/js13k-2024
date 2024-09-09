@@ -19,7 +19,7 @@ import { Enemy } from '@/ai/enemy-ai';
 import { lightInfo } from '@/light-info';
 import { PathNode } from '@/ai/path-node';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { baseDrum, elevatorDoor1, elevatorDoorTest, elevatorMotionRev1 } from '@/sounds';
+import { baseDrum, elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep } from '@/sounds';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -107,11 +107,13 @@ export class GameState implements State {
       tmpl.requestPointerLock();
     });
     this.player.cameraRotation.set(0, Math.PI, 0);
-    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 80, elevatorMotionRev1, audioContext.currentTime + 6);
+    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorMotionRev1, audioContext.currentTime + 6);
 
     setTimeout(() => {
       this.elevator.isOpenTriggered = true;
       this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
+      this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 4);
+      this.player.sfxPlayer.playNote(audioContext.currentTime + 1.5, 60, 70, footstep, audioContext.currentTime + 4);
       this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
     }, 7_000);
   }
@@ -221,8 +223,7 @@ export class GameState implements State {
                 this.player.heldKeyRoomNumber = item.roomNumber;
                 if (!this.hasEnemySpawned) {
                   this.hasEnemySpawned = true;
-                  lightInfo.pointLightAttenuation.set(0.005, 0.001, 0.4);
-                  // TODO: Spawn enemy;
+                  this.enemy.spawn();
                 }
               }
             }
@@ -236,14 +237,17 @@ export class GameState implements State {
         this.hasPlayerLeftElevator = true;
         this.elevator.isCloseTriggered = true;
         this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
+        this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 4);
+        this.player.sfxPlayer.playNote(audioContext.currentTime + 1.8, 60, 70, footstep, audioContext.currentTime + 4);
         this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
         setTimeout(() => {
           const bathNode = this.firstNodeRef.getPresentSiblings().find(node => node.hidingPlace);
           const roomNode = bathNode?.getPresentSiblings().find(node => node.hidingPlace);
           lightInfo.pointLightPosition.set(roomNode!.position);
           lightInfo.pointLightPosition.y = 8;
+          lightInfo.pointLightAttenuation.set(0.002, 0.001, 0.4);
           bathNode!.door!.pullLever(true);
-        } ,3_000)
+        } ,4_000)
       }
     }
   }

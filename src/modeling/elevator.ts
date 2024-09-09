@@ -16,7 +16,7 @@ export class Elevator {
   isCloseTriggered = false;
 
   constructor() {
-    const testWall = buildSegmentedWall([4, DoubleDoorWidth, 4], 12, [12, 3, 12], [0, 0, 0], 1);
+    const testWall = buildSegmentedWall([4, DoubleDoorWidth - 0.1, 4], 12, [12, 3, 12], [0, 0, 0], 1);
     const testWall2 = buildSegmentedWall([16], 12, [12], [], 1);
     const testWall3 = buildSegmentedWall([10], 12, [12], [], 1);
     const testWall4 = buildSegmentedWall([10], 12, [12], [], 1);
@@ -52,8 +52,8 @@ export class Elevator {
 
     this.openDoors = () => {
       if (elevatorRightDoor.position_.x > -5) {
-        elevatorRightDoor.position_.x -= 0.04;
-        elevatorLeftDoor.position_.x += 0.04;
+        elevatorRightDoor.position_.x -= 0.05;
+        elevatorLeftDoor.position_.x += 0.05;
       } else {
         this.isOpenTriggered = false;
       }

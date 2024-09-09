@@ -8,7 +8,7 @@ import { meshToFaces } from '@/engine/physics/parse-faces';
 import { materials } from '@/textures';
 import { getAllWhite } from '@/modeling/building-blocks';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { doorOpening4, footstep, hideSound } from '@/sounds';
+import { baseDrum, doorOpening4, footstep, hideSound } from '@/sounds';
 
 export class LeverDoorObject3d extends Object3d {
   swapHingeSideX: -1 | 1;
@@ -70,11 +70,11 @@ export class LeverDoorObject3d extends Object3d {
     if (!this.isAnimating) {
       this.isAnimating = true;
       this.openClose *= -1;
-      this.sfxPlayer2.playNote(audioContext.currentTime, 20, 40, footstep, audioContext.currentTime + 1);
-      this.sfxPlayer2.playNote(audioContext.currentTime, 38, 50, hideSound, audioContext.currentTime + 1);
+      this.sfxPlayer.playNote(audioContext.currentTime, 10, 40, baseDrum, audioContext.currentTime + 1);
+      // this.sfxPlayer2.playNote(audioContext.currentTime, 38, 50, hideSound, audioContext.currentTime + 1);
 
       if (isEnemy) {
-        this.sfxPlayer.playNote(audioContext.currentTime, 72, 30, doorOpening4, audioContext.currentTime + 1);
+        this.sfxPlayer2.playNote(audioContext.currentTime, 72, 30, doorOpening4, audioContext.currentTime + 1);
       }
 
     }

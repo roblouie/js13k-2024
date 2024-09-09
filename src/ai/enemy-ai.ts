@@ -52,14 +52,13 @@ export class Enemy {
   footstepDebounce = 0;
   isSpawned = false;
 
-  constructor(startingNode: PathNode) {
+  constructor() {
     this.songPlayer = new SimplestMidiRev2();
     this.songPlayer.volume_.connect(biquadFilter)
     this.footstepPlayer.volume_.connect(this.pannerNode).connect(compressor);
-    this.currentNode = startingNode;
-    this.position = new EnhancedDOMPoint().set(startingNode.position);
-    const siblings = startingNode.getPresentSiblings();
-    this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
+    this.currentNode = AiNavPoints[2];
+    this.position = new EnhancedDOMPoint().set(this.currentNode.position);
+    this.nextNode =this.currentNode;
     this.patrolState = {
       onEnter: () => {
         this.stopSong()
@@ -82,6 +81,17 @@ export class Enemy {
     this.stateMachine = new StateMachine(this.patrolState);
     this.model_ = upyri();
     this.model_.add_(this.lightObject);
+  }
+
+  spawn() {
+    lightInfo.pointLightAttenuation.set(0.005, 0.001, 0.4);
+    this.isSpawned = true;
+    this.setFarthestPoint();
+    this.position.set(this.farthestPoint.position);
+    this.currentNode = this.farthestPoint;
+    const siblings = this.currentNode.getPresentSiblings();
+    this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
+    this.stateMachine.setState(this.patrolState);
   }
 
   playSong() {
@@ -202,7 +212,7 @@ export class Enemy {
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       if (this.position.y < 2.402) {
         clearTimeout(this.footstepDebounce);
-        this.footstepDebounce = setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 4, 50, footstep, audioContext.currentTime + 1), 40);
+        this.footstepDebounce = setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 4, 60, footstep, audioContext.currentTime + 1), 40);
       }
       this.currentInterval++;
       this.pannerNode.positionX.value = this.position.x;
@@ -429,9 +439,7 @@ export class Enemy {
     }
   }
 
-  farthestPoint = AiNavPoints[0];
-  fleeEnter() {
-    this.stopSong();
+  setFarthestPoint() {
     let longestDistance = 0;
     const difference = new EnhancedDOMPoint();
     AiNavPoints.forEach(node => {
@@ -441,6 +449,12 @@ export class Enemy {
         this.farthestPoint = node;
       }
     });
+  }
+
+  farthestPoint = AiNavPoints[0];
+  fleeEnter() {
+    this.stopSong();
+    this.setFarthestPoint();
     this.advancePathToNode(this.farthestPoint);
     this.nextNode = this.pathCache[0];
     this.updateNodeDistanceData();

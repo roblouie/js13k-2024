@@ -55,7 +55,7 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   ];
 
   let roomsWorkingCopy = [...roomEntrances];
-  const firstNode = roomEntrances[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
+  const firstNode = roomEntrances[Math.floor(3 + Math.random() * 4)];
 
   placeKeys(firstNode);
 
