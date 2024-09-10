@@ -17,7 +17,7 @@ const interval = 1000 / 60;
 
     draw(0);
 
-    document.onclick = null;
+    document.onclick = () => tmpl.requestPointerLock();
 
   function draw(currentTime: number) {
     const delta = currentTime - previousTime;

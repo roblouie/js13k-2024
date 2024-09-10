@@ -65,6 +65,8 @@ export function makeHotel(isIncludingDetails = false) {
           )
             .translate_(0, 6, 10)
         )
+        // Table for cake
+        .merge(new MoldableCubeGeometry(3, 3.25, 3).translate_(0, 1.5, 15).texturePerSide(...wallpapered))
         .translate_(0, 0, 118)
     )
 

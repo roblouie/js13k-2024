@@ -116,7 +116,6 @@ export class GameState implements State {
   playerHidingPlaceDifference = new EnhancedDOMPoint();
 
   onUpdate() {
-    //TODO: Probably change how this works, otherwise I might clear other useful HUD stuff
     tmpl.innerHTML = '';
 
     this.player.update(this.gridFaces);
@@ -216,7 +215,9 @@ export class GameState implements State {
             }
             if (controls.isConfirm && !controls.prevConfirm) {
               item.isTaken = true;
-              this.scene.remove_(item.mesh);
+              if (item.roomNumber !== -1) {
+                this.scene.remove_(item.mesh);
+              }
               if (item.roomNumber) {
                 this.player.heldKeyRoomNumber = item.roomNumber;
                 this.enemy.increaseAggression(0.08);
@@ -228,7 +229,7 @@ export class GameState implements State {
                 }
                 if (item.roomNumber === 1313) {
                   this.enemy.isSpawned = false;
-                  lightInfo.pointLightPosition.set(0, 2, 135);
+                  lightInfo.pointLightPosition.set(0, 3.8, 137.75);
                 }
                 if (item.roomNumber === -1) {
                   this.elevator.isOpenTriggered = true;
