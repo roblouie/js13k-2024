@@ -46,7 +46,7 @@ export class FirstPersonPlayer {
     this.sfxPlayer = new SimplestMidiRev2();
     this.sfxPlayer.volume_.connect(compressor);
     this.closestNavPoint = startingPoint;
-    this.feetCenter.set(2, 2.5, 100);
+    this.feetCenter.set(2, 2.5, 2);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
     this.listener = audioContext.listener;
@@ -81,7 +81,7 @@ export class FirstPersonPlayer {
   }
 
   update(gridFaces: Set<Face>[]) {
-    if (this.heldKeyRoomNumber) {
+    if (this.heldKeyRoomNumber && this.heldKeyRoomNumber !== -1) {
       tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 40px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
     }
 

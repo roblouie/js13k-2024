@@ -151,6 +151,8 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
   const LowerQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 47.5)); // 11.5 diff from prev
   const UpperQuarterCenterIntersection = new PathNode(new EnhancedDOMPoint(0, 2.5, 82.5));
   const TopCenterEntrance = new PathNode(new EnhancedDOMPoint(0, 2.5, 118.5), undefined, 1313); // 11.5 diff from prev
+  TopCenterEntrance.item = new Item(new EnhancedDOMPoint(0, 3, 20).add_(TopCenterEntrance.position), new EnhancedDOMPoint(), -1);
+  items.push(TopCenterEntrance.item);
 
 
   // LEFT HALLWAY INTERSECTIONS

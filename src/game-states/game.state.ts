@@ -103,9 +103,6 @@ export class GameState implements State {
 
     this.scene.add_(...this.elevator.meshes, ceiling, floor, hotelRender, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
     this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]));
-    tmpl.addEventListener('click', () => {
-      tmpl.requestPointerLock();
-    });
     this.player.cameraRotation.set(0, Math.PI, 0);
     this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorMotionRev1, audioContext.currentTime + 6);
 
@@ -152,7 +149,7 @@ export class GameState implements State {
           if (distance < 1 || direction < -0.77) {
             if (door.isLocked) {
               if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Unlock and Open 🗝</div>`;
+                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ &nbsp; Unlock and Open</div>`;
                 if (controls.isConfirm) {
                   door.pullLever();
                   door.isLocked = false;
@@ -209,7 +206,11 @@ export class GameState implements State {
           const direction = this.player.normal.dot( this.playerHidingPlaceDifference.normalize_());
           if (direction < -0.9) {
             if (item.roomNumber) {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Take Room ${item.roomNumber} Key 🗝</div>`;
+              if (item.roomNumber === -1) {
+                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🎂 Make a Wish</div>`;
+              } else {
+                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ Take Room ${item.roomNumber} Key</div>`;
+              }
             } else {
               tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Use Health Pack</div>`;
             }
@@ -224,6 +225,15 @@ export class GameState implements State {
                   this.enemy.aggression = 0;
                   this.hasEnemySpawned = true;
                   this.enemy.spawn();
+                }
+                if (item.roomNumber === 1313) {
+                  this.enemy.isSpawned = false;
+                  lightInfo.pointLightPosition.set(0, 2, 135);
+                }
+                if (item.roomNumber === -1) {
+                  this.elevator.isOpenTriggered = true;
+                  this.playElevatorSound();
+                  lightInfo.pointLightPosition.set(0, 8, 0);
                 }
               }
             }

@@ -127,7 +127,7 @@ export class Enemy {
   }
 
   getSpeed() {
-    return 0.15 + 0.2 * this.aggression;
+    return 0.15 + 0.2 * this.aggression; // depending on sprinting ability, consider capping at .3;
   }
 
   getChanceOfFindingPlayer() {
@@ -150,7 +150,9 @@ export class Enemy {
 
   update_(player: FirstPersonPlayer) {
     if (!this.isSpawned) {
-      this.position.y = -1000;
+      this.model_.position.y = -1000;
+      this.model_.updateWorldMatrix();
+      this.stopSong();
       return;
     }
     // tmpl.innerHTML += `ENEMY AGRESSION: ${this.lightPosition.worldMatrix}<br>`

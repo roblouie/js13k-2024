@@ -8,6 +8,7 @@ const interval = 1000 / 60;
   tmpl.innerHTML = 'CLICK TO START';
   document.onclick = async () => {
     tmpl.innerHTML = 'LOADING';
+    tmpl.requestPointerLock();
 
     await initTextures();
 

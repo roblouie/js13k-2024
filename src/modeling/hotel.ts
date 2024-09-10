@@ -58,11 +58,11 @@ export function makeHotel(isIncludingDetails = false) {
         //
         .merge(
           createBox(
-            [new MoldableCubeGeometry(20, 12, 0.5).spreadTextureCoords(6, 6), 20],
+            [new MoldableCubeGeometry(20, 12, 0.5).texturePerSide(...wallpapered).spreadTextureCoords(6, 6), 20],
             [undefined, 20],
-            [new MoldableCubeGeometry(19.5, 12, 0.5).spreadTextureCoords(6, 6), 19],
-            [new MoldableCubeGeometry(19.5, 12, 0.5).spreadTextureCoords(6, 6), 19]
-          ).texturePerSide(...wallpapered)
+            [new MoldableCubeGeometry(19.5, 12, 0.5).texturePerSide(...wallpapered).spreadTextureCoords(6, 6), 19],
+            [new MoldableCubeGeometry(19.5, 12, 0.5).texturePerSide(...wallpapered).spreadTextureCoords(6, 6), 19]
+          )
             .translate_(0, 6, 10)
         )
         .translate_(0, 0, 118)
