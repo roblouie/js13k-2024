@@ -1,7 +1,7 @@
 import {
   depth_fragment_glsl,
   depth_vertex_glsl,
-  fragment_glsl, shadowCubeMap, shadowMap, uSampler, vertex_glsl
+  fragment_glsl, shadowCubeMap, uSampler, vertex_glsl
 } from '@/engine/shaders/shaders';
 
 export class LilGl {
@@ -19,12 +19,10 @@ export class LilGl {
    const depthFragment = this.createShader(this.gl.FRAGMENT_SHADER, depth_fragment_glsl);
    this.depthProgram = this.createProgram(depthVertex, depthFragment);
 
-   const shadowMapLocation = this.gl.getUniformLocation(this.program, shadowMap);
    const shadowCubeMapLocation = this.gl.getUniformLocation(this.program, shadowCubeMap)
    const textureLocation = this.gl.getUniformLocation(this.program, uSampler);
    this.gl.useProgram(this.program);
    this.gl.uniform1i(textureLocation, 0);
-   this.gl.uniform1i(shadowMapLocation, 1);
    this.gl.uniform1i(shadowCubeMapLocation, 2);
  }
 

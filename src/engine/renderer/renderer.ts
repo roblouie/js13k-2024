@@ -45,21 +45,7 @@ const lightPositionMain = gl.getUniformLocation(lilgl.program, lightWorldPositio
 // const shadowCubeMapMain = gl.getUniformLocation(lilgl.program, shadowCubeMap);
 
 
-const lightPovMvpRenderLocation = gl.getUniformLocation(lilgl.program, lightPovMvp);
 gl.useProgram(lilgl.program);
-
-const depthTextureSize = new DOMPoint(4096, 4096);
-const depthTexture = gl.createTexture();
-gl.activeTexture(gl.TEXTURE1);
-gl.bindTexture(gl.TEXTURE_2D, depthTexture);
-gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT32F, depthTextureSize.x, depthTextureSize.y);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, 0x812F); // gl.CLAMP_TO_EDGE
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, 0x812F); // gl.CLAMP_TO_EDGE
-
-// const depthFramebuffer = gl.createFramebuffer();
-// gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
-// gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 
 
 const lightPerspective = new Camera(Math.PI / 2, 1, 0.1, 60);

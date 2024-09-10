@@ -35,7 +35,7 @@ export class LeverDoorObject3d extends Object3d {
             .texturePerSide(materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!)
         )
         .done_(),
-      materials.potentialPlasterWall
+      materials.white
     )
     super(mesh);
     this.isLocked = !!isLocked;

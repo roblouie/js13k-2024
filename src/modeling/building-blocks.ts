@@ -9,12 +9,12 @@ export const DoorTopSegment = WallHeight - DoorHeight;
 
 export function getAllWhite(): [Texture, Texture, Texture, Texture, Texture, Texture] {
   return [
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
+    materials.white.texture!,
+    materials.white.texture!,
+    materials.white.texture!,
+    materials.white.texture!,
+    materials.white.texture!,
+    materials.white.texture!,
   ]
 }
 

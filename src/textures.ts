@@ -13,10 +13,9 @@ export async function initTextures() {
   materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});
   materials.elevatorPanel = new Material({ texture: textureLoader.load_(await elevatorPanel())});
   materials.redCarpet = new Material({ texture: textureLoader.load_(await redCarpet())});
-  materials.potentialPlasterWall = new Material({ texture: textureLoader.load_(await potentialPlasterWall())});
   materials.wallpaper = new Material({ texture: textureLoader.load_(await wallpaper())});
   materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await greenPlasterWall())});
-  materials.white = new Material({ texture: textureLoader.load_(await color('#FFF'))});
+  materials.white = new Material({ texture: textureLoader.load_(await color('#bbb'))});
 
   for (let i = 1; i <= 13; i++) {
     materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});
@@ -78,23 +77,6 @@ function greenPlasterWall() {
             <feFuncA type="gamma" exponent="4"/>
         </feComponentTransfer>
         <feDiffuseLighting color-interpolation-filters="sRGB" lighting-color="#97a58f" surfaceScale="2" result="d">
-            <feDistantLight azimuth="90" elevation="45"/>
-        </feDiffuseLighting>
-        
-        <feBlend in2="d"/>
-    </filter>
-    <rect width="100%" height="100%" filter="url(#filter)"/>
-</svg>`)
-}
-
-function potentialPlasterWall() {
-  return toImage(`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
-    <filter id="filter">
-        <feTurbulence type="fractalNoise" baseFrequency=".01" numOctaves="5"/>
-        <feComponentTransfer result="n">
-            <feFuncA type="gamma" exponent="4"/>
-        </feComponentTransfer>
-        <feDiffuseLighting lighting-color="#ddd" surfaceScale="2" result="d">
             <feDistantLight azimuth="90" elevation="45"/>
         </feDiffuseLighting>
         
@@ -189,7 +171,7 @@ export function metals(content = '', brightnessModifier = 1) {
  ${value}, ${value}, ${value}, 0, 0,
     ${value}, ${value}, ${value}, 0, 0,
     ${value}, ${value}, ${value}, 0, 0,
-    0, 0, 0, 0, 1,"/>
+    1, 1, 1, 1, 1"/>
 </filter>
 <rect x="0" y="0" width="100%" height="100%" filter="url(#b)"/>
 ${ content }

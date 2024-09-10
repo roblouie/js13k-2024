@@ -44,26 +44,25 @@ export class MoldableCubeGeometry {
     this.vao = gl.createVertexArray()!;
     const indices: number[] = [];
     const uvs: number[] = [];
-
     let vertexCount = 0;
 
     const buildPlane = (
-      u: 'x' | 'y' | 'z',
-      v: 'x' | 'y' | 'z',
-      w: 'x' | 'y' | 'z',
+      u: keyof EnhancedDOMPoint,
+      v: keyof EnhancedDOMPoint,
+      w: keyof EnhancedDOMPoint,
       uDir: number,
       vDir: number,
-      width_: number,
-      height_: number,
+      width: number,
+      height: number,
       depth: number,
       gridX: number,
-      gridY: number,
+      gridY: number
     ) => {
-      const segmentWidth = width_ / gridX;
-      const segmentHeight = height_ / gridY;
+      const segmentWidth = width / gridX;
+      const segmentHeight = height / gridY;
 
-      const widthHalf = width_ / 2;
-      const heightHalf = height_ / 2;
+      const widthHalf = width / 2;
+      const heightHalf = height / 2;
       const depthHalf = depth / 2;
 
       const gridX1 = gridX + 1;
@@ -73,20 +72,15 @@ export class MoldableCubeGeometry {
         const y = iy * segmentHeight - heightHalf;
 
         for (let ix = 0; ix < gridX1; ix++) {
-          const vector = new EnhancedDOMPoint();
-
           const x = ix * segmentWidth - widthHalf;
 
-          // set values to correct vector component
+          const vector = new EnhancedDOMPoint();
           vector[u] = x * uDir;
           vector[v] = y * vDir;
           vector[w] = depthHalf;
 
-          // now apply vector to vertex buffer
           this.vertices.push(vector);
-
-          uvs.push(ix / gridX);
-          uvs.push(1 - (iy / gridY));
+          uvs.push(ix / gridX, 1 - iy / gridY);
         }
       }
 
@@ -97,13 +91,11 @@ export class MoldableCubeGeometry {
           const c = vertexCount + (ix + 1) + gridX1 * (iy + 1);
           const d = vertexCount + (ix + 1) + gridX1 * iy;
 
-          // Faces here, this could be updated to populate an array of faces rather than calculating them separately
-          indices.push(a, b, d);
-          indices.push(b, c, d);
+          indices.push(a, b, d, b, c, d);
         }
       }
 
-      vertexCount += (gridX1 * gridY1);
+      vertexCount += gridX1 * gridY1;
     };
 
     const sides = [

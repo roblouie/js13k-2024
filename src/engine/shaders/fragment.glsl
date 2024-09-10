@@ -15,7 +15,6 @@ uniform vec3 lightWorldPosition;
 uniform vec3 pointLightAttenuation;
 vec4 pointLightColor = vec4(1.0, 1.0, 1.0, 1.0);
 uniform mediump sampler2DArray uSampler;
-uniform mediump sampler2DShadow shadowMap;
 uniform mediump samplerCube shadowCubeMap;
 
 uniform vec3 spotlightPosition;

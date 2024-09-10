@@ -152,7 +152,7 @@ export class GameState implements State {
           if (distance < 1 || direction < -0.77) {
             if (door.isLocked) {
               if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Unlock and Open 🗝</div>`;
+                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Unlock and Open 🗝</div>`;
                 if (controls.isConfirm) {
                   door.pullLever();
                   door.isLocked = false;
@@ -170,7 +170,7 @@ export class GameState implements State {
             } else if (this.enemy.currentNode.door === door) {
               tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🚫</div>`;
             } else {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 &nbsp; Door</div>`;
+              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Door</div>`;
               if (controls.isConfirm) {
                 door.pullLever();
               }
@@ -194,7 +194,7 @@ export class GameState implements State {
         if (distance < 8) {
           const direction = this.player.normal.dot(this.playerHidingPlaceDifference.normalize_());
           if (direction < -0.77 && !this.player.isHiding) {
-            tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 HIDE</div>`;
+            tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Hide</div>`;
             if (controls.isConfirm && !controls.prevConfirm) {
               this.player.hide(hidingPlace);
             }
@@ -209,9 +209,9 @@ export class GameState implements State {
           const direction = this.player.normal.dot( this.playerHidingPlaceDifference.normalize_());
           if (direction < -0.9) {
             if (item.roomNumber) {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 Take Room ${item.roomNumber} Key 🗝</div>`;
+              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Take Room ${item.roomNumber} Key 🗝</div>`;
             } else {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🅴 Use Health Pack</div>`;
+              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Use Health Pack</div>`;
             }
             if (controls.isConfirm && !controls.prevConfirm) {
               item.isTaken = true;

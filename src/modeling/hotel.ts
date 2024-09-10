@@ -102,15 +102,6 @@ function makeAllBracing() {
 }
 
 function makeBracing(xOffset: number, zOffset: number) {
-  const wood = [
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-  ];
-
-  return buildSegmentedWall([0.75, HallwayWidth - 0.5, 0.75], 12, [12, 1, 12], [], 1.25, 4, wood)[0]
+  return buildSegmentedWall([0.75, HallwayWidth - 0.5, 0.75], 12, [12, 1, 12], [], 1.25, 4, getAllWhite())[0]
     .translate_(xOffset, 0, HallwayWidth + 1.875 + zOffset);
 }
