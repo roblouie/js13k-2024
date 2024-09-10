@@ -3,12 +3,13 @@ import { EnhancedDOMPoint, VectorLike } from '@/engine/enhanced-dom-point';
 import { radsToDegrees, unormalizedNormal } from "@/engine/helpers";
 import { Texture } from '@/engine/renderer/texture';
 import { gl } from '@/engine/renderer/lil-gl';
+import { Material } from '@/engine/renderer/material';
 
 type BufferInfo = { data: Float32Array; size: number };
 
-export function getTextureForSide(uDivisions: number, vDivisions: number, texture: Texture) {
+export function getTextureForSide(uDivisions: number, vDivisions: number, material: Material) {
   // @ts-ignore
-  return new Array((uDivisions + 1) * (vDivisions + 1)).fill().map(_ => texture.id);
+  return new Array((uDivisions + 1) * (vDivisions + 1)).fill().map(_ => material.texture.id);
 }
 
 
@@ -23,14 +24,14 @@ export class MoldableCubeGeometry {
   heightSegments: number;
   depthSegments: number;
 
-  texturePerSide(left: Texture, right: Texture, top: Texture, bottom: Texture, back: Texture, front: Texture) {
+  texturePerSide(leftOrAll: Material, right?: Material, top?: Material, bottom?: Material, back?: Material, front?: Material) {
     const allSides = [
-        ...getTextureForSide(this.depthSegments, this.heightSegments, left),
-        ...getTextureForSide(this.depthSegments, this.heightSegments, right),
-        ...getTextureForSide(this.widthSegments, this.depthSegments, top),
-        ...getTextureForSide(this.widthSegments, this.depthSegments, bottom),
-        ...getTextureForSide(this.widthSegments, this.heightSegments, back),
-        ...getTextureForSide(this.widthSegments, this.heightSegments, front),
+        ...getTextureForSide(this.depthSegments, this.heightSegments, leftOrAll),
+        ...getTextureForSide(this.depthSegments, this.heightSegments, right ?? leftOrAll),
+        ...getTextureForSide(this.widthSegments, this.depthSegments, top ?? leftOrAll),
+        ...getTextureForSide(this.widthSegments, this.depthSegments, bottom ?? leftOrAll),
+        ...getTextureForSide(this.widthSegments, this.heightSegments, back ?? leftOrAll),
+        ...getTextureForSide(this.widthSegments, this.heightSegments, front ?? leftOrAll),
     ];
     this.setAttribute_(AttributeLocation.TextureDepth, new Float32Array(allSides), 1);
     return this;

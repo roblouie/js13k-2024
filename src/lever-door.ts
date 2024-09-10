@@ -6,7 +6,6 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { Face } from '@/engine/physics/face';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { materials } from '@/textures';
-import { getAllWhite } from '@/modeling/building-blocks';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { baseDrum, doorOpening4, footstep, hideSound } from '@/sounds';
 
@@ -27,12 +26,12 @@ export class LeverDoorObject3d extends Object3d {
   constructor(x: number, y: number, z: number, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean, isLocked?: boolean) {
     const mesh = new Mesh(
       new MoldableCubeGeometry(5, 7.75, 0.25)
-        .texturePerSide(...getAllWhite())
+        .texturePerSide(materials.white)
         .merge(
           new MoldableCubeGeometry(1, 1, 1, 4, 4)
             .cylindrify(0.2, 'z')
             .translate_(2 * swapHingeSideX, -0.5)
-            .texturePerSide(materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!, materials.silver.texture!)
+            .texturePerSide(materials.silver)
         )
         .done_(),
       materials.white

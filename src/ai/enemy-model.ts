@@ -11,12 +11,12 @@ export function upyri() {
       .selectBy(vert => vert.y > 0.8)
       .scale_(1.5, 8, 2)
       .texturePerSide(
-        materials.iron.texture!,
-        materials.iron.texture!,
-        materials.iron.texture!,
-        materials.iron.texture!,
-        materials.face.texture!,
-        materials.iron.texture!,
+        materials.iron,
+        materials.iron,
+        materials.iron,
+        materials.iron,
+        materials.face,
+        materials.iron,
       )
       .all_()
       .rotate_(Math.PI)

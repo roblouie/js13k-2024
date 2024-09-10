@@ -1,21 +1,11 @@
 import { buildRoom, RoomDepth, RoomWidth } from '@/modeling/room';
-import { buildSegmentedWall, createBox, DoorHeight, DoubleDoorWidth, getAllWhite } from '@/modeling/building-blocks';
+import { buildSegmentedWall, createBox, DoorHeight } from '@/modeling/building-blocks';
 import { materials } from '@/textures';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 
 const HallwayWidth = 10;
 
 export function makeHotel(isIncludingDetails = false) {
-
-  const wallpapered = [
-    materials.wallpaper.texture!,
-    materials.wallpaper.texture!,
-    materials.wallpaper.texture!,
-    materials.wallpaper.texture!,
-    materials.wallpaper.texture!,
-    materials.wallpaper.texture!,
-  ];
-
   const hotel = buildRoom(1, false, isIncludingDetails).translate_(0, 0, HallwayWidth)
     .merge(buildRoom(2, false, isIncludingDetails).translate_(0, 0, HallwayWidth * 2 + 25))
     .merge(buildRoom(3, false, isIncludingDetails).translate_(0, 0, HallwayWidth * 3 + 50))
@@ -37,48 +27,41 @@ export function makeHotel(isIncludingDetails = false) {
     .translate_((RoomWidth + HallwayWidth) * 1.5, 0, HallwayWidth + 4)
 
     // Draw wall in front of elevator
-    .merge(buildSegmentedWall([45, 11, 45], 12, [12, 2, 12], [], 1, 4, wallpapered)[0])
+    .merge(buildSegmentedWall([45, 11, 45], 12, [12, 2, 12], [], 1, 4, [materials.wallpaper])[0])
 
     // Draw back wall
     .merge(
-      buildSegmentedWall([45, 11, 45], 12, [12, 3, 12], [], 1, 4, wallpapered)[0]
+      buildSegmentedWall([45, 11, 45], 12, [12, 3, 12], [], 1, 4, [materials.wallpaper])[0]
         // Door frame
         .merge(
-          buildSegmentedWall([0.5, 10, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, getAllWhite())[0]
+          buildSegmentedWall([0.5, 10, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, [materials.white])[0]
         )
         // room number card
-        .merge(new MoldableCubeGeometry(2, 1.5).texturePerSide(
-          materials[13].texture!,
-          materials[13].texture!,
-          materials[13].texture!,
-          materials[13].texture!,
-          materials[13].texture!,
-          materials[13].texture!,
-        ).translate_(0, 10, -0.1))
+        .merge(new MoldableCubeGeometry(2, 1.5).texturePerSide(materials[13]).translate_(0, 10, -0.1))
         //
         .merge(
           createBox(
-            [new MoldableCubeGeometry(20, 12, 0.5).texturePerSide(...wallpapered).spreadTextureCoords(6, 6), 20],
+            [new MoldableCubeGeometry(20, 12, 0.5).texturePerSide(materials.wallpaper).spreadTextureCoords(6, 6), 20],
             [undefined, 20],
-            [new MoldableCubeGeometry(19.5, 12, 0.5).texturePerSide(...wallpapered).spreadTextureCoords(6, 6), 19],
-            [new MoldableCubeGeometry(19.5, 12, 0.5).texturePerSide(...wallpapered).spreadTextureCoords(6, 6), 19]
+            [new MoldableCubeGeometry(19.5, 12, 0.5).texturePerSide(materials.wallpaper).spreadTextureCoords(6, 6), 19],
+            [new MoldableCubeGeometry(19.5, 12, 0.5).texturePerSide(materials.wallpaper).spreadTextureCoords(6, 6), 19]
           )
             .translate_(0, 6, 10)
         )
         // Table for cake
-        .merge(new MoldableCubeGeometry(3, 3.25, 3).translate_(0, 1.5, 15).texturePerSide(...wallpapered))
+        .merge(new MoldableCubeGeometry(3, 3.25, 3).translate_(0, 1.5, 15).texturePerSide(materials.wallpaper))
         .translate_(0, 0, 118)
     )
 
     // Build left side wall
     .merge(
-      buildSegmentedWall([11, RoomDepth, HallwayWidth, RoomDepth, HallwayWidth, RoomDepth, 11], 12, [12, 0, 12, 0, 12, 0, 12], [], 1, 4, wallpapered)[0]
+      buildSegmentedWall([11, RoomDepth, HallwayWidth, RoomDepth, HallwayWidth, RoomDepth, 11], 12, [12, 0, 12, 0, 12, 0, 12], [], 1, 4, [materials.wallpaper])[0]
         .rotate_(0, Math.PI / 2)
         .translate_(49.5, 0, 59)
     )
     // Build right side wall
     .merge(
-      buildSegmentedWall([11, RoomDepth, HallwayWidth, RoomDepth, HallwayWidth, RoomDepth, 11], 12, [12, 0, 12, 0, 12, 0, 12], [], 1, 4, wallpapered)[0]
+      buildSegmentedWall([11, RoomDepth, HallwayWidth, RoomDepth, HallwayWidth, RoomDepth, 11], 12, [12, 0, 12, 0, 12, 0, 12], [], 1, 4, [materials.wallpaper])[0]
         .rotate_(0, Math.PI / 2)
         .translate_(-49.5, 0, 59)
     )
@@ -104,6 +87,6 @@ function makeAllBracing() {
 }
 
 function makeBracing(xOffset: number, zOffset: number) {
-  return buildSegmentedWall([0.75, HallwayWidth - 0.5, 0.75], 12, [12, 1, 12], [], 1.25, 4, getAllWhite())[0]
+  return buildSegmentedWall([0.75, HallwayWidth - 0.5, 0.75], 12, [12, 1, 12], [], 1.25, 4, [materials.white])[0]
     .translate_(xOffset, 0, HallwayWidth + 1.875 + zOffset);
 }

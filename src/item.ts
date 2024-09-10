@@ -2,7 +2,7 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { Mesh } from '@/engine/renderer/mesh';
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { materials } from '@/textures';
-import { buildSegmentedWall, getAllWhite } from '@/modeling/building-blocks';
+import { buildSegmentedWall } from '@/modeling/building-blocks';
 
 export class Item {
   roomNumber?: number;
@@ -36,7 +36,7 @@ export class Item {
       }
     } else {
       this.mesh = new Mesh(
-        new MoldableCubeGeometry(1.9, 1, 0.5).texturePerSide(...getAllWhite())
+        new MoldableCubeGeometry(1.9, 1, 0.5).texturePerSide(materials.white)
         ,
         materials.wood
       )
