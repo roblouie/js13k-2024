@@ -103,7 +103,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
         .texturePerSide(materials.silver)
     )
     .merge(
-      new MoldableCubeGeometry(6, 7, 0.1, 8, 1, 1)
+      new MoldableCubeGeometry(6, 7, 0.1, 10, 1, 1)
         .modifyEachVertex(vert => vert.z = Math.sin(vert.x * 3) * 0.3)
         .translate_(-0.5, 3.75, 2.5)
         .rotate_(-0.1)
@@ -139,7 +139,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
       .done_()
   }
 
-  const bed =  new MoldableCubeGeometry(7, 2, 7, 5, 1, 5)
+  const bed =  new MoldableCubeGeometry(7, 2, 7, 8, 1, 8)
     .selectBy(v => Math.hypot(v.x, v.z) > 4.5)
     .scale_(0.9, 1, 0.9)
     .selectBy(v => Math.hypot(v.x, v.z) > 3)
@@ -160,7 +160,7 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
     .translate_(6, 2, -6.5)
     .done_();
 
-  const toilet = new MoldableCubeGeometry(2, 2,2, 4, 2, 4)
+  const toilet = new MoldableCubeGeometry(2, 2,2, 6, 2, 6)
     .cylindrify(1)
     .scale_(1, 1, 1.2)
     .selectBy(v => v.y === 0)

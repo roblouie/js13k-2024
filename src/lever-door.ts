@@ -6,8 +6,8 @@ import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { Face } from '@/engine/physics/face';
 import { meshToFaces } from '@/engine/physics/parse-faces';
 import { materials } from '@/textures';
-import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { baseDrum, doorOpening4, footstep, hideSound } from '@/sounds';
+import { audioContext, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
+import { baseDrum, doorOpening4 } from '@/sounds';
 
 export class LeverDoorObject3d extends Object3d {
   swapHingeSideX: -1 | 1;
@@ -21,7 +21,6 @@ export class LeverDoorObject3d extends Object3d {
   isAnimating = false;
   speed_ = 3;
   sfxPlayer = new SimplestMidiRev2();
-  sfxPlayer2 = new SimplestMidiRev2();
 
   constructor(x: number, y: number, z: number, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean, isLocked?: boolean) {
     const mesh = new Mesh(
@@ -42,7 +41,6 @@ export class LeverDoorObject3d extends Object3d {
     this.swapHingeSideX = swapHingeSideX;
     this.swapHingeSideZ = swapHingeSideZ;
     this.sfxPlayer.volume_.connect(compressor);
-    this.sfxPlayer2.volume_.connect(biquadFilter);
 
     this.position.set(x - 2 * swapHingeSideX, y, z);
     this.children_[0].position.x = 2 * swapHingeSideX;
@@ -72,7 +70,7 @@ export class LeverDoorObject3d extends Object3d {
       this.sfxPlayer.playNote(audioContext.currentTime, 10, 40, baseDrum, audioContext.currentTime + 1);
 
       if (isEnemy) {
-        this.sfxPlayer2.playNote(audioContext.currentTime, 72, 30, doorOpening4, audioContext.currentTime + 1);
+        this.sfxPlayer.playNote(audioContext.currentTime, 72, 20, doorOpening4, audioContext.currentTime + 1);
       }
 
     }

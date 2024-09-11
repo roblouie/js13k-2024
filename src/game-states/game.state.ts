@@ -150,7 +150,7 @@ export class GameState implements State {
               if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
                 tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ &nbsp; Unlock and Open</div>`;
                 if (controls.isConfirm) {
-                  door.pullLever();
+                  door.pullLever(true);
                   door.isLocked = false;
                   this.player.heldKeyRoomNumber = undefined;
                   if (i > 0) {
@@ -168,7 +168,7 @@ export class GameState implements State {
             } else {
               tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Door</div>`;
               if (controls.isConfirm) {
-                door.pullLever();
+                door.pullLever(true);
               }
             }
           }

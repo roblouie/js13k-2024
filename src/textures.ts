@@ -7,7 +7,7 @@ export const materials: {[key: string]: Material} = {};
 export async function initTextures() {
   materials.wood = new Material({ texture: textureLoader.load_(await wood())});
   materials.face = new Material({ texture: textureLoader.load_(await face())});
-  materials.silver = new Material({ texture: textureLoader.load_(await metals('', 30)) });
+  materials.silver = new Material({ texture: textureLoader.load_(await metals('', 20)) });
   materials.iron = new Material({ texture: textureLoader.load_(await metals()) });
   materials.marble = new Material({ texture: textureLoader.load_(await marbleFloor())});
   materials.ceilingTiles = new Material({ texture: textureLoader.load_(await ceilingTiles())});

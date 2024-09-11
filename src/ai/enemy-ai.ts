@@ -152,6 +152,7 @@ export class Enemy {
     if (!this.isSpawned) {
       this.model_.position.y = -1000;
       this.model_.updateWorldMatrix();
+      this.currentNode = AiNavPoints[0];
       this.stopSong();
       return;
     }
