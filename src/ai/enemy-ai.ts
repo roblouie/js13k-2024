@@ -47,13 +47,12 @@ export class Enemy {
   });
   unseenFrameCount = 0;
   aggression = 0;
-  songPlayer: SimplestMidiRev2;
+  songPlayer = new SimplestMidiRev2();
   lightObject = new Object3d();
   footstepDebounce = 0;
   isSpawned = false;
 
   constructor() {
-    this.songPlayer = new SimplestMidiRev2();
     this.songPlayer.volume_.connect(biquadFilter)
     this.footstepPlayer.volume_.connect(this.pannerNode).connect(compressor);
     this.currentNode = AiNavPoints[2];
@@ -101,14 +100,14 @@ export class Enemy {
       }
     }
     this.songPlayer.volume_.gain.cancelScheduledValues(audioContext.currentTime);
-    this.songPlayer.volume_.gain.value = 1;
+    this.songPlayer.volume_.gain.setValueAtTime(1, audioContext.currentTime);
     playSong();
     // @ts-ignore
     this.songInterval = setInterval(playSong, 6000);
   }
 
   stopSong() {
-    this.songPlayer.volume_.gain.linearRampToValueAtTime(0, audioContext.currentTime + 3);
+    this.songPlayer.volume_.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
     clearInterval(this.songInterval);
   }
 
