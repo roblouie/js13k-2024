@@ -45,24 +45,20 @@ export class FirstPersonPlayer {
     this.sfxPlayer = new SimplestMidiRev2();
     this.sfxPlayer.volume_.connect(compressor);
     this.closestNavPoint = startingPoint;
-    this.feetCenter.set(2, 2.5, 20);
+    this.feetCenter.set(2, 2.5, -2);
     this.collisionSphere = new Sphere(this.feetCenter, 2);
     this.camera = camera;
     this.listener = audioContext.listener;
 
-    const rotationSpeed = 0.002;
+    const rotationSpeed = 0.001;
     controls.onMouseMove(mouseMovement => {
-      // if (!this.isHiding) {
+      if (!this.isFrozen_) {
         this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
         this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
         this.cameraRotation.x = Math.min(Math.max(this.cameraRotation.x, -Math.PI / 2), Math.PI / 2)
         this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
-      // }
+      }
     });
-  }
-
-  takeDamage() {
-    this.health -= 23;
   }
 
   heal() {
@@ -73,7 +69,6 @@ export class FirstPersonPlayer {
   hide(hidingPlace: HidingPlace) {
     this.hidFrom.set(this.feetCenter);
     this.isHiding = true;
-    this.isFrozen_ = true;
     this.camera.position.set(hidingPlace.position);
     this.cameraRotation.set(hidingPlace.cameraRotation);
     this.sfxPlayer.playNote(audioContext.currentTime, 30, 40, hideSound, audioContext.currentTime + 1);
@@ -81,7 +76,6 @@ export class FirstPersonPlayer {
 
   unhide() {
     this.isHiding = false;
-    this.isFrozen_ = false;
     this.feetCenter.set(this.hidFrom);
     this.sfxPlayer.playNote(audioContext.currentTime, 38, 40, hideSound, audioContext.currentTime + 1);
   }
@@ -91,10 +85,7 @@ export class FirstPersonPlayer {
       tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 50px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
     }
 
-    tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 10px; right: 280px; color: #b00;">
-♥ 
-<div style="position: absolute; bottom: 13px; left: 30px; width: ${this.health * 2}px; height: 20px; background-color: #b00;"></div>
-</div>`
+    tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 10px; right: 280px; color: #b00;">♥ <div style="position: absolute; bottom: 13px; left: 30px; width: ${this.health * 2}px; height: 20px; background-color: #b00;"></div></div>`;
 
     let smallestDistance = Infinity;
     [this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()].forEach(point => {
@@ -109,7 +100,7 @@ export class FirstPersonPlayer {
 
     // tmpl.innerHTML += `PLAYER NODE DIFF: ${this.differenceFromNavPoint.x}, ${this.differenceFromNavPoint.z}<br>`;
 
-    if (this.isFrozen_) {
+    if (this.isFrozen_ || this.isHiding) {
       this.velocity.set(0, 0, 0);
     } else {
       this.updateVelocityFromControls();

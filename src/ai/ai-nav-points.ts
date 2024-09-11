@@ -93,7 +93,7 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
           rotation_: new EnhancedDOMPoint(0, 0, -Math.PI / 2),
         },
         {
-          position: new EnhancedDOMPoint(-1.5 * scaler, 0.8, -13.5 * scaler),
+          position: new EnhancedDOMPoint(-2 * scaler, 0.8, -13.5 * scaler),
           rotation_: new EnhancedDOMPoint(Math.PI / 3 * -scaler, 0, 0),
         },
       ]

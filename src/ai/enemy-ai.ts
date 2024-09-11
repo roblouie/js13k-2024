@@ -6,7 +6,7 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { footstep, frenchHorn, song, violin } from '@/sounds';
+import { baseDrum, elevatorDoorTest, footstep, frenchHorn, song, violin } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
 import { lightInfo } from '@/light-info';
 import { Object3d } from '@/engine/renderer/object-3d';
@@ -74,19 +74,19 @@ export class Enemy {
       onUpdate: (player: FirstPersonPlayer) => this.searchUpdate(player),
     };
     this.fleeState = {
-      onEnter: () => this.fleeEnter(),
+      onEnter: (player: FirstPersonPlayer) => this.fleeEnter(player),
       onUpdate: () => this.fleeUpdate(),
     };
-    this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
+    this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player), onEnter: (player: FirstPersonPlayer) => this.killEnter(player) };
     this.stateMachine = new StateMachine(this.patrolState);
     this.model_ = upyri();
     this.model_.add_(this.lightObject);
   }
 
-  spawn() {
+  spawn(player: FirstPersonPlayer) {
     lightInfo.pointLightAttenuation.set(0.005, 0.001, 0.4);
     this.isSpawned = true;
-    this.setFarthestPoint();
+    this.setFarthestPoint(player);
     this.position.set(this.farthestPoint.position);
     this.currentNode = this.farthestPoint;
     const siblings = this.currentNode.getPresentSiblings();
@@ -127,11 +127,7 @@ export class Enemy {
   }
 
   getSpeed() {
-    return 0.15 + 0.2 * this.aggression; // depending on sprinting ability, consider capping at .3;
-  }
-
-  getChanceOfFindingPlayer() {
-    return this.aggression * 0.4;
+    return Math.min(0.15 + 0.2 * this.aggression, 0.3); // depending on sprinting ability, consider capping at .3;
   }
 
   updateNodeDistanceData() {
@@ -193,14 +189,18 @@ export class Enemy {
       this.moveInTravelingDirection();
       let lastNode = this.currentNode;
       this.currentNode = this.nextNode;
-      let siblings = this.currentNode.getPresentSiblings();
-      if (siblings.length > 1) {
-        siblings = siblings.filter(p => {
-          const isGoingToEnterRoom = this.currentNode.door && p.door && this.currentNode.roomNumber === p.roomNumber && this.currentNode !== p && !this.currentNode.hidingPlace;
-          return p !== lastNode && !isGoingToEnterRoom;
-        });
+      if (Math.random() < this.aggression / 3) {
+        this.advancePathToNode(player.closestNavPoint);
+      } else {
+        let siblings = this.currentNode.getPresentSiblings();
+        if (siblings.length > 1) {
+          siblings = siblings.filter(p => {
+            const isGoingToEnterRoom = this.currentNode.door && p.door && this.currentNode.roomNumber === p.roomNumber && this.currentNode !== p && !this.currentNode.hidingPlace;
+            return p !== lastNode && !isGoingToEnterRoom;
+          });
+        }
+        this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
       }
-      this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
     }
     if (!this.nextNode) {
       this.nextNode = this.currentNode;
@@ -286,15 +286,19 @@ export class Enemy {
     this.checkVision(player);
 
     if (this.unseenFrameCount >= this.getMaxUnseenFramesBeforeGivingUp()) {
-      this.stateMachine.setState(this.fleeState);
+      this.stateMachine.setState(this.fleeState, player);
       this.increaseAggression();
     }
 
     // If we're in chase mode and at the player hiding place. Kill the player. If the player was hidden
     // before the enemy entered the room, the enemy would be in search mode. So this means the enemy
     // entered the room while the player wasn't hidden, meaning they will die if they try to hide now.
-    if (this.currentNode.hidingPlace && player.isHiding && player.closestNavPoint === this.currentNode) {
-      // TODO: Kill player
+    if (
+      (this.currentNode.hidingPlace && player.isHiding && player.closestNavPoint === this.currentNode)
+      || ((this.currentNode === player.closestNavPoint || this.nextNode === player.closestNavPoint) && new EnhancedDOMPoint().subtractVectors(this.position, player.feetCenter).magnitude < 7)
+    ) {
+      this.stateMachine.setState(this.killState, player);
+      return;
     }
 
     const nodeDistance = this.nextNode.door ? 1 : 6;
@@ -352,8 +356,32 @@ export class Enemy {
     this.pathCache = search(this.currentNode, node)!;
   }
 
-  killUpdate(player: FirstPersonPlayer) {
+  killFrames = 300;
+  killFrameCount = 0;
+  killEnter(player: FirstPersonPlayer) {
+    this.killFrameCount = 0;
+    this.stopSong();
+    player.isFlashlightOn = false;
+    const lookAtTarget = new EnhancedDOMPoint().set(player.feetCenter);
+    this.model_.lookAt(lookAtTarget);
+    this.footstepPlayer.playNote(audioContext.currentTime, 70, 100, footstep, audioContext.currentTime + 1);
+    this.footstepPlayer.playNote(audioContext.currentTime + 0.1, 1, 80, elevatorDoorTest, audioContext.currentTime + 5);
+    // player.camera.updateWorldMatrix();
+    if (player.isHiding) {
+      player.unhide();
+    }
+    player.isFrozen_ = true;
+  }
 
+  killUpdate(player: FirstPersonPlayer) {
+    this.updateLight(5, 5);
+    this.killFrameCount++;
+    player.health -= 0.1;
+    if (this.killFrameCount === this.killFrames) {
+      this.spawn(player);
+      player.isFrozen_ = false;
+      this.decreaseAggression();
+    }
   }
 
   checkVision(player: FirstPersonPlayer) {
@@ -426,27 +454,31 @@ export class Enemy {
         this.model_.rotate_(0, this.spotSearchFrameCount > 100 ? -0.02 : 0.02, 0);
         this.spotSearchFrameCount++;
       } else {
-        // TODO: KIll player based on kill chanceaw
-
         this.spotsSearched++;
         this.currentNode = this.nextNode;
+
+        if (this.currentNode === player.closestNavPoint && Math.random() < Math.min(this.aggression, 0.3)) {
+          this.stateMachine.setState(this.killState, player);
+          return;
+        }
+
         this.nextNode = this.currentNode.getPresentSiblings().find(node => node.hidingPlace)!
         this.updateNodeDistanceData();
         this.spotSearchFrameCount = 0;
 
         if (this.spotsSearched >= 2 && Math.random() > 0.25) {
-          this.stateMachine.setState(this.fleeState);
+          this.stateMachine.setState(this.fleeState, player);
           this.increaseAggression();
         }
       }
     }
   }
 
-  setFarthestPoint() {
+  setFarthestPoint(player: FirstPersonPlayer) {
     let longestDistance = 0;
     const difference = new EnhancedDOMPoint();
     AiNavPoints.forEach(node => {
-      const distance = difference.subtractVectors(this.position, node.position).magnitude;
+      const distance = difference.subtractVectors(player.feetCenter, node.position).magnitude;
       if (distance > longestDistance) {
         longestDistance = distance;
         this.farthestPoint = node;
@@ -455,9 +487,9 @@ export class Enemy {
   }
 
   farthestPoint = AiNavPoints[0];
-  fleeEnter() {
+  fleeEnter(player: FirstPersonPlayer) {
     this.stopSong();
-    this.setFarthestPoint();
+    this.setFarthestPoint(player);
     this.advancePathToNode(this.farthestPoint);
     this.nextNode = this.pathCache[0];
     this.updateNodeDistanceData();

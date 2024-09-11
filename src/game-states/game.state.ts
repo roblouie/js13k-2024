@@ -18,7 +18,7 @@ import { AiNavPoints, items, makeNavPoints } from '@/ai/ai-nav-points';
 import { Enemy } from '@/ai/enemy-ai';
 import { lightInfo } from '@/light-info';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep } from '@/sounds';
+import { elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound } from '@/sounds';
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -217,6 +217,7 @@ export class GameState implements State {
               item.isTaken = true;
               if (item.roomNumber !== -1) {
                 this.scene.remove_(item.mesh);
+                this.sfxPlayer.playNote(audioContext.currentTime, 90, 30, hideSound, audioContext.currentTime + 1);
               }
               if (item.roomNumber) {
                 this.player.heldKeyRoomNumber = item.roomNumber;
@@ -225,16 +226,19 @@ export class GameState implements State {
                   lightInfo.pointLightAttenuation.set(0.001, 0.001, 0.4);
                   this.enemy.aggression = 0;
                   this.hasEnemySpawned = true;
-                  this.enemy.spawn();
+                  this.enemy.spawn(this.player);
                 }
                 if (item.roomNumber === 1313) {
                   this.enemy.isSpawned = false;
                   lightInfo.pointLightPosition.set(0, 3.7, 138);
                 }
                 if (item.roomNumber === -1) {
-                  this.elevator.isOpenTriggered = true;
-                  this.playElevatorSound();
+                  this.sfxPlayer.playNote(audioContext.currentTime, 180, 20, hideSound, audioContext.currentTime + 1);
                   lightInfo.pointLightPosition.set(0, 8, 0);
+                  setTimeout(() => {
+                    this.elevator.isOpenTriggered = true;
+                    this.playElevatorSound();
+                  }, 1000);
                 }
               }
               if (!item.roomNumber) {
@@ -254,7 +258,7 @@ export class GameState implements State {
       }
     }
 
-    if (this.hasPlayerLeftElevator && this.player.feetCenter.z < 1) {
+    if (this.hasPlayerLeftElevator && this.player.feetCenter.z < 3) {
       this.player.isFrozen_ = true;
       tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 20px; width: 100%;">You Win!</div>`;
       if (!this.isGameEnded) {
