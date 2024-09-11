@@ -59,7 +59,7 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
   let roomsWorkingCopy = [...roomEntrances];
   const firstNode = roomsWorkingCopy[Math.floor(Math.random() * (roomsWorkingCopy.length - 1))];
-  //firstNode.door!.isLocked = true;
+  firstNode.door!.isLocked = true;
 
   placeKeys(firstNode);
 
@@ -123,7 +123,7 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
 
     if (roomsWorkingCopy.length > 3) {
       nodeToPlaceItemIn.item = new Item(new EnhancedDOMPoint().addVectors(nodeToPlaceItemIn.position, itemSpots[itemRoomIndex][itemSpotIndex].position), itemSpots[itemRoomIndex][itemSpotIndex].rotation_, nextNode!.roomNumber);
-      //nextNode!.door!.isLocked = true;
+      nextNode!.door!.isLocked = true;
     } else if (roomsWorkingCopy.length > 2) {
       nodeToPlaceItemIn.item = new Item(new EnhancedDOMPoint().addVectors(nodeToPlaceItemIn.position, itemSpots[itemRoomIndex][itemSpotIndex].position), itemSpots[itemRoomIndex][itemSpotIndex].rotation_, 1313);
     } else {

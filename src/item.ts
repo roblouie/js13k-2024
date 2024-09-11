@@ -38,6 +38,9 @@ export class Item {
     } else {
       this.mesh = new Mesh(
         new MoldableCubeGeometry(1.9, 1, 0.5).texturePerSide(materials.white)
+          .merge(new MoldableCubeGeometry(0.75, 0.2, 0.75).texturePerSide(materials.red))
+          .merge(new MoldableCubeGeometry(0.2, 0.75, 0.75).texturePerSide(materials.red))
+          .done_()
         ,
         materials.wood
       )

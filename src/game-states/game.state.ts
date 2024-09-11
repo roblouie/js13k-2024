@@ -79,9 +79,9 @@ export class GameState implements State {
       new LeverDoorObject3d(-48, 4.75, 96.25, 1, 1, true),
 
       // 1313 Door Left
-      new LeverDoorObject3d(2.5, 4.75, 124, -1, -1, false, false),
+      new LeverDoorObject3d(2.5, 4.75, 124, -1, -1, false, true),
       // 1313 Door Right
-      new LeverDoorObject3d(-2.5, 4.75, 124, 1, -1, false, false),
+      new LeverDoorObject3d(-2.5, 4.75, 124, 1, -1, false, true),
     ];
 
 
@@ -150,7 +150,7 @@ export class GameState implements State {
               if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
                 tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ &nbsp; Unlock and Open</div>`;
                 if (controls.isConfirm) {
-                  door.pullLever(true);
+                  door.pullLever();
                   door.isLocked = false;
                   this.player.heldKeyRoomNumber = undefined;
                   if (i > 0) {
@@ -166,9 +166,9 @@ export class GameState implements State {
             } else if (this.enemy.currentNode.door === door) {
               tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🚫</div>`;
             } else {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Door</div>`;
+              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">${door.openClose === -1 ? 'Open' : 'Close'} Door</div>`;
               if (controls.isConfirm) {
-                door.pullLever(true);
+                door.pullLever();
               }
             }
           }
@@ -222,7 +222,7 @@ export class GameState implements State {
                 this.player.heldKeyRoomNumber = item.roomNumber;
                 this.enemy.increaseAggression(0.08);
                 if (!this.hasEnemySpawned) {
-                  lightInfo.pointLightAttenuation.set(0.002, 0.001, 0.4);
+                  lightInfo.pointLightAttenuation.set(0.001, 0.001, 0.4);
                   this.enemy.aggression = 0;
                   this.hasEnemySpawned = true;
                   this.enemy.spawn();
