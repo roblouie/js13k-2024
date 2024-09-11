@@ -229,7 +229,7 @@ export class GameState implements State {
                 }
                 if (item.roomNumber === 1313) {
                   this.enemy.isSpawned = false;
-                  lightInfo.pointLightPosition.set(0, 3.8, 137.75);
+                  lightInfo.pointLightPosition.set(0, 3.7, 138);
                 }
                 if (item.roomNumber === -1) {
                   this.elevator.isOpenTriggered = true;

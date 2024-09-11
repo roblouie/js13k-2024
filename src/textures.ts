@@ -16,6 +16,7 @@ export async function initTextures() {
   materials.wallpaper = new Material({ texture: textureLoader.load_(await wallpaper(true))});
   materials.greenPlasterWall = new Material({ texture: textureLoader.load_(await wallpaper())});
   materials.white = new Material({ texture: textureLoader.load_(await color('#bbb'))});
+  materials.red = new Material({ texture: textureLoader.load_(await color('#b00'))});
 
   for (let i = 1; i <= 13; i++) {
     materials[i] = new Material({ texture: textureLoader.load_(await roomSign(`13${i.toString().padStart(2, '0')}`))});

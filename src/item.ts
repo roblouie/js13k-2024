@@ -14,10 +14,11 @@ export class Item {
     if (this.roomNumber) {
       if (this.roomNumber === -1) {
         this.mesh = new Mesh(
-          buildSegmentedWall([0.5, 2, 0.5, 2, 0.5], 2, [2, 0.5, 2, 0.5, 2], [])[0]
-            .merge(new MoldableCubeGeometry(5.5, 0.5).translate_(0, -2, 0))
+          buildSegmentedWall([0.5, 2, 0.5, 2, 0.5], 2, [2, 0.5, 2, 0.5, 2], [], 1, 4, [materials.red])[0]
+            .merge(new MoldableCubeGeometry(5.5, 0.5).texturePerSide(materials.red).translate_(0, -2, 0))
             .rotate_(0, 0, -Math.PI / 2)
-            .merge(new MoldableCubeGeometry(3, 4, 3, 4, 4, 4).cylindrify(6).all_().translate_(0, -5.5).spreadTextureCoords())
+            .merge(new MoldableCubeGeometry(3, 4, 3, 4, 4, 4).cylindrify(6).all_().translate_(0, -5.5).texturePerSide(materials.white))
+            .merge(new MoldableCubeGeometry(4, 1, 4, 4, 4, 4).cylindrify(8).all_().translate_(0, -8).texturePerSide(materials.white))
             .rotate_(0, Math.PI)
             .scale_(0.1, 0.1, 0.1)
             .computeNormals()

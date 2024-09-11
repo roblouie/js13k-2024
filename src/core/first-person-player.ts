@@ -124,6 +124,7 @@ export class FirstPersonPlayer {
 
       //findWallCollisionsFromList(faces, this);
       this.feetCenter.add_(this.velocity);
+      this.feetCenter.y = 2.5;
 
       this.camera.position.set(this.feetCenter);
       this.camera.position.y += 3.5;
@@ -158,6 +159,7 @@ export class FirstPersonPlayer {
 
     this.velocity.z = depthMovementZ + sidestepZ;
     this.velocity.x = depthMovementX + sidestepX;
+    this.velocity.normalize_().scale_(speed);
 
     if (controls.isFlashlight && !controls.prevFlash) {
       this.sfxPlayer.playNote(audioContext.currentTime, 31 + (this.isFlashlightOn ? 0 : 10), 40, flashlightSound, audioContext.currentTime + 1);
