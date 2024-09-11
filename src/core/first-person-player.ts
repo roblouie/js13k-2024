@@ -40,7 +40,6 @@ export class FirstPersonPlayer {
   normal = new EnhancedDOMPoint();
 
   health = 100;
-  sprint = 100;
 
   constructor(camera: Camera, startingPoint: PathNode) {
     this.sfxPlayer = new SimplestMidiRev2();
@@ -62,7 +61,14 @@ export class FirstPersonPlayer {
     });
   }
 
+  takeDamage() {
+    this.health -= 23;
+  }
 
+  heal() {
+    this.health += 50;
+    this.health = Math.min(this.health, 100);
+  }
 
   hide(hidingPlace: HidingPlace) {
     this.hidFrom.set(this.feetCenter);
@@ -82,8 +88,13 @@ export class FirstPersonPlayer {
 
   update(gridFaces: Set<Face>[]) {
     if (this.heldKeyRoomNumber && this.heldKeyRoomNumber !== -1) {
-      tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 40px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
+      tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 50px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
     }
+
+    tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 10px; right: 280px; color: #b00;">
+♥ 
+<div style="position: absolute; bottom: 13px; left: 30px; width: ${this.health * 2}px; height: 20px; background-color: #b00;"></div>
+</div>`
 
     let smallestDistance = Infinity;
     [this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()].forEach(point => {

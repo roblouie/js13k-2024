@@ -237,6 +237,9 @@ export class GameState implements State {
                   lightInfo.pointLightPosition.set(0, 8, 0);
                 }
               }
+              if (!item.roomNumber) {
+                this.player.heal();
+              }
             }
           }
         }
@@ -260,7 +263,14 @@ export class GameState implements State {
         this.playElevatorSound();
       }
     }
+
+    if (this.player.health <= 0 && !this.deathTriggered) {
+      this.deathTriggered = true;
+      alert('YOU DIED');
+      location.reload();
+    }
   }
+  deathTriggered = false;
 
   playElevatorSound() {
     this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);

@@ -20,15 +20,15 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
   const testWall4 = buildSegmentedWall([34], 12, [12], [], 1, 4, [materials.wallpaper]);
 
   const [bathroomDoorWall] = buildSegmentedWall([4, NormalDoorWidth, 4], 12, [12, DoorTopSegment, 12], [], 1, 4, [materials.greenPlasterWall]);
-  bathroomDoorWall.rotate_(0, Math.PI).translate_(-10).spreadTextureCoords().computeNormals();
+  bathroomDoorWall.rotate_(0, Math.PI).translate_(-10).computeNormals();
 
-  const secondBathroomWall = new MoldableCubeGeometry(1, WallHeight, 11.5).texturePerSide(materials.greenPlasterWall).translate_(-4, 6, -6.25).spreadTextureCoords();
+  const secondBathroomWall = new MoldableCubeGeometry(1, WallHeight, 11.5).texturePerSide(materials.greenPlasterWall).translate_(-4, 6, -6.25).spreadTextureCoords(4, 4);
 
-  const bathroomCornerColumn = new MoldableCubeGeometry(3, WallHeight, 4).texturePerSide(materials.greenPlasterWall).translate_(-6, 6, -9.5).spreadTextureCoords();
+  const bathroomCornerColumn = new MoldableCubeGeometry(3, WallHeight, 4).texturePerSide(materials.greenPlasterWall).translate_(-6, 6, -9.5).spreadTextureCoords(4, 4);
 
-  const aboveShowerWall = new MoldableCubeGeometry(9, 3, 1).texturePerSide(materials.greenPlasterWall).merge(new MoldableCubeGeometry(12, 0.5, 1.5).translate_(2, 1.25).texturePerSide(materials.white))
+  const aboveShowerWall = new MoldableCubeGeometry(9, 3, 1).texturePerSide(materials.greenPlasterWall).merge(new MoldableCubeGeometry(12, 0.5, 1.5).translate_(2, 1.25).texturePerSide(materials.wood))
     .translate_(-12, 10, -8)
-    .spreadTextureCoords();
+    .spreadTextureCoords(4, 4);
 
 
   const bedPlaceholder = new MoldableCubeGeometry(7, 2, 8)
@@ -191,20 +191,20 @@ export function buildRoom(roomNumber: number, swapSign = false, isIncludeDetails
 
   // TRIM
   function outerLargeTrimPiece() {
-    return new MoldableCubeGeometry(1, 3.5, 3).texturePerSide(materials.white).translate_(-16.6, 2.5, 10)
-      .merge(new MoldableCubeGeometry(1, 3.5, 15).texturePerSide(materials.white).translate_(-16.6, 2.5, -4))
-      .merge(new MoldableCubeGeometry(1, 3.5, 23).texturePerSide(materials.white).translate_(16.6, 2.5, 0))
-      .merge(new MoldableCubeGeometry(33, 3.5, 1).texturePerSide(materials.white).translate_(0, 2.5, 12.1))
-      .merge(new MoldableCubeGeometry(33, 3.5, 1).texturePerSide(materials.white).translate_(0, 2.5, -12.1))
+    return new MoldableCubeGeometry(1, 3.5, 3).texturePerSide(materials.wood).spreadTextureCoords(4, 4).translate_(-16.6, 2.5, 10)
+      .merge(new MoldableCubeGeometry(1, 3.5, 15).texturePerSide(materials.wood).spreadTextureCoords(4, 4).translate_(-16.6, 2.5, -4))
+      .merge(new MoldableCubeGeometry(1, 3.5, 23).texturePerSide(materials.wood).spreadTextureCoords(4, 4).translate_(16.6, 2.5, 0))
+      .merge(new MoldableCubeGeometry(33, 3.5, 1).texturePerSide(materials.wood).spreadTextureCoords(4, 4).translate_(0, 2.5, 12.1))
+      .merge(new MoldableCubeGeometry(33, 3.5, 1).texturePerSide(materials.wood).spreadTextureCoords(4, 4).translate_(0, 2.5, -12.1))
   }
 
-  const outerTrimFront = buildSegmentedWall([3, NormalDoorWidth, 15], 12, [1, 1, 1], [1, 0, 1], 1.5, 12, [materials.white])
-  const outerTrimBack = buildSegmentedWall([23], 12, [1], [1], 1.5, 12, [materials.white]);
-  const outerTrimLeft = buildSegmentedWall([34], 12, [1], [1], 1.5, 12, [materials.white]); //new MoldableCubeGeometry(34, 2, 1.5);
-  const outerTrimRight = buildSegmentedWall([34], 12, [1], [1], 1.5, 12, [materials.white]); //new MoldableCubeGeometry(34, 2, 1.5);
-  const bathroomDoorTrim = buildSegmentedWall([4.25, NormalDoorWidth - 0.5, 4.25], 12, [1, 1, 1], [1, 0, 1], 1.5, 12, [materials.white]);
-  const bathroomWallTrim = buildSegmentedWall([12], 12, [1], [1], 1.5, 12, [materials.white]) //new MoldableCubeGeometry(1.5, 1, 12);
-  const doorTrim = buildSegmentedWall([0.5, NormalDoorWidth - 0.5, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, [materials.white]);
+  const outerTrimFront = buildSegmentedWall([3, NormalDoorWidth, 15], 12, [1, 1, 1], [1, 0, 1], 1.5, 4, [materials.wood])
+  const outerTrimBack = buildSegmentedWall([23], 12, [1], [1], 1.5, 4, [materials.wood]);
+  const outerTrimLeft = buildSegmentedWall([34], 12, [1], [1], 1.5, 4, [materials.wood]); //new MoldableCubeGeometry(34, 2, 1.5);
+  const outerTrimRight = buildSegmentedWall([34], 12, [1], [1], 1.5, 4, [materials.wood]); //new MoldableCubeGeometry(34, 2, 1.5);
+  const bathroomDoorTrim = buildSegmentedWall([4.25, NormalDoorWidth - 0.5, 4.25], 12, [1, 1, 1], [1, 0, 1], 1.5, 4, [materials.wood]);
+  const bathroomWallTrim = buildSegmentedWall([12], 12, [1], [1], 1.5, 4, [materials.wood]) //new MoldableCubeGeometry(1.5, 1, 12);
+  const doorTrim = buildSegmentedWall([0.5, NormalDoorWidth - 0.5, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 4, [materials.wood]);
   const trim =
     createBox(outerTrimLeft, outerTrimRight, outerTrimBack, outerTrimFront)
       .merge(bathroomDoorTrim[0].rotate_(0, Math.PI).translate_(-10))

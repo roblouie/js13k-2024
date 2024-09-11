@@ -4,9 +4,9 @@ import { GameState } from '@/game-states/game.state';
 
 let previousTime = 0;
 const interval = 1000 / 60;
-// (async () => {
+(async () => {
   tmpl.innerHTML = 'CLICK TO START';
-  document.onclick = async () => {
+  //document.onclick = async () => {
     tmpl.innerHTML = 'LOADING';
     tmpl.requestPointerLock();
 
@@ -30,5 +30,5 @@ const interval = 1000 / 60;
     }
     requestAnimationFrame(draw);
   }
-  };
+  })();
 

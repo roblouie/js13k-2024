@@ -26,7 +26,7 @@ export class LeverDoorObject3d extends Object3d {
   constructor(x: number, y: number, z: number, swapHingeSideX: 1 | -1 = 1, swapHingeSideZ: 1 | -1 = 1, swapOpenClosed?: boolean, isLocked?: boolean) {
     const mesh = new Mesh(
       new MoldableCubeGeometry(5, 7.75, 0.25)
-        .texturePerSide(materials.white)
+        .texturePerSide(materials.wood)
         .merge(
           new MoldableCubeGeometry(1, 1, 1, 4, 4)
             .cylindrify(0.2, 'z')

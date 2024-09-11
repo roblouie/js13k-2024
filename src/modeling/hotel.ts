@@ -34,7 +34,7 @@ export function makeHotel(isIncludingDetails = false) {
       buildSegmentedWall([45, 11, 45], 12, [12, 3, 12], [], 1, 4, [materials.wallpaper])[0]
         // Door frame
         .merge(
-          buildSegmentedWall([0.5, 10, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, [materials.white])[0]
+          buildSegmentedWall([0.5, 10, 0.5], DoorHeight, [12, 0.5, 12], [], 1.5, 12, [materials.wood])[0]
         )
         // room number card
         .merge(new MoldableCubeGeometry(2, 1.5).texturePerSide(materials[13]).translate_(0, 10, -0.1))
@@ -49,7 +49,7 @@ export function makeHotel(isIncludingDetails = false) {
             .translate_(0, 6, 10)
         )
         // Table for cake
-        .merge(new MoldableCubeGeometry(3, 3.25, 3).translate_(0, 1.5, 15).texturePerSide(materials.wallpaper))
+        .merge(new MoldableCubeGeometry(3, 3.25, 3).translate_(0, 1.5, 15).texturePerSide(materials.wood))
         .translate_(0, 0, 118)
     )
 
@@ -87,6 +87,6 @@ function makeAllBracing() {
 }
 
 function makeBracing(xOffset: number, zOffset: number) {
-  return buildSegmentedWall([0.75, HallwayWidth - 0.5, 0.75], 12, [12, 1, 12], [], 1.25, 4, [materials.white])[0]
+  return buildSegmentedWall([0.75, HallwayWidth - 0.5, 0.75], 12, [12, 1, 12], [], 1.25, 4, [materials.wood])[0]
     .translate_(xOffset, 0, HallwayWidth + 1.875 + zOffset);
 }
