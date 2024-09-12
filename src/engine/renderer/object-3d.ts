@@ -2,7 +2,7 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { radsToDegrees } from '@/engine/helpers';
 
 export class Object3d {
-  position_: EnhancedDOMPoint;
+  position: EnhancedDOMPoint;
   scale_: EnhancedDOMPoint;
   children_: Object3d[];
   parent_?: Object3d;
@@ -12,7 +12,7 @@ export class Object3d {
   rotationMatrix: DOMMatrix;
 
   constructor(...children_: Object3d[]) {
-    this.position_ = new EnhancedDOMPoint();
+    this.position = new EnhancedDOMPoint();
     this.scale_ = new EnhancedDOMPoint(1, 1, 1);
     this.children_ = [];
     this.localMatrix = new DOMMatrix();
@@ -53,7 +53,7 @@ export class Object3d {
   isUsingLookAt = false;
   getMatrix() {
     const matrix = new DOMMatrix();
-    matrix.translateSelf(this.position_.x, this.position_.y, this.position_.z);
+    matrix.translateSelf(this.position.x, this.position.y, this.position.z);
     if (this.isUsingLookAt) {
       matrix.multiplySelf(this.rotationMatrix);
     } else {
@@ -89,12 +89,12 @@ export class Object3d {
   }
 
   private right = new EnhancedDOMPoint();
-  private lookatUp = new EnhancedDOMPoint();
+  lookatUp = new EnhancedDOMPoint();
   forward = new EnhancedDOMPoint();
 
   lookAt(target: EnhancedDOMPoint) {
     this.isUsingLookAt = true;
-    this.forward.subtractVectors(this.position_, target).normalize_();
+    this.forward.subtractVectors(this.position, target).normalize_();
     this.right.crossVectors(this.up, this.forward).normalize_();
     this.lookatUp.crossVectors(this.forward, this.right).normalize_();
 
@@ -106,14 +106,3 @@ export class Object3d {
     ]);
   }
 }
-
-
-export function createOrtho(bottom: number, top: number, left: number, right: number, near: number, far: number) {
-  return new DOMMatrix([
-    2 / (right - left), 0, 0, 0,
-    0, 2 / (top - bottom), 0, 0,
-    0, 0, -2 / (far - near), 0,
-    -(right + left) / (right - left), -(top + bottom) / (top - bottom), -(far + near) / (far - near), 1,
-  ]);
-}
-

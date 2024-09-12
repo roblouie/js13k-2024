@@ -2,7 +2,9 @@ import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 
 class Controls {
   isConfirm = false;
+  isFlashlight = false;
   prevConfirm = false;
+  prevFlash = false;
   inputDirection: EnhancedDOMPoint;
   private mouseMovement = new EnhancedDOMPoint();
   private onMouseMoveCallback?: (mouseMovement: EnhancedDOMPoint) => void;
@@ -29,6 +31,7 @@ class Controls {
 
   queryController() {
     this.prevConfirm = this.isConfirm;
+    this.prevFlash = this.isFlashlight;
     const leftVal = (this.keyMap.get('KeyA')) ? -1 : 0;
     const rightVal = (this.keyMap.get('KeyD')) ? 1 : 0;
     const upVal = (this.keyMap.get('KeyW')) ? -1 : 0;
@@ -36,6 +39,7 @@ class Controls {
     this.inputDirection.x = (leftVal + rightVal);
     this.inputDirection.y = (upVal + downVal);
     this.isConfirm = !!this.keyMap.get('KeyE');
+    this.isFlashlight = !!this.keyMap.get('KeyF');
   }
 }
 

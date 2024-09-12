@@ -1,6 +1,7 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
 import { LeverDoorObject3d } from '@/lever-door';
 import { HidingPlace } from '@/hiding-place';
+import { Item } from '@/item';
 
 export class PathNode {
   position: EnhancedDOMPoint;
@@ -11,6 +12,7 @@ export class PathNode {
   door?: LeverDoorObject3d;
   roomNumber?: number;
   hidingPlace?: HidingPlace;
+  item?: Item;
 
   constructor(position: EnhancedDOMPoint, door?: LeverDoorObject3d, roomNumber?: number, hidingPlace?: HidingPlace) {
     this.position = position;

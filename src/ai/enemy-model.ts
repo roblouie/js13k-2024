@@ -11,21 +11,21 @@ export function upyri() {
       .selectBy(vert => vert.y > 0.8)
       .scale_(1.5, 8, 2)
       .texturePerSide(
-        materials.iron.texture!,
-        materials.iron.texture!,
-        materials.iron.texture!,
-        materials.iron.texture!,
-        materials.face.texture!,
-        materials.face.texture!,
+        materials.iron,
+        materials.iron,
+        materials.iron,
+        materials.iron,
+        materials.face,
+        materials.iron,
       )
-      .computeNormals(true)
       .all_()
       .rotate_(Math.PI)
       .translate_(0, 5)
+      .computeNormals(true)
       .done_()
     , materials.face);
 
-  obj.position_.set(0, 54, 2);
+  obj.position.set(0, 54, 2);
 
   return obj;
 }

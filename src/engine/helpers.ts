@@ -1,5 +1,4 @@
 import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { PathNode } from '@/ai/path-node';
 
 export function radsToDegrees(radians: number): number {
   return radians * (180 / Math.PI);

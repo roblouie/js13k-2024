@@ -6,8 +6,10 @@ import { FirstPersonPlayer } from '@/core/first-person-player';
 import { Mesh } from '@/engine/renderer/mesh';
 import { upyri } from '@/ai/enemy-model';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
-import { footstep, frenchHorn, song, violin } from '@/sounds';
+import { baseDrum, elevatorDoorTest, footstep, frenchHorn, song, violin } from '@/sounds';
 import { AiNavPoints } from '@/ai/ai-nav-points';
+import { lightInfo } from '@/light-info';
+import { Object3d } from '@/engine/renderer/object-3d';
 
 export class Enemy {
   position: EnhancedDOMPoint;
@@ -45,16 +47,17 @@ export class Enemy {
   });
   unseenFrameCount = 0;
   aggression = 0;
-  songPlayer: SimplestMidiRev2;
+  songPlayer = new SimplestMidiRev2();
+  lightObject = new Object3d();
+  footstepDebounce = 0;
+  isSpawned = false;
 
-  constructor(startingNode: PathNode) {
-    this.songPlayer = new SimplestMidiRev2();
+  constructor() {
     this.songPlayer.volume_.connect(biquadFilter)
     this.footstepPlayer.volume_.connect(this.pannerNode).connect(compressor);
-    this.currentNode = startingNode;
-    this.position = new EnhancedDOMPoint().set(startingNode.position);
-    const siblings = startingNode.getPresentSiblings();
-    this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
+    this.currentNode = AiNavPoints[2];
+    this.position = new EnhancedDOMPoint().set(this.currentNode.position);
+    this.nextNode =this.currentNode;
     this.patrolState = {
       onEnter: () => {
         this.stopSong()
@@ -70,12 +73,24 @@ export class Enemy {
       onUpdate: (player: FirstPersonPlayer) => this.searchUpdate(player),
     };
     this.fleeState = {
-      onEnter: () => this.fleeEnter(),
+      onEnter: (player: FirstPersonPlayer) => this.fleeEnter(player),
       onUpdate: () => this.fleeUpdate(),
     };
-    this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player) };
+    this.killState = { onUpdate: (player: FirstPersonPlayer) => this.killUpdate(player), onEnter: (player: FirstPersonPlayer) => this.killEnter(player) };
     this.stateMachine = new StateMachine(this.patrolState);
     this.model_ = upyri();
+    this.model_.add_(this.lightObject);
+  }
+
+  spawn(player: FirstPersonPlayer) {
+    lightInfo.pointLightAttenuation.set(0.005, 0.001, 0.4);
+    this.isSpawned = true;
+    this.setFarthestPoint(player);
+    this.position.set(this.farthestPoint.position);
+    this.currentNode = this.farthestPoint;
+    const siblings = this.currentNode.getPresentSiblings();
+    this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
+    this.stateMachine.setState(this.patrolState);
   }
 
   playSong() {
@@ -85,14 +100,14 @@ export class Enemy {
       }
     }
     this.songPlayer.volume_.gain.cancelScheduledValues(audioContext.currentTime);
-    this.songPlayer.volume_.gain.value = 1;
+    this.songPlayer.volume_.gain.setValueAtTime(1, audioContext.currentTime);
     playSong();
     // @ts-ignore
     this.songInterval = setInterval(playSong, 6000);
   }
 
   stopSong() {
-    this.songPlayer.volume_.gain.linearRampToValueAtTime(0, audioContext.currentTime + 3);
+    this.songPlayer.volume_.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
     clearInterval(this.songInterval);
   }
 
@@ -107,15 +122,11 @@ export class Enemy {
   }
 
   getMaxUnseenFramesBeforeGivingUp() {
-    return 300 + 600 * this.aggression;
+    return 600 + 600 * this.aggression;
   }
 
   getSpeed() {
-    return 0.15 + 0.2 * this.aggression;
-  }
-
-  getChanceOfFindingPlayer() {
-    return this.aggression * 0.4;
+    return Math.min(0.15 + 0.23 * this.aggression, 0.3); // depending on sprinting ability, consider capping at .3;
   }
 
   updateNodeDistanceData() {
@@ -125,17 +136,44 @@ export class Enemy {
     this.currentNodeDifference.subtractVectors(this.currentNode.position, this.position);
   }
 
+  updateLight(followDistance: number, height: number) {
+    this.lightObject.position.z = followDistance;
+    lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
+    lightInfo.pointLightPosition.y = height;
+  }
+
 
   update_(player: FirstPersonPlayer) {
-    // tmpl.innerHTML += `ENEMY AGRESSION: ${this.aggression}<br>`
+    if (!this.isSpawned) {
+      this.model_.position.y = -1000;
+      // this.model_.updateWorldMatrix();
+      this.currentNode = AiNavPoints[0];
+      this.stopSong();
+      return;
+    }
+    // tmpl.innerHTML += `ENEMY AGRESSION: ${this.lightPosition.worldMatrix}<br>`
     this.updateNodeDistanceData();
+    //lightInfo.pointLightPosition.set(this.position);
+    // lightInfo.pointLightPosition.z = 23;
 
     this.stateMachine.getState().onUpdate(player);
-    this.model_.position_.set(this.position);
+    this.model_.position.set(this.position);
+    // this.model_.updateWorldMatrix();
+    // lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
+    // lightInfo.pointLightPosition.y = 9;
+
+    // tmpl.innerHTML += `LIGHT POS: ${test.x}, ${test.y}, ${test.z}<br>`;
+    // tmpl.innerHTML += `ENEMY POS: ${this.position.x}, ${this.position.y}, ${this.position.z}`;
   }
 
   patrolUpdate(player: FirstPersonPlayer) {
     this.checkVision(player);
+
+    if (player.closestNavPoint.hidingPlace) {
+      this.updateLight(4, 2);
+    } else {
+      this.updateLight(8, 9);
+    }
 
     // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else
@@ -150,21 +188,24 @@ export class Enemy {
       this.moveInTravelingDirection();
       let lastNode = this.currentNode;
       this.currentNode = this.nextNode;
-      let siblings = this.currentNode.getPresentSiblings();
-      if (siblings.length > 1) {
-        siblings = siblings.filter(p => {
-          const isGoingToEnterRoom = this.currentNode.door && p.door && this.currentNode.roomNumber === p.roomNumber && this.currentNode !== p && !this.currentNode.hidingPlace;
-          return p !== lastNode && !isGoingToEnterRoom;
-        });
+      if (Math.random() < this.aggression / 3) {
+        this.advancePathToNode(player.closestNavPoint);
+      } else {
+        let siblings = this.currentNode.getPresentSiblings();
+        if (siblings.length > 1) {
+          siblings = siblings.filter(p => {
+            const isGoingToEnterRoom = this.currentNode.door && p.door && this.currentNode.roomNumber === p.roomNumber && this.currentNode !== p && !this.currentNode.hidingPlace;
+            return p !== lastNode && !isGoingToEnterRoom;
+          });
+        }
+        this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
       }
-      this.nextNode = siblings[Math.floor(Math.random() * siblings.length)];
     }
     if (!this.nextNode) {
       this.nextNode = this.currentNode;
     }
   }
 
-  footstepDebounce: number;
   moveInTravelingDirection() {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;
@@ -173,7 +214,7 @@ export class Enemy {
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       if (this.position.y < 2.402) {
         clearTimeout(this.footstepDebounce);
-        this.footstepDebounce = setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 2, 50, footstep, audioContext.currentTime + 1), 40);
+        this.footstepDebounce = setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 4, 60, footstep, audioContext.currentTime + 1), 40);
       }
       this.currentInterval++;
       this.pannerNode.positionX.value = this.position.x;
@@ -219,6 +260,7 @@ export class Enemy {
   }
 
   chaseEnter(player: FirstPersonPlayer) {
+    this.stopSong();
     this.playSong();
     this.pathCache = [];
     this.positionInPathCache = 0;
@@ -232,6 +274,7 @@ export class Enemy {
 
   chaseUpdate(player: FirstPersonPlayer) {
     // tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
+    this.updateLight(8, 9);
 
     // Handle door opening, while door is opening, don't do anything else
     if (this.handleDoor(player)) {
@@ -242,15 +285,19 @@ export class Enemy {
     this.checkVision(player);
 
     if (this.unseenFrameCount >= this.getMaxUnseenFramesBeforeGivingUp()) {
-      this.stateMachine.setState(this.fleeState);
+      this.stateMachine.setState(this.fleeState, player);
       this.increaseAggression();
     }
 
     // If we're in chase mode and at the player hiding place. Kill the player. If the player was hidden
     // before the enemy entered the room, the enemy would be in search mode. So this means the enemy
     // entered the room while the player wasn't hidden, meaning they will die if they try to hide now.
-    if (this.currentNode.hidingPlace && player.isHiding && player.closestNavPoint === this.currentNode) {
-      // TODO: Kill player
+    if (
+      (this.currentNode.hidingPlace && player.isHiding && player.closestNavPoint === this.currentNode)
+      || ((this.currentNode === player.closestNavPoint || this.nextNode === player.closestNavPoint) && new EnhancedDOMPoint().subtractVectors(this.position, player.feetCenter).magnitude < 7)
+    ) {
+      this.stateMachine.setState(this.killState, player);
+      return;
     }
 
     const nodeDistance = this.nextNode.door ? 1 : 6;
@@ -308,8 +355,32 @@ export class Enemy {
     this.pathCache = search(this.currentNode, node)!;
   }
 
-  killUpdate(player: FirstPersonPlayer) {
+  killFrames = 300;
+  killFrameCount = 0;
+  killEnter(player: FirstPersonPlayer) {
+    this.killFrameCount = 0;
+    this.stopSong();
+    player.isFlashlightOn = false;
+    const lookAtTarget = new EnhancedDOMPoint().set(player.feetCenter);
+    this.model_.lookAt(lookAtTarget);
+    this.footstepPlayer.playNote(audioContext.currentTime, 70, 100, footstep, audioContext.currentTime + 1);
+    this.footstepPlayer.playNote(audioContext.currentTime + 0.1, 1, 80, elevatorDoorTest, audioContext.currentTime + 5);
+    // player.camera.updateWorldMatrix();
+    if (player.isHiding) {
+      player.unhide();
+    }
+    player.isFrozen_ = true;
+  }
 
+  killUpdate(player: FirstPersonPlayer) {
+    this.updateLight(5, 5);
+    this.killFrameCount++;
+    player.health -= 0.1;
+    if (this.killFrameCount === this.killFrames) {
+      this.spawn(player);
+      player.isFrozen_ = false;
+      this.decreaseAggression();
+    }
   }
 
   checkVision(player: FirstPersonPlayer) {
@@ -365,6 +436,7 @@ export class Enemy {
 
   searchUpdate(player: FirstPersonPlayer) {
     // tmpl.innerHTML += 'ENEMY STATE: SEARCH<br>';
+    this.updateLight(5, 5);
 
     // If player comes out from hiding spot while searching, chase them
     if (!player.isHiding) {
@@ -378,43 +450,53 @@ export class Enemy {
     } else {
       const searchSpotFor = 300;
       if (this.spotSearchFrameCount <= searchSpotFor) {
-        this.model_.rotate_(0, this.spotSearchFrameCount > 100 ? 0.02 : -0.02, 0);
+        this.model_.rotate_(0, this.spotSearchFrameCount > 100 ? -0.02 : 0.02, 0);
         this.spotSearchFrameCount++;
       } else {
-        // TODO: KIll player based on kill chanceaw
-
         this.spotsSearched++;
         this.currentNode = this.nextNode;
+
+        if (this.currentNode === player.closestNavPoint && Math.random() < Math.min(this.aggression, 0.3)) {
+          this.stateMachine.setState(this.killState, player);
+          return;
+        }
+
         this.nextNode = this.currentNode.getPresentSiblings().find(node => node.hidingPlace)!
         this.updateNodeDistanceData();
         this.spotSearchFrameCount = 0;
 
         if (this.spotsSearched >= 2 && Math.random() > 0.25) {
-          this.stateMachine.setState(this.fleeState);
+          this.stateMachine.setState(this.fleeState, player);
           this.increaseAggression();
         }
       }
     }
   }
 
-  farthestPoint = AiNavPoints[0];
-  fleeEnter() {
-    this.stopSong();
+  setFarthestPoint(player: FirstPersonPlayer) {
     let longestDistance = 0;
     const difference = new EnhancedDOMPoint();
     AiNavPoints.forEach(node => {
-      const distance = difference.subtractVectors(this.position, node.position).magnitude;
+      const distance = difference.subtractVectors(player.feetCenter, node.position).magnitude;
       if (distance > longestDistance) {
         longestDistance = distance;
         this.farthestPoint = node;
       }
     });
+  }
+
+  farthestPoint = AiNavPoints[0];
+  fleeEnter(player: FirstPersonPlayer) {
+    this.stopSong();
+    this.setFarthestPoint(player);
     this.advancePathToNode(this.farthestPoint);
     this.nextNode = this.pathCache[0];
     this.updateNodeDistanceData();
   }
 
   fleeUpdate() {
+    this.updateLight(3, 9);
+
     // tmpl.innerHTML += 'ENEMY STATE: FLEE<br>';
     if (this.nextNodeDistance > 1) {
       // tmpl.innerHTML += `DIRECTION: ${this.nextNodeDirection.x}, ${this.nextNodeDirection.y}, ${this.nextNodeDirection.z}`;

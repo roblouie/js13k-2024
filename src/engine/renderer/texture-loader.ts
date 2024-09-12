@@ -12,13 +12,13 @@ class TextureLoader {
 
   bindTextures() {
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D_ARRAY, gl.createTexture());
-    gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 8, gl.RGBA8, 512, 512, this.textures.length);
+    gl.bindTexture(0x8C1A, gl.createTexture());
+    gl.texStorage3D(0x8C1A, 8, gl.RGBA8, 512, 512, this.textures.length);
 
     this.textures.forEach((texture, index) => {
-      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, index, 512, 512, 1, gl.RGBA, gl.UNSIGNED_BYTE, texture.source);
+      gl.texSubImage3D(0x8C1A, 0, 0, 0, index, 512, 512, 1, gl.RGBA, gl.UNSIGNED_BYTE, texture.source);
     });
-    gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+    gl.generateMipmap(0x8C1A);
   }
 }
 

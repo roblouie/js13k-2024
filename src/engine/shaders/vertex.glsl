@@ -8,12 +8,14 @@ layout(location = 3) in float aDepth;
 uniform mat4 modelviewProjection;
 uniform mat4 normalMatrix;
 uniform mat4 lightPovMvp;
+uniform mat4 worldMatrix;
 
 out vec2 vTexCoord;
 out float vDepth;
 out vec3 vNormal;
 out mat4 vNormalMatrix;
 out vec4 positionFromLightPov;
+out vec3 worldPosition;
 
 void main() {
     vec4 coords = vec4(aCoords, 1.0);
@@ -24,4 +26,5 @@ void main() {
     vNormal = aNormal;
     vNormalMatrix = normalMatrix;
     positionFromLightPov = lightPovMvp * coords;
+    worldPosition = (worldMatrix * coords).xyz;
 }

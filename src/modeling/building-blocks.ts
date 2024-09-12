@@ -1,24 +1,14 @@
 import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 import { Texture } from '@/engine/renderer/texture';
 import { materials } from '@/textures';
+import { Material } from '@/engine/renderer/material';
 
 export const DoubleDoorWidth = 8;
 export const WallHeight = 12;
 export const DoorHeight = 9;
 export const DoorTopSegment = WallHeight - DoorHeight;
 
-export function getAllWhite(): [Texture, Texture, Texture, Texture, Texture, Texture] {
-  return [
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-    materials.potentialPlasterWall.texture!,
-  ]
-}
-
-export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide: Texture[]): [MoldableCubeGeometry, number] {
+export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide?: Material[]): [MoldableCubeGeometry, number] {
   let geo: MoldableCubeGeometry;
   let totalWidth = 0;
   let runningSide = 0;

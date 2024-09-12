@@ -42,8 +42,14 @@ export function build2dGrid(allFaces: Face[]) {
 }
 
 
+const floor = new EnhancedDOMPoint(0, 1, 0);
+const ceiling = new EnhancedDOMPoint(0, -1, 0);
 export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPersonPlayer) {
   for (const wall of walls) {
+    if (wall.normal.isEqualTo(ceiling) || wall.normal.isEqualTo(floor)) {
+      continue;
+    }
+
     const newWallHit = testSphereTriangle(player.collisionSphere, wall);
 
     if (newWallHit) {
@@ -56,7 +62,6 @@ export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPerson
       // Slightly sketch way of dealing with gravity on a sloped surface, but it does work
       if (wall.normal.y >= 0.6 && player.velocity.y < 0) {
         player.velocity.y = 0;
-        player.isJumping = false;
       } else if (wall.normal.y <= -0.6 && player.velocity.y > 0) {
         player.velocity.y = 0;
       }

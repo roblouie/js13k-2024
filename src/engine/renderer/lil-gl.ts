@@ -1,7 +1,7 @@
 import {
   depth_fragment_glsl,
   depth_vertex_glsl,
-  fragment_glsl, shadowMap, uSampler, vertex_glsl
+  fragment_glsl, shadowCubeMap, uSampler, vertex_glsl
 } from '@/engine/shaders/shaders';
 
 export class LilGl {
@@ -12,19 +12,18 @@ export class LilGl {
  constructor() {
    // @ts-ignore
    this.gl = c3d.getContext('webgl2')!;
-   const vertex = this.createShader(this.gl.VERTEX_SHADER, vertex_glsl);
-   const fragment = this.createShader(this.gl.FRAGMENT_SHADER, fragment_glsl);
+   const vertex = this.createShader(0x8B31, vertex_glsl);
+   const fragment = this.createShader(0x8B30, fragment_glsl);
    this.program = this.createProgram(vertex, fragment);
-   const depthVertex = this.createShader(this.gl.VERTEX_SHADER, depth_vertex_glsl);
-   const depthFragment = this.createShader(this.gl.FRAGMENT_SHADER, depth_fragment_glsl);
+   const depthVertex = this.createShader(0x8B31, depth_vertex_glsl);
+   const depthFragment = this.createShader(0x8B30, depth_fragment_glsl);
    this.depthProgram = this.createProgram(depthVertex, depthFragment);
 
-   const shadowMapLocation = this.gl.getUniformLocation(this.program, shadowMap);
+   const shadowCubeMapLocation = this.gl.getUniformLocation(this.program, shadowCubeMap)
    const textureLocation = this.gl.getUniformLocation(this.program, uSampler);
    this.gl.useProgram(this.program);
    this.gl.uniform1i(textureLocation, 0);
-   this.gl.uniform1i(shadowMapLocation, 1);
-
+   this.gl.uniform1i(shadowCubeMapLocation, 2);
  }
 
   createShader(type: GLenum, source: string): WebGLShader {
@@ -40,10 +39,10 @@ export class LilGl {
     this.gl.attachShader(program, fragmentShader);
     this.gl.linkProgram(program);
 
-    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
-      console.log(this.gl.getShaderInfoLog(vertexShader));
-      console.log(this.gl.getShaderInfoLog(fragmentShader));
-    }
+    // if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
+    //   console.log(this.gl.getShaderInfoLog(vertexShader));
+    //   console.log(this.gl.getShaderInfoLog(fragmentShader));
+    // }
 
     return program;
   }

@@ -1,29 +1,22 @@
-import { createGameStateMachine, gameStateMachine } from './game-state-machine';
 import { controls } from '@/core/controls';
 import { initTextures } from '@/textures';
 import { GameState } from '@/game-states/game.state';
-import { gameStates } from '@/game-states/game-states';
-import { MenuState } from '@/game-states/menu.state';
 
 let previousTime = 0;
 const interval = 1000 / 60;
-
-(async () => {
-  //tmpl.innerHTML = 'CLICK TO START';
-  //document.onclick = async () => {
-    tmpl.innerHTML = 'LOADING';
+tmpl.innerHTML = `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Click to Start</div>`;
+document.onclick = async () => {
+    tmpl.requestPointerLock();
+    tmpl.innerHTML = '';
 
     await initTextures();
 
-    gameStates.gameState = new GameState();
-    gameStates.menuState = new MenuState();
-
-    createGameStateMachine(gameStates.gameState);
+    const gameState = new GameState();
+    gameState.onEnter();
 
     draw(0);
 
-    document.onclick = null;
-  //};
+    document.onclick = () => tmpl.requestPointerLock();
 
   function draw(currentTime: number) {
     const delta = currentTime - previousTime;
@@ -32,9 +25,9 @@ const interval = 1000 / 60;
       previousTime = currentTime - (delta % interval);
 
       controls.queryController();
-      gameStateMachine.getState().onUpdate(delta);
+      gameState.onUpdate();
     }
     requestAnimationFrame(draw);
   }
-})();
+};
 
