@@ -82,10 +82,10 @@ export class FirstPersonPlayer {
 
   update(gridFaces: Set<Face>[]) {
     if (this.heldKeyRoomNumber && this.heldKeyRoomNumber !== -1) {
-      tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 50px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
+      // tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 50px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
     }
 
-    tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 10px; right: 280px; color: #b00;">♥ <div style="position: absolute; bottom: 13px; left: 30px; width: ${this.health * 2}px; height: 20px; background-color: #b00;"></div></div>`;
+    // tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 10px; right: 280px; color: #b00;">♥ <div style="position: absolute; bottom: 13px; left: 30px; width: ${this.health * 2}px; height: 20px; background-color: #b00;"></div></div>`;
 
     let smallestDistance = Infinity;
     [this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()].forEach(point => {

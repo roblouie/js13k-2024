@@ -167,13 +167,13 @@ export class Enemy {
   }
 
   patrolUpdate(player: FirstPersonPlayer) {
-    this.checkVision(player);
+    // this.checkVision(player);
 
-    if (player.closestNavPoint.hidingPlace) {
-      this.updateLight(4, 2);
-    } else {
+    // if (player.closestNavPoint.hidingPlace) {
+    //   this.updateLight(4, 2);
+    // } else {
       this.updateLight(8, 9);
-    }
+    // }
 
     // tmpl.innerHTML += 'ENEMY STATE: PATROL<br>';
     // Handle door opening, while door is opening, don't do anything else

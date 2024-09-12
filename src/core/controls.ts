@@ -17,6 +17,7 @@ class Controls {
     document.addEventListener('mousedown', () => this.keyMap.set('KeyE', true));
     document.addEventListener('mouseup', () => this.keyMap.set('KeyE', false));
 
+
     document.addEventListener('mousemove', event => {
       this.mouseMovement.x = event.movementX;
       this.mouseMovement.y = event.movementY;
@@ -36,8 +37,11 @@ class Controls {
     const rightVal = (this.keyMap.get('KeyD')) ? 1 : 0;
     const upVal = (this.keyMap.get('KeyW')) ? -1 : 0;
     const downVal = (this.keyMap.get('KeyS')) ? 1 : 0;
+    const vertStrafeUp = (this.keyMap.get('KeyQ') || this.keyMap.get('KeyQ')) ? -1 : 0;
+    const vertStrafeDown = (this.keyMap.get('KeyE') || this.keyMap.get('KeyE')) ? 1 : 0;
     this.inputDirection.x = (leftVal + rightVal);
     this.inputDirection.y = (upVal + downVal);
+    this.inputDirection.z = (vertStrafeUp + vertStrafeDown);
     this.isConfirm = !!this.keyMap.get('KeyE');
     this.isFlashlight = !!this.keyMap.get('KeyF');
   }

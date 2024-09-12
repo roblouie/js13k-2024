@@ -19,9 +19,10 @@ import { Enemy } from '@/ai/enemy-ai';
 import { lightInfo } from '@/light-info';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound } from '@/sounds';
+import { FreeCam } from '@/core/free-cam';
 
 export class GameState implements State {
-  player: FirstPersonPlayer;
+  player: FreeCam;
   scene: Scene;
   gridFaces: Set<Face>[] = [];
 
@@ -86,8 +87,7 @@ export class GameState implements State {
 
 
     const firstKeyRoomNum = makeNavPoints(this.doors).roomNumber;
-    this.player = new FirstPersonPlayer(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[0]);
-    this.player.heldKeyRoomNumber = firstKeyRoomNum;
+    this.player = new FreeCam(new Camera(Math.PI / 3, 16 / 9, 1, 500), AiNavPoints[0]);
 
     this.enemy = new Enemy();
 
@@ -104,7 +104,6 @@ export class GameState implements State {
     this.scene.add_(...this.elevator.meshes, ceiling, floor, hotelRender, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
     this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]));
     this.player.cameraRotation.set(0, Math.PI, 0);
-    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorMotionRev1, audioContext.currentTime + 6);
 
     setTimeout(() => {
       this.elevator.isOpenTriggered = true;
@@ -129,14 +128,14 @@ export class GameState implements State {
     // tmpl.innerHTML += `ENEMY HEADED TO: ${this.enemy.nextNode.name}<br/>`
 
     if (!this.elevator.isOpen) {
-      findWallCollisionsFromList(this.elevator.doorCollision, this.player);
+      // findWallCollisionsFromList(this.elevator.doorCollision, this.player);
     }
 
       [this.player.closestNavPoint.door, this.doors[12], this.doors[13]].forEach((door, i) => {
       if (door) {
         const distance = this.playerDoorDifference.subtractVectors(this.player.feetCenter, door.placedPosition).magnitude;
         if (door.openClose === -1 && !door.isAnimating && distance < 7) {
-          findWallCollisionsFromList(door.closedDoorCollision, this.player)
+          // findWallCollisionsFromList(door.closedDoorCollision, this.player)
         }
 
         if (distance < 8) {
@@ -146,30 +145,10 @@ export class GameState implements State {
           const direction = this.player.normal.dot(this.playerDoorDifference.normalize_());
           // tmpl.innerHTML += `DIRECTION: ${direction}<br/>`
           if (distance < 1 || direction < -0.77) {
-            if (door.isLocked) {
-              if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ &nbsp; Unlock and Open</div>`;
-                if (controls.isConfirm) {
-                  door.pullLever();
-                  door.isLocked = false;
-                  this.player.heldKeyRoomNumber = undefined;
-                  if (i > 0) {
-                    this.doors[12].pullLever();
-                    this.doors[12].isLocked = false;
-                    this.doors[13].pullLever();
-                    this.doors[13].isLocked = false;
-                  }
-                }
-              } else {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
-              }
-            } else if (this.enemy.currentNode.door === door) {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🚫</div>`;
-            } else {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">${door.openClose === -1 ? 'Open' : 'Close'} Door</div>`;
-              if (controls.isConfirm) {
-                door.pullLever();
-              }
+
+            // tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">${door.openClose === -1 ? 'Open' : 'Close'} Door</div>`;
+            if (controls.isConfirm) {
+              door.pullLever();
             }
           }
         }
@@ -190,60 +169,9 @@ export class GameState implements State {
         if (distance < 8) {
           const direction = this.player.normal.dot(this.playerHidingPlaceDifference.normalize_());
           if (direction < -0.77 && !this.player.isHiding) {
-            tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Hide</div>`;
+            // tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Hide</div>`;
             if (controls.isConfirm && !controls.prevConfirm) {
               this.player.hide(hidingPlace);
-            }
-          }
-        }
-      }
-
-      const item = this.player.closestNavPoint.item;
-      if (item && !item.isTaken) {
-        const distance = this.playerHidingPlaceDifference.subtractVectors(this.player.camera.position, item.mesh.position).magnitude;
-        if (distance < 6) {
-          const direction = this.player.normal.dot( this.playerHidingPlaceDifference.normalize_());
-          if (direction < -0.9) {
-            if (item.roomNumber) {
-              if (item.roomNumber === -1) {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🎂 Make a Wish</div>`;
-              } else {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ Take Room ${item.roomNumber} Key</div>`;
-              }
-            } else {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Use Health Pack</div>`;
-            }
-            if (controls.isConfirm && !controls.prevConfirm) {
-              item.isTaken = true;
-              if (item.roomNumber !== -1) {
-                this.scene.remove_(item.mesh);
-                this.sfxPlayer.playNote(audioContext.currentTime, 90, 30, hideSound, audioContext.currentTime + 1);
-              }
-              if (item.roomNumber) {
-                this.player.heldKeyRoomNumber = item.roomNumber;
-                this.enemy.increaseAggression();
-                if (!this.hasEnemySpawned) {
-                  lightInfo.pointLightAttenuation.set(0.001, 0.001, 0.4);
-                  this.enemy.aggression = 0;
-                  this.hasEnemySpawned = true;
-                  this.enemy.spawn(this.player);
-                }
-                if (item.roomNumber === 1313) {
-                  this.enemy.isSpawned = false;
-                  lightInfo.pointLightPosition.set(0, 3.7, 138);
-                }
-                if (item.roomNumber === -1) {
-                  this.sfxPlayer.playNote(audioContext.currentTime, 120, 30, hideSound, audioContext.currentTime + 1);
-                  lightInfo.pointLightPosition.set(0, 8, 0);
-                  setTimeout(() => {
-                    this.elevator.isOpenTriggered = true;
-                    this.playElevatorSound();
-                  }, 1000);
-                }
-              }
-              if (!item.roomNumber) {
-                this.player.heal();
-              }
             }
           }
         }
@@ -259,7 +187,7 @@ export class GameState implements State {
     }
 
     if (this.hasPlayerLeftElevator && this.player.feetCenter.z < 3) {
-      this.player.isFrozen_ = true;
+      this.player.isHiding = true;
       tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 20px; width: 100%;">You Win!</div>`;
       if (!this.isGameEnded) {
         this.isGameEnded = true;
@@ -267,20 +195,13 @@ export class GameState implements State {
         this.playElevatorSound();
       }
     }
-
-    if (this.player.health <= 0 && !this.deathTriggered) {
-      this.deathTriggered = true;
-      alert('YOU DIED');
-      location.reload();
-    }
   }
-  deathTriggered = false;
 
   playElevatorSound() {
-    this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
-    this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 2.5);
-    this.player.sfxPlayer.playNote(audioContext.currentTime + 1.8, 60, 70, footstep, audioContext.currentTime + 2.5);
-    this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
+    // this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoor1, audioContext.currentTime + 4);
+    // this.player.sfxPlayer.playNote(audioContext.currentTime + 0.5, 60, 70, footstep, audioContext.currentTime + 2.5);
+    // this.player.sfxPlayer.playNote(audioContext.currentTime + 1.8, 60, 70, footstep, audioContext.currentTime + 2.5);
+    // this.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorDoorTest, audioContext.currentTime + 1);
   }
 
 }
