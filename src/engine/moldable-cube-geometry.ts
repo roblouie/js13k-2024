@@ -291,7 +291,7 @@ export class MoldableCubeGeometry {
     const fullSize = [...this.buffers.values()].reduce((total, current) => total += current.data.length , 0);
     const fullBuffer = new Float32Array(fullSize);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()!);
+    gl.bindBuffer(0x8892, gl.createBuffer()!);
 
     gl.bindVertexArray(this.vao);
 
@@ -306,10 +306,10 @@ export class MoldableCubeGeometry {
       lengthOffset+= buffer.data.length;
     });
 
-    gl.bufferData(gl.ARRAY_BUFFER, fullBuffer, gl.STATIC_DRAW);
+    gl.bufferData(0x8892, fullBuffer, gl.STATIC_DRAW);
 
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer()!);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+    gl.bindBuffer(0x8893, gl.createBuffer()!);
+    gl.bufferData(0x8893, this.indices, gl.STATIC_DRAW);
   }
 }

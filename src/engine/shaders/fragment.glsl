@@ -7,10 +7,8 @@ in vec2 vTexCoord;
 in float vDepth;
 in vec3 vNormal;
 in mat4 vNormalMatrix;
-in vec4 positionFromLightPov;
 in vec3 worldPosition;
 
-uniform vec4 emissive;
 uniform vec3 lightWorldPosition;
 uniform vec3 pointLightAttenuation;
 vec4 pointLightColor = vec4(1.0, 1.0, 1.0, 1.0);

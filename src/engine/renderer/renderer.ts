@@ -26,7 +26,7 @@ export const enum AttributeLocation {
 gl.enable(gl.CULL_FACE);
 gl.enable(gl.DEPTH_TEST);
 // gl.enable(gl.BLEND);
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.blendFunc(gl.SRC_ALPHA, 0x303);
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 gl.getExtension('EXT_color_buffer_float');
 gl.getExtension('OES_texture_float_linear');
@@ -65,10 +65,7 @@ export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoin
   ]);
 }
 
-
-
 const cubeMap = new ShadowCubeMapFbo(1024);
-gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap.cubeMapTexture);
 
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
@@ -79,11 +76,11 @@ export function render(camera: Camera, scene: Scene) {
   gl.disable(gl.BLEND);
   gl.uniform3fv(lightPositionDepth, lightInfo.pointLightPosition.toArray());
 
-  cubeMap.getSides().forEach(side => {
-    cubeMap.bindForWriting(side);
+  cubeMap.getSides().forEach((side, i) => {
+    cubeMap.bindForWriting(i);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(0x4100);
 
     const lightView = createLookAt(lightInfo.pointLightPosition, new EnhancedDOMPoint().addVectors(lightInfo.pointLightPosition, side.target), side.up);
     const lightViewProjectionMatrix = lightPerspective.projection.multiply(lightView);
@@ -105,13 +102,13 @@ export function render(camera: Camera, scene: Scene) {
 
   // Render solid meshes first
   gl.activeTexture(gl.TEXTURE0);
-  gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(0x8C1A,  0x2801, gl.LINEAR_MIPMAP_LINEAR);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.bindFramebuffer(0x8D40, null);
   gl.cullFace(gl.BACK);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.clear(0x4100);
   // gl.uniform1i(shadowCubeMapMain, 2);
 
   scene.solidMeshes.forEach(mesh => {
