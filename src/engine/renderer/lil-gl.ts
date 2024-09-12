@@ -12,11 +12,11 @@ export class LilGl {
  constructor() {
    // @ts-ignore
    this.gl = c3d.getContext('webgl2')!;
-   const vertex = this.createShader(this.gl.VERTEX_SHADER, vertex_glsl);
-   const fragment = this.createShader(this.gl.FRAGMENT_SHADER, fragment_glsl);
+   const vertex = this.createShader(0x8B31, vertex_glsl);
+   const fragment = this.createShader(0x8B30, fragment_glsl);
    this.program = this.createProgram(vertex, fragment);
-   const depthVertex = this.createShader(this.gl.VERTEX_SHADER, depth_vertex_glsl);
-   const depthFragment = this.createShader(this.gl.FRAGMENT_SHADER, depth_fragment_glsl);
+   const depthVertex = this.createShader(0x8B31, depth_vertex_glsl);
+   const depthFragment = this.createShader(0x8B30, depth_fragment_glsl);
    this.depthProgram = this.createProgram(depthVertex, depthFragment);
 
    const shadowCubeMapLocation = this.gl.getUniformLocation(this.program, shadowCubeMap)

@@ -111,9 +111,9 @@ export class Enemy {
     clearInterval(this.songInterval);
   }
 
-  increaseAggression(amountToIncrease?: number) {
+  increaseAggression() {
     if (this.aggression <= 0.9) {
-      this.aggression += (amountToIncrease ?? 0.1);
+      this.aggression += 0.1;
     }
   }
 
@@ -126,7 +126,7 @@ export class Enemy {
   }
 
   getSpeed() {
-    return Math.min(0.15 + 0.2 * this.aggression, 0.3); // depending on sprinting ability, consider capping at .3;
+    return Math.min(0.15 + 0.23 * this.aggression, 0.3); // depending on sprinting ability, consider capping at .3;
   }
 
   updateNodeDistanceData() {
@@ -146,7 +146,7 @@ export class Enemy {
   update_(player: FirstPersonPlayer) {
     if (!this.isSpawned) {
       this.model_.position.y = -1000;
-      this.model_.updateWorldMatrix();
+      // this.model_.updateWorldMatrix();
       this.currentNode = AiNavPoints[0];
       this.stopSong();
       return;
@@ -158,7 +158,7 @@ export class Enemy {
 
     this.stateMachine.getState().onUpdate(player);
     this.model_.position.set(this.position);
-    this.model_.updateWorldMatrix();
+    // this.model_.updateWorldMatrix();
     // lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
     // lightInfo.pointLightPosition.y = 9;
 

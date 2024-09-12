@@ -89,7 +89,7 @@ export function render(camera: Camera, scene: Scene) {
       gl.bindVertexArray(mesh.geometry.vao!);
       gl.uniformMatrix4fv(worldMatrixDepth, false, mesh.worldMatrix.toFloat32Array());
       gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightViewProjectionMatrix.multiply(mesh.worldMatrix).toFloat32Array());
-      gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
+      gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, 0x1403, 0);
     });
   });
 
@@ -102,7 +102,7 @@ export function render(camera: Camera, scene: Scene) {
 
   // Render solid meshes first
   gl.activeTexture(gl.TEXTURE0);
-  gl.texParameteri(0x8C1A,  0x2801, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(0x8C1A,  0x2801, 0x2703);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.bindFramebuffer(0x8D40, null);
@@ -123,7 +123,7 @@ export function render(camera: Camera, scene: Scene) {
     gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.color ? mesh.cachedMatrixData : mesh.worldMatrix.inverse().toFloat32Array());
     gl.uniformMatrix4fv(worldMatrixMain, false, mesh.worldMatrix.toFloat32Array());
     gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
-    gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, 0x1403, 0);
   });
 
   // Unbinding the vertex array being used to make sure the last item drawn isn't still bound on the next draw call.

@@ -221,7 +221,7 @@ export class GameState implements State {
               }
               if (item.roomNumber) {
                 this.player.heldKeyRoomNumber = item.roomNumber;
-                this.enemy.increaseAggression(0.08);
+                this.enemy.increaseAggression();
                 if (!this.hasEnemySpawned) {
                   lightInfo.pointLightAttenuation.set(0.001, 0.001, 0.4);
                   this.enemy.aggression = 0;
@@ -233,7 +233,7 @@ export class GameState implements State {
                   lightInfo.pointLightPosition.set(0, 3.7, 138);
                 }
                 if (item.roomNumber === -1) {
-                  this.sfxPlayer.playNote(audioContext.currentTime, 180, 20, hideSound, audioContext.currentTime + 1);
+                  this.sfxPlayer.playNote(audioContext.currentTime, 120, 30, hideSound, audioContext.currentTime + 1);
                   lightInfo.pointLightPosition.set(0, 8, 0);
                   setTimeout(() => {
                     this.elevator.isOpenTriggered = true;
