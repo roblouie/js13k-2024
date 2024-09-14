@@ -101,7 +101,7 @@ export class GameState implements State {
     const hotelRender = new Mesh(makeHotel(true).translate_(0, 0, 6).done_(), materials.wallpaper);
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
 
-    this.scene.add_(...this.elevator.meshes, ceiling, floor, hotelRender, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
+    this.scene.add_(...this.elevator.meshes, floor, hotelRender, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
     this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]));
     this.player.cameraRotation.set(0, Math.PI, 0);
 

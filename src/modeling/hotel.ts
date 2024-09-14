@@ -67,9 +67,9 @@ export function makeHotel(isIncludingDetails = false) {
     )
     .done_();
 
-  if (isIncludingDetails) {
-    hotel.merge(makeAllBracing()).computeNormals()
-  }
+  // if (isIncludingDetails) {
+  //   hotel.merge(makeAllBracing()).computeNormals()
+  // }
 
   return hotel;
 }

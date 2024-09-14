@@ -29,7 +29,7 @@ export class FreeCam {
     this.camera = camera;
     this.camera.add_(this.lightObject);
 
-    const rotationSpeed = 0.0003;
+    const rotationSpeed = 0.001;
     controls.onMouseMove(mouseMovement => {
       if (this.isCameraFrozenRotFrozen) {
         return;
@@ -71,13 +71,15 @@ export class FreeCam {
 
     this.lightObject.position.z = -3;
     lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
+    lightInfo.pointLightAttenuation.set(0.0005, 0.0001, 0.4);
+
     lightInfo.pointLightPosition.x -= 3;
-    lightInfo.pointLightPosition.y = 7;
+    lightInfo.pointLightPosition.y = 40;
 
   }
 
   protected updateVelocityFromControls() {
-    const speed = 0.1;
+    const speed = 0.25;
 
     const depthMovementZ = -controls.inputDirection.y * speed;
     // const depthMovementX = controls.inputDirection.y * speed;
