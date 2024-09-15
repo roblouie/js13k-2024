@@ -230,7 +230,7 @@ export class Enemy {
         if (player.isHiding) {
           this.stateMachine.setState(this.searchState, player);
         } else {
-          if (this.stateMachine.getState() !== this.chaseState) {
+          if (this.stateMachine.getState() !== this.chaseState && this.stateMachine.getState() !== this.killState) {
             this.stateMachine.setState(this.chaseState, player);
           }
         }
