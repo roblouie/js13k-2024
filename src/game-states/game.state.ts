@@ -152,7 +152,6 @@ export class GameState implements State {
                 if (controls.isConfirm) {
                   door.pullLever();
                   door.isLocked = false;
-                  this.player.heldKeyRoomNumber = undefined;
                   if (i > 0) {
                     this.doors[12].pullLever();
                     this.doors[12].isLocked = false;
