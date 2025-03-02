@@ -46,9 +46,9 @@ const floor = new EnhancedDOMPoint(0, 1, 0);
 const ceiling = new EnhancedDOMPoint(0, -1, 0);
 export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPersonPlayer) {
   for (const wall of walls) {
-    if (wall.normal.isEqualTo(ceiling) || wall.normal.isEqualTo(floor)) {
-      continue;
-    }
+    // if (wall.normal.isEqualTo(ceiling) || wall.normal.isEqualTo(floor)) {
+    //   continue;
+    // }
 
     const newWallHit = testSphereTriangle(player.collisionSphere, wall);
 

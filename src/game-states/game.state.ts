@@ -19,6 +19,7 @@ import { Enemy } from '@/ai/enemy-ai';
 import { lightInfo } from '@/light-info';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound } from '@/sounds';
+import {computeSceneBounds, insertFace, OctreeNode} from "@/engine/physics/octree";
 
 export class GameState implements State {
   player: FirstPersonPlayer;
@@ -94,15 +95,24 @@ export class GameState implements State {
     this.elevator = new Elevator();
   }
 
+  octree: OctreeNode;
+
   onEnter() {
-    const floor = new Mesh(new MoldableCubeGeometry(180, 1, 180, 20, 1, 20).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
+    const floor = new Mesh(new MoldableCubeGeometry(180, 1, 180).spreadTextureCoords(5, 5).translate_(0, 0, 64).done_(), materials.redCarpet);
     const ceiling = new Mesh(new MoldableCubeGeometry(170, 1, 160).translate_(0, 12, 65).done_().spreadTextureCoords(5, 5), materials.ceilingTiles);
     // Move hotel layout to just outside the elevator
     const hotelRender = new Mesh(makeHotel(true).translate_(0, 0, 6).done_(), materials.wallpaper);
     const hotelCollision = new Mesh(makeHotel().translate_(0, 0, 6).done_(), materials.wallpaper);
 
     this.scene.add_(...this.elevator.meshes, ceiling, floor, hotelRender, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
-    this.gridFaces = build2dGrid(meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]));
+    const faces = meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]);
+    this.gridFaces = build2dGrid(faces);
+
+    const worldBounds = computeSceneBounds(faces);
+    debugger;
+    this.octree = new OctreeNode(0, worldBounds);
+    faces.forEach(face => insertFace(this.octree, face));
+
     this.player.cameraRotation.set(0, Math.PI, 0);
     this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorMotionRev1, audioContext.currentTime + 6);
 
@@ -118,7 +128,7 @@ export class GameState implements State {
   onUpdate() {
     tmpl.innerHTML = '';
 
-    this.player.update(this.gridFaces);
+    this.player.update(this.octree);
     this.enemy.update_(this.player);
     this.elevator.update();
     this.scene.updateWorldMatrix();

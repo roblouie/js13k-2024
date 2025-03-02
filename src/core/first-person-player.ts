@@ -10,8 +10,9 @@ import { HidingPlace } from '@/hiding-place';
 import { audioContext, biquadFilter, compressor, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { flashlightSound, hideSound } from '@/sounds';
 import { lightInfo } from '@/light-info';
+import {OctreeNode, querySphere} from "@/engine/physics/octree";
 
-class Sphere {
+export class Sphere {
   center: EnhancedDOMPoint;
   radius: number;
 
@@ -80,7 +81,9 @@ export class FirstPersonPlayer {
     this.sfxPlayer.playNote(audioContext.currentTime, 38, 40, hideSound, audioContext.currentTime + 1);
   }
 
-  update(gridFaces: Set<Face>[]) {
+  nearbyFaces = new Set<Face>();
+
+  update(octreeNode: OctreeNode) {
     if (this.heldKeyRoomNumber && this.heldKeyRoomNumber !== -1) {
       tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 50px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
     }
@@ -109,9 +112,11 @@ export class FirstPersonPlayer {
     if (!this.isHiding) {
       // this.velocity.y -= 0.008; // gravity
 
-      const playerGridPositions = getGridPositionWithNeighbors(this.feetCenter, gridFaces.length);
+      // const playerGridPositions = getGridPositionWithNeighbors(this.feetCenter, gridFaces.length);
+      this.nearbyFaces.clear();
+      querySphere(octreeNode, this.collisionSphere, this.nearbyFaces);
 
-      playerGridPositions.forEach(p => findWallCollisionsFromList(gridFaces[p], this));
+      findWallCollisionsFromList(this.nearbyFaces, this);
 
       //findWallCollisionsFromList(faces, this);
       this.feetCenter.add_(this.velocity);
