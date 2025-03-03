@@ -82,6 +82,7 @@ export class FirstPersonPlayer {
   }
 
   nearbyFaces = new Set<Face>();
+  navPointDifference = new EnhancedDOMPoint();
 
   update(octreeNode: OctreeNode) {
     if (this.heldKeyRoomNumber && this.heldKeyRoomNumber !== -1) {
@@ -92,7 +93,7 @@ export class FirstPersonPlayer {
 
     let smallestDistance = Infinity;
     [this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()].forEach(point => {
-      const difference = new EnhancedDOMPoint().subtractVectors(this.feetCenter, point.position);
+      const difference = this.navPointDifference.subtractVectors(this.feetCenter, point.position);
       const distance = difference.magnitude;
       if (distance < smallestDistance) {
         this.closestNavPoint = point;

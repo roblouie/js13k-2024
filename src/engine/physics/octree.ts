@@ -11,7 +11,7 @@ export class OctreeNode {
   bounds: AABB;
 
   static readonly MaxTriangles = 10;
-  static readonly MaxDepth = 10;
+  static readonly MaxDepth = 12;
 
   constructor(depth: number, bounds: AABB) {
     this.depth = depth;

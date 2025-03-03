@@ -49,13 +49,16 @@ gl.useProgram(lilgl.program);
 
 
 const lightPerspective = new Camera(Math.PI / 2, 1, 0.1, 60);
-
+const zAxis = new EnhancedDOMPoint();
+const xAxis = new EnhancedDOMPoint();
+const yAxis = new EnhancedDOMPoint();
+const invertedZ = new EnhancedDOMPoint();
 export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoint, up: EnhancedDOMPoint) {
-  const zAxis = new EnhancedDOMPoint().subtractVectors(target, position).normalize_(); //normalize(subtractVectors(target, position));
-  const xAxis = new EnhancedDOMPoint().crossVectors(zAxis, up).normalize_(); //normalize(crossVectors(zAxis, up));
-  const yAxis = new EnhancedDOMPoint().crossVectors(xAxis, zAxis); //crossVectors(xAxis, zAxis);
+  zAxis.subtractVectors(target, position).normalize_(); //normalize(subtractVectors(target, position));
+  xAxis.crossVectors(zAxis, up).normalize_(); //normalize(crossVectors(zAxis, up));
+  yAxis.crossVectors(xAxis, zAxis); //crossVectors(xAxis, zAxis);
 
-  const invertedZ = new EnhancedDOMPoint(zAxis.x * -1, zAxis.y * -1, zAxis.z * -1);
+  invertedZ.set(zAxis.x * -1, zAxis.y * -1, zAxis.z * -1);
 
   return new DOMMatrix([
     xAxis.x, yAxis.x, invertedZ.x, 0,
@@ -66,7 +69,7 @@ export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoin
 }
 
 const cubeMap = new ShadowCubeMapFbo(1024);
-
+const lightViewLookAt = new EnhancedDOMPoint();
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewProjectionMatrix = camera.projection.multiply(viewMatrix);
@@ -76,13 +79,13 @@ export function render(camera: Camera, scene: Scene) {
   gl.disable(gl.BLEND);
   gl.uniform3fv(lightPositionDepth, lightInfo.pointLightPosition.toArray());
 
-  cubeMap.getSides().forEach((side, i) => {
+  cubeMap.sides.forEach((side, i) => {
     cubeMap.bindForWriting(i);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(0x4100);
 
-    const lightView = createLookAt(lightInfo.pointLightPosition, new EnhancedDOMPoint().addVectors(lightInfo.pointLightPosition, side.target), side.up);
+    const lightView = createLookAt(lightInfo.pointLightPosition, lightViewLookAt.addVectors(lightInfo.pointLightPosition, side.target), side.up);
     const lightViewProjectionMatrix = lightPerspective.projection.multiply(lightView);
 
     scene.solidMeshes.forEach((mesh, index) => {
