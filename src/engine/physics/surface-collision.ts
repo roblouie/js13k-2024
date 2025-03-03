@@ -69,16 +69,17 @@ export function findWallCollisionsFromList(walls: Set<Face>, player: FirstPerson
     }
   }
 
-
+const sphereTriangleDist = new EnhancedDOMPoint();
+const centerPointDist = new EnhancedDOMPoint();
 function testSphereTriangle(s: { center: EnhancedDOMPoint, radius: number }, wall: Face) {
   // Ignore back sides of triangles
-  const dist = new EnhancedDOMPoint().subtractVectors(s.center, wall.points_[0]).dot(wall.normal);
+  const dist = sphereTriangleDist.subtractVectors(s.center, wall.points_[0]).dot(wall.normal);
   if (dist < 0) {
     return;
   }
 
   const p = closestPointInTriangle(s.center, wall.points_[0], wall.points_[1], wall.points_[2]);
-  const v = new EnhancedDOMPoint().subtractVectors(s.center, p);
+  const v = centerPointDist.subtractVectors(s.center, p);
   const squaredDistanceFromPointOnTriangle = v.dot(v);
   const isColliding = squaredDistanceFromPointOnTriangle <= s.radius * s.radius;
   if (isColliding) {
@@ -91,17 +92,31 @@ function testSphereTriangle(s: { center: EnhancedDOMPoint, radius: number }, wal
   }
 }
 
+const abPoint = new EnhancedDOMPoint();
+const acPoint = new EnhancedDOMPoint();
+const apPoint = new EnhancedDOMPoint();
+const bpPoint = new EnhancedDOMPoint();
+const cpPoint = new EnhancedDOMPoint();
+const abScaleV = new EnhancedDOMPoint();
+const aabScaleV = new EnhancedDOMPoint();
+const acScaleW = new EnhancedDOMPoint();
+const aacScaleW = new EnhancedDOMPoint();
+const wbcPoint = new EnhancedDOMPoint();
+const bWbc = new EnhancedDOMPoint();
+const abvPoint = new EnhancedDOMPoint();
+const acwPoint = new EnhancedDOMPoint();
+const abvacwaPoint = new EnhancedDOMPoint();
 function closestPointInTriangle(p: EnhancedDOMPoint, a: EnhancedDOMPoint, b: EnhancedDOMPoint, c: EnhancedDOMPoint) {
-  const ab = new EnhancedDOMPoint().subtractVectors(b, a);
-  const ac = new EnhancedDOMPoint().subtractVectors(c, a);
-  const ap = new EnhancedDOMPoint().subtractVectors(p, a);
+  const ab = abPoint.subtractVectors(b, a);
+  const ac = acPoint.subtractVectors(c, a);
+  const ap = apPoint.subtractVectors(p, a);
 
   const d1 = ab.dot(ap);
   const d2 = ac.dot(ap);
 
   if (d1 <= 0 && d2 <= 0) return a;
 
-  const bp = new EnhancedDOMPoint().subtractVectors(p, b);
+  const bp = bpPoint.subtractVectors(p, b);
   const d3 = ab.dot(bp);
   const d4 = ac.dot(bp);
 
@@ -111,10 +126,10 @@ function closestPointInTriangle(p: EnhancedDOMPoint, a: EnhancedDOMPoint, b: Enh
 
   if (vc <= 0 && d1 >= 0 && d3 <= 0) {
     const v = d1 / (d1 - d3);
-    return new EnhancedDOMPoint().addVectors(a, new EnhancedDOMPoint().set(ab).scale_(v));
+    return aabScaleV.addVectors(a, abScaleV.set(ab).scale_(v));
   }
 
-  const cp = new EnhancedDOMPoint().subtractVectors(p, c);
+  const cp = cpPoint.subtractVectors(p, c);
   const d5 = ab.dot(cp);
   const d6 = ac.dot(cp);
 
@@ -123,20 +138,20 @@ function closestPointInTriangle(p: EnhancedDOMPoint, a: EnhancedDOMPoint, b: Enh
   const vb = d5 * d2 - d1 * d6;
   if (vb <= 0 && d2 >= 0 && d6 <= 0) {
     const w = d2 / (d2 - d6);
-    return new EnhancedDOMPoint().addVectors(a, new EnhancedDOMPoint().set(ac).scale_(w));
+    return aacScaleW.addVectors(a, acScaleW.set(ac).scale_(w));
   }
 
   const va = d3 * d6 - d5 * d4;
   if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) {
     const w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-    const wbc = new EnhancedDOMPoint().subtractVectors(c, b).scale_(w);
-    return new EnhancedDOMPoint().addVectors(b, wbc);
+    const wbc = wbcPoint.subtractVectors(c, b).scale_(w);
+    return bWbc.addVectors(b, wbc);
   }
 
   const denom = 1 / (va + vb + vc);
   const v = vb * denom;
   const w = vc * denom;
-  const abv = new EnhancedDOMPoint().set(ab).scale_(v);
-  const acw = new EnhancedDOMPoint().set(ac).scale_(w);
-  return new EnhancedDOMPoint().addVectors(abv, acw).add_(a);
+  const abv = abvPoint.set(ab).scale_(v);
+  const acw = acwPoint.set(ac).scale_(w);
+  return abvacwaPoint.addVectors(abv, acw).add_(a);
 }

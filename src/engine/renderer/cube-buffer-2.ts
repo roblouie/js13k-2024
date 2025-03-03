@@ -43,15 +43,13 @@ export class ShadowCubeMapFbo {
     gl.framebufferTexture2D(0x8D40, 0x8CE0, 0x8515 + i, this.cubeMapTexture, 0);
   }
 
-  getSides() {
-    return [
+  readonly sides = [
       { target: new EnhancedDOMPoint(1.0, 0.0, 0.0),  up: new EnhancedDOMPoint(0.0, -1.0, 0.0)},
       { target: new EnhancedDOMPoint(-1., 0.0, 0.0), up: new EnhancedDOMPoint(0.0, -1.0, 0.0) },
       { target: new EnhancedDOMPoint(0.0, 1.0, 0.0),  up: new EnhancedDOMPoint(0.0, 0.0, 1.0) },
       { target: new EnhancedDOMPoint(0.0, -1.0, 0.0), up: new EnhancedDOMPoint(0.0, 0.0, -1.0) },
       { target: new EnhancedDOMPoint(0.0, 0.0, 1.0),  up: new EnhancedDOMPoint(0.0, -1.0, 0.0) },
       { target: new EnhancedDOMPoint(0.0, 0.0, -1.0), up: new EnhancedDOMPoint(0.0, -1.0, 0.0) }
-    ]
-  }
+    ];
 }
 

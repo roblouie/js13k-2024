@@ -82,7 +82,7 @@ export class FirstPersonPlayer {
   }
 
   nearbyFaces = new Set<Face>();
-
+  navPointDifference = new EnhancedDOMPoint();
   update(octreeNode: OctreeNode) {
     if (this.heldKeyRoomNumber && this.heldKeyRoomNumber !== -1) {
       tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 50px; right: 80px;">🗝️ #${this.heldKeyRoomNumber}</div>`;
@@ -92,7 +92,7 @@ export class FirstPersonPlayer {
 
     let smallestDistance = Infinity;
     [this.closestNavPoint, ...this.closestNavPoint.getPresentSiblings()].forEach(point => {
-      const difference = new EnhancedDOMPoint().subtractVectors(this.feetCenter, point.position);
+      const difference = this.navPointDifference.subtractVectors(this.feetCenter, point.position);
       const distance = difference.magnitude;
       if (distance < smallestDistance) {
         this.closestNavPoint = point;

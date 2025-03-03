@@ -136,9 +136,11 @@ export class Enemy {
     this.currentNodeDifference.subtractVectors(this.currentNode.position, this.position);
   }
 
+  baseForLightToTransform = new EnhancedDOMPoint();
   updateLight(followDistance: number, height: number) {
     this.lightObject.position.z = followDistance;
-    lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(new EnhancedDOMPoint(0, 0, 0)));
+    this.baseForLightToTransform.set(0, 0, 0);
+    lightInfo.pointLightPosition.set(this.lightObject.worldMatrix.transformPoint(this.baseForLightToTransform));
     lightInfo.pointLightPosition.y = height;
   }
 
@@ -206,11 +208,12 @@ export class Enemy {
     }
   }
 
+  lookAtPoint = new EnhancedDOMPoint();
   moveInTravelingDirection() {
     if (this.nextNodeDistance > 0.3) {
       const enemyFeetPos = 2.5;
       this.position.add_(this.travelingDirection.clone_().normalize_().scale_(this.getSpeed()));
-      this.model_.lookAt(new EnhancedDOMPoint().addVectors(this.position, this.travelingDirection));
+      this.model_.lookAt(this.lookAtPoint.addVectors(this.position, this.travelingDirection));
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       if (this.position.y < 2.402) {
         clearTimeout(this.footstepDebounce);
@@ -259,6 +262,7 @@ export class Enemy {
     return false;
   }
 
+  initialDirection = new EnhancedDOMPoint();
   chaseEnter(player: FirstPersonPlayer) {
     this.stopSong();
     this.playSong();
@@ -267,11 +271,12 @@ export class Enemy {
     this.advancePathToNode(player.closestNavPoint);
     this.nextNode = this.pathCache[1] ?? this.currentNode;
     this.positionInPathCache++;
-    const direction = new EnhancedDOMPoint().subtractVectors(this.nextNode.position, this.position).normalize_();
+    const direction = this.initialDirection.subtractVectors(this.nextNode.position, this.position).normalize_();
     this.travelingDirection.set(direction);
     this.unseenFrameCount = 0;
   }
 
+  chasePlayerEnemyDistanceCheck = new EnhancedDOMPoint();
   chaseUpdate(player: FirstPersonPlayer) {
     // tmpl.innerHTML += 'ENEMY STATE: CHASE<br>';
     this.updateLight(8, 9);
@@ -294,7 +299,7 @@ export class Enemy {
     // entered the room while the player wasn't hidden, meaning they will die if they try to hide now.
     if (
       (this.currentNode.hidingPlace && player.isHiding && player.closestNavPoint === this.currentNode)
-      || ((this.currentNode === player.closestNavPoint || this.nextNode === player.closestNavPoint) && new EnhancedDOMPoint().subtractVectors(this.position, player.feetCenter).magnitude < 7)
+      || ((this.currentNode === player.closestNavPoint || this.nextNode === player.closestNavPoint) && this.chasePlayerEnemyDistanceCheck.subtractVectors(this.position, player.feetCenter).magnitude < 7)
     ) {
       this.stateMachine.setState(this.killState, player);
       return;
@@ -357,11 +362,12 @@ export class Enemy {
 
   killFrames = 300;
   killFrameCount = 0;
+  killLookAt = new EnhancedDOMPoint();
   killEnter(player: FirstPersonPlayer) {
     this.killFrameCount = 0;
     this.stopSong();
     player.isFlashlightOn = false;
-    const lookAtTarget = new EnhancedDOMPoint().set(player.feetCenter);
+    const lookAtTarget = this.killLookAt.set(player.feetCenter);
     this.model_.lookAt(lookAtTarget);
     this.footstepPlayer.playNote(audioContext.currentTime, 70, 100, footstep, audioContext.currentTime + 1);
     this.footstepPlayer.playNote(audioContext.currentTime + 0.1, 1, 80, elevatorDoorTest, audioContext.currentTime + 5);

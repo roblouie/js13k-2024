@@ -78,7 +78,8 @@ export class EnhancedDOMPoint extends DOMPoint {
   normalize_() {
     const magnitude = this.magnitude;
     if (magnitude === 0) {
-      return new EnhancedDOMPoint();
+      this.set(0, 0, 0);
+      return this;
     }
     this.x /= magnitude;
     this.y /= magnitude;

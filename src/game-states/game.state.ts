@@ -124,6 +124,7 @@ export class GameState implements State {
 
   playerDoorDifference = new EnhancedDOMPoint();
   playerHidingPlaceDifference = new EnhancedDOMPoint();
+  playerNavPointDifference = new EnhancedDOMPoint();
 
   onUpdate() {
     tmpl.innerHTML = '';
@@ -260,7 +261,7 @@ export class GameState implements State {
 
     // Only really have a couple of events so handle them with booleans even though it kind of sucks
     if (!this.hasPlayerLeftElevator) {
-      if (new EnhancedDOMPoint().subtractVectors(this.player.feetCenter, AiNavPoints[0].position).magnitude > 17) {
+      if (this.playerNavPointDifference.subtractVectors(this.player.feetCenter, AiNavPoints[0].position).magnitude > 17) {
         this.hasPlayerLeftElevator = true;
         this.elevator.isCloseTriggered = true;
         this.playElevatorSound();
