@@ -4,10 +4,10 @@ import { GameState } from '@/game-states/game.state';
 
 let previousTime = 0;
 const interval = 1000 / 60;
-tmpl.innerHTML = `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Click to Start</div>`;
+// tmpl.innerHTML = `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Click to Start</div>`;
 document.onclick = async () => {
     tmpl.requestPointerLock();
-    tmpl.innerHTML = '';
+    // tmpl.innerHTML = '';
 
     await initTextures();
 

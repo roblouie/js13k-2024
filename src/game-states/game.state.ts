@@ -20,11 +20,11 @@ import { lightInfo } from '@/light-info';
 import { audioContext, biquadFilter, SimplestMidiRev2 } from '@/engine/audio/simplest-midi';
 import { elevatorDoor1, elevatorDoorTest, elevatorMotionRev1, footstep, hideSound } from '@/sounds';
 import {computeSceneBounds, insertFace, OctreeNode} from "@/engine/physics/octree";
+import {hud} from "@/hud";
 
 export class GameState implements State {
   player: FirstPersonPlayer;
   scene: Scene;
-  gridFaces: Set<Face>[] = [];
 
   doors: LeverDoorObject3d[];
   enemy: Enemy;
@@ -106,12 +106,16 @@ export class GameState implements State {
 
     this.scene.add_(...this.elevator.meshes, ceiling, floor, hotelRender, ...this.doors, this.enemy.model_, ...items.map(i => i.mesh));
     const faces = meshToFaces([floor, hotelCollision, this.elevator.bodyCollision]);
-    this.gridFaces = build2dGrid(faces);
+    // this.gridFaces = build2dGrid(faces);
 
     const worldBounds = computeSceneBounds(faces);
-    debugger;
-    this.octree = new OctreeNode(0, worldBounds);
-    faces.forEach(face => insertFace(this.octree, face));
+    this.octree = new OctreeNode(worldBounds, 0);
+    faces.forEach(face => this.octree.insert(face));
+    console.log(`Total nodes: ${countNodes(this.octree)}`);
+    function countNodes(node: OctreeNode): number {
+      if (!node.children) return 1;
+      return 1 + node.children.reduce((sum, child) => sum + countNodes(child), 0);
+    }
 
     this.player.cameraRotation.set(0, Math.PI, 0);
     this.player.sfxPlayer.playNote(audioContext.currentTime, 60, 70, elevatorMotionRev1, audioContext.currentTime + 6);
@@ -127,7 +131,7 @@ export class GameState implements State {
   playerPointDifference = new EnhancedDOMPoint();
 
   onUpdate() {
-    tmpl.innerHTML = '';
+    hud.clearFreeBottomText();
 
     this.player.update(this.octree);
     this.enemy.update_(this.player);
@@ -159,7 +163,7 @@ export class GameState implements State {
           if (distance < 1 || direction < -0.77) {
             if (door.isLocked) {
               if (this.player.heldKeyRoomNumber === this.player.closestNavPoint.roomNumber) {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ &nbsp; Unlock and Open</div>`;
+                hud.setFreeBottomText(`🗝️  Unlock and Open`);
                 if (controls.isConfirm) {
                   door.pullLever();
                   door.isLocked = false;
@@ -171,12 +175,12 @@ export class GameState implements State {
                   }
                 }
               } else {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🔒 &nbsp; Locked</div>`;
+                hud.setFreeBottomText(`🔒  Locked`);
               }
             } else if (this.enemy.currentNode.door === door) {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🚫</div>`;
+              hud.setFreeBottomText(`🚫`);
             } else {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">${door.openClose === -1 ? 'Open' : 'Close'} Door</div>`;
+              hud.setFreeBottomText(door.openClose === -1 ? 'Open Door' : 'Close Door');
               if (controls.isConfirm) {
                 door.pullLever();
               }
@@ -200,7 +204,7 @@ export class GameState implements State {
         if (distance < 8) {
           const direction = this.player.normal.dot(this.playerHidingPlaceDifference.normalize_());
           if (direction < -0.77 && !this.player.isHiding) {
-            tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Hide</div>`;
+            hud.setFreeBottomText('Hide');
             if (controls.isConfirm && !controls.prevConfirm) {
               this.player.hide(hidingPlace);
             }
@@ -216,12 +220,12 @@ export class GameState implements State {
           if (direction < -0.9) {
             if (item.roomNumber) {
               if (item.roomNumber === -1) {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🎂 Make a Wish</div>`;
+                hud.setFreeBottomText('🎂 Make a Wish');
               } else {
-                tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">🗝️ Take Room ${item.roomNumber} Key</div>`;
+                hud.setFreeBottomText(`🗝️ Take Room ${item.roomNumber} Key`);
               }
             } else {
-              tmpl.innerHTML += `<div style="font-size: 30px; text-align: center; position: absolute; bottom: 20px; width: 100%;">Use Health Pack</div>`;
+              hud.setFreeBottomText('Use Health Pack');
             }
             if (controls.isConfirm && !controls.prevConfirm) {
               item.isTaken = true;
@@ -270,7 +274,7 @@ export class GameState implements State {
 
     if (this.hasPlayerLeftElevator && this.player.feetCenter.z < 3) {
       this.player.isFrozen_ = true;
-      tmpl.innerHTML += `<div style="font-size: 40px; text-align: center; position: absolute; bottom: 20px; width: 100%;">You Win!</div>`;
+      hud.setFreeBottomText('You Win!');
       if (!this.isGameEnded) {
         this.isGameEnded = true;
         this.elevator.isCloseTriggered = true;

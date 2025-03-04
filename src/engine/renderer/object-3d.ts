@@ -51,16 +51,33 @@ export class Object3d {
   }
 
   isUsingLookAt = false;
+  private localWorkMatrix = new DOMMatrix();
+  // TODO: Don't recreate matrix every time
   getMatrix() {
-    const matrix = new DOMMatrix();
-    matrix.translateSelf(this.position.x, this.position.y, this.position.z);
+    this.localWorkMatrix.m11 = 1
+    this.localWorkMatrix.m12 = 0
+    this.localWorkMatrix.m13 = 0
+    this.localWorkMatrix.m14 = 0
+    this.localWorkMatrix.m21 = 0
+    this.localWorkMatrix.m22 = 1
+    this.localWorkMatrix.m23 = 0
+    this.localWorkMatrix.m24 = 0
+    this.localWorkMatrix.m31 = 0
+    this.localWorkMatrix.m32 = 0
+    this.localWorkMatrix.m33 = 1
+    this.localWorkMatrix.m34 = 0
+    this.localWorkMatrix.m41 = 0
+    this.localWorkMatrix.m42 = 0
+    this.localWorkMatrix.m43 = 0
+    this.localWorkMatrix.m44 = 1
+    this.localWorkMatrix.translateSelf(this.position.x, this.position.y, this.position.z);
     if (this.isUsingLookAt) {
-      matrix.multiplySelf(this.rotationMatrix);
+      this.localWorkMatrix.multiplySelf(this.rotationMatrix);
     } else {
-      matrix.rotateSelf(this.rotation_.x, this.rotation_.y, this.rotation_.z);
+      this.localWorkMatrix.rotateSelf(this.rotation_.x, this.rotation_.y, this.rotation_.z);
     }
-    matrix.scaleSelf(this.scale_.x, this.scale_.y, this.scale_.z);
-    return matrix;
+    this.localWorkMatrix.scaleSelf(this.scale_.x, this.scale_.y, this.scale_.z);
+    return this.localWorkMatrix;
   }
 
   updateWorldMatrix() {

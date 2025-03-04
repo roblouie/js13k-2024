@@ -68,8 +68,31 @@ export function createLookAt(position: EnhancedDOMPoint, target: EnhancedDOMPoin
   ]);
 }
 
+function updateArrayFromDomMatrix(array: Float32Array, matrix: DOMMatrix) {
+  array[0] = matrix.m11;
+  array[1] = matrix.m12;
+  array[2] = matrix.m13;
+  array[3] = matrix.m14;
+  array[4] = matrix.m21;
+  array[5] = matrix.m22;
+  array[6] = matrix.m23;
+  array[7] = matrix.m24;
+  array[8] = matrix.m31;
+  array[9] = matrix.m32;
+  array[10] = matrix.m33;
+  array[11] = matrix.m34;
+  array[12] = matrix.m41;
+  array[13] = matrix.m42;
+  array[14] = matrix.m43;
+  array[15] = matrix.m44;
+}
+
+
 const cubeMap = new ShadowCubeMapFbo(1024);
 const lightViewLookAt = new EnhancedDOMPoint();
+const lightPovMvpArray = new Float32Array(16);
+const normalMatrixArray = new Float32Array(16);
+
 export function render(camera: Camera, scene: Scene) {
   const viewMatrix = camera.worldMatrix.inverse();
   const viewProjectionMatrix = camera.projection.multiply(viewMatrix);
@@ -91,7 +114,8 @@ export function render(camera: Camera, scene: Scene) {
     scene.solidMeshes.forEach((mesh, index) => {
       gl.bindVertexArray(mesh.geometry.vao!);
       gl.uniformMatrix4fv(worldMatrixDepth, false, mesh.worldMatrix.toFloat32Array());
-      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightViewProjectionMatrix.multiply(mesh.worldMatrix).toFloat32Array());
+      updateArrayFromDomMatrix(lightPovMvpArray, lightViewProjectionMatrix.multiply(mesh.worldMatrix));
+      gl.uniformMatrix4fv(lightPovMvpDepthLocation, false, lightPovMvpArray);
       gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, 0x1403, 0);
     });
   });
@@ -122,8 +146,9 @@ export function render(camera: Camera, scene: Scene) {
     gl.vertexAttrib1f(AttributeLocation.TextureDepth, mesh.material.texture?.id ?? -1.0);
     gl.bindVertexArray(mesh.geometry.vao!);
 
+    updateArrayFromDomMatrix(normalMatrixArray, mesh.worldMatrix.inverse());
     // @ts-ignore
-    gl.uniformMatrix4fv(normalMatrixLocation, true, mesh.color ? mesh.cachedMatrixData : mesh.worldMatrix.inverse().toFloat32Array());
+    gl.uniformMatrix4fv(normalMatrixLocation, true, normalMatrixArray);
     gl.uniformMatrix4fv(worldMatrixMain, false, mesh.worldMatrix.toFloat32Array());
     gl.uniformMatrix4fv(modelviewProjectionLocation, false, modelViewProjectionMatrix.toFloat32Array());
     gl.drawElements(gl.TRIANGLES, mesh.geometry.getIndices()!.length, 0x1403, 0);

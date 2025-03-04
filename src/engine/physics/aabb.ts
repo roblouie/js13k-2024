@@ -1,7 +1,7 @@
-import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
+import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
 import {Sphere} from "@/core/first-person-player";
 
-export type AABB = { min: EnhancedDOMPoint, max: EnhancedDOMPoint };
+export type AABB = { min: VectorLike, max: VectorLike };
 
 export function isAABBOverlapping(a: AABB, b: AABB): boolean {
   return a.min.x <= b.max.x && a.max.x >= b.min.x
