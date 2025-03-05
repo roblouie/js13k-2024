@@ -52,11 +52,10 @@ export class FirstPersonPlayer {
     this.camera = camera;
     this.listener = audioContext.listener;
 
-    const rotationSpeed = 0.001;
     controls.onMouseMove(mouseMovement => {
       if (!this.isFrozen_) {
-        this.cameraRotation.x += mouseMovement.y * -rotationSpeed;
-        this.cameraRotation.y += mouseMovement.x * -rotationSpeed;
+        this.cameraRotation.x -= mouseMovement.y;
+        this.cameraRotation.y -= mouseMovement.x;
         this.cameraRotation.x = Math.min(Math.max(this.cameraRotation.x, -Math.PI / 2), Math.PI / 2)
         this.cameraRotation.y = this.cameraRotation.y % (Math.PI * 2);
       }

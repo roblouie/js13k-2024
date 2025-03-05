@@ -9,19 +9,72 @@ class Controls {
   private mouseMovement = new EnhancedDOMPoint();
   private onMouseMoveCallback?: (mouseMovement: EnhancedDOMPoint) => void;
 
+  mouseSensitivity = 0.001;
+  touchSensitivity = 0.004;
+
+  lastTouch = new EnhancedDOMPoint();
+  lookTouchId: number | null = null;
+  touchStartTime = 0;
+
   keyMap: Map<string, boolean> = new Map();
 
   constructor() {
     document.addEventListener('keydown', event => this.keyMap.set(event.code, true));
     document.addEventListener('keyup', event => this.keyMap.set(event.code, false));
-    document.addEventListener('mousedown', () => this.keyMap.set('KeyE', true));
-    document.addEventListener('mouseup', () => this.keyMap.set('KeyE', false));
+    // document.addEventListener('mousedown', () => this.keyMap.set('KeyE', true));
+    // document.addEventListener('mouseup', () => this.keyMap.set('KeyE', false));
 
-    document.addEventListener('mousemove', event => {
-      this.mouseMovement.x = event.movementX;
-      this.mouseMovement.y = event.movementY;
-      this.onMouseMoveCallback?.(this.mouseMovement);
+    tmpl.addEventListener('touchstart', e => {
+      for (const touch of e.changedTouches) {
+        if (touch.clientX > 200) { // to the right of the dpad
+          this.lookTouchId = touch.identifier;
+          this.lastTouch.set(touch.clientX, touch.clientY);
+          this.touchStartTime = Date.now();
+        }
+      }
     });
+
+    tmpl.addEventListener('touchmove', e => {
+      if (this.lookTouchId === null) {
+        return;
+      }
+
+      for (const touch of e.changedTouches) {
+        if (touch.identifier === this.lookTouchId) {
+          const deltaX = touch.clientX - this.lastTouch.x;
+          const deltaY = touch.clientY - this.lastTouch.y;
+
+          this.lastTouch.set(touch.clientX, touch.clientY);
+
+          this.mouseMovement.set(deltaX * this.touchSensitivity, deltaY * this.touchSensitivity);
+          this.onMouseMoveCallback?.(this.mouseMovement);
+        }
+      }
+    });
+
+    const touchDistanceVector = new EnhancedDOMPoint();
+    tmpl.addEventListener('touchend', e => {
+      for (const touch of e.changedTouches) {
+        if (touch.identifier === this.lookTouchId) {
+          this.lookTouchId = null;
+          const duration = Date.now() - this.touchStartTime;
+          touchDistanceVector.set(touch.clientX - this.lastTouch.x, touch.clientY - this.lastTouch.y)
+          // const movedX = Math.abs(touch.clientX - this.lastTouch.x);
+          // const movedY = Math.abs(touch.clientY - this.lastTouch.y);
+
+          if (duration < 200 && touchDistanceVector.magnitude < 10) {
+            this.keyMap.set('KeyE', true);
+            setTimeout(() => this.keyMap.set('KeyE', false), 100);
+          }
+        }
+      }
+    })
+
+    // document.addEventListener('mousemove', event => {
+    //   this.mouseMovement.x = event.movementX * this.mouseSensitivity;
+    //   this.mouseMovement.y = event.movementY * this.mouseSensitivity;
+    //   this.onMouseMoveCallback?.(this.mouseMovement);
+    // });
     this.inputDirection = new EnhancedDOMPoint();
   }
 
