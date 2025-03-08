@@ -24,7 +24,7 @@ class Controls {
     // document.addEventListener('mousedown', () => this.keyMap.set('KeyE', true));
     // document.addEventListener('mouseup', () => this.keyMap.set('KeyE', false));
 
-    tmpl.addEventListener('touchstart', e => {
+    tmpl.addEventListener('touchstart', (e: TouchEvent) => {
       for (const touch of e.changedTouches) {
         if (touch.clientX > 200) { // to the right of the dpad
           this.lookTouchId = touch.identifier;
@@ -34,7 +34,7 @@ class Controls {
       }
     });
 
-    tmpl.addEventListener('touchmove', e => {
+    tmpl.addEventListener('touchmove', (e: TouchEvent) => {
       if (this.lookTouchId === null) {
         return;
       }
@@ -53,7 +53,7 @@ class Controls {
     });
 
     const touchDistanceVector = new EnhancedDOMPoint();
-    tmpl.addEventListener('touchend', e => {
+    tmpl.addEventListener('touchend', (e: TouchEvent) => {
       for (const touch of e.changedTouches) {
         if (touch.identifier === this.lookTouchId) {
           this.lookTouchId = null;

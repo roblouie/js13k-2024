@@ -1,6 +1,6 @@
 {
   "exclude": ["tools"],
-  "include": ["./src"],
+  "include": ["./src", "./vite-env.d.ts"],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 

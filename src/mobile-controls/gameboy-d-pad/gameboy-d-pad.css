@@ -1,17 +1,23 @@
+:host {
+    --dpad-face: #353535;
+    --dpad-side: #000;
+}
+
 .dpad-touch-area {
     width: 140px;
     height: 140px;
     border-radius: 100% 100%;
     perspective-origin: center 75%;
     perspective: 575px;
-    background-color: #b2ada9;
+    background-color: #161616;
+    filter: opacity(0.7);
 }
 .dpad {
     transform-style: preserve-3d;
     transform-origin: 70px 70px -10px;
 }
 .dpad-horizontal {
-    background-color: #434343;
+    background-color: var(--dpad-face);
     width: 110px;
     height: 30px;
     transform-origin: center;
@@ -20,7 +26,7 @@
     top: 55px;
 }
 .dpad-horizontal-top {
-    background-color: #343434;
+    background-color: var(--dpad-side);
     width: 110px;
     height: 30px;
     transform-origin: top;
@@ -30,7 +36,7 @@
     transform: translateZ(-30px) rotateX(90deg);
 }
 .dpad-horizontal-bottom {
-    background-color: #343434;
+    background-color: var(--dpad-side);
     width: 110px;
     height: 30px;
     transform-origin: top;
@@ -40,7 +46,7 @@
     transform: translateZ(-30px) rotateX(90deg);
 }
 .dpad-horizontal-left {
-    background-color: #343434;
+    background-color: var(--dpad-side);
     width: 30px;
     height: 30px;
     transform-origin: left;
@@ -50,7 +56,7 @@
     transform: rotateY(90deg);
 }
 .dpad-horizontal-right {
-    background-color: #343434;
+    background-color: var(--dpad-side);
     width: 30px;
     height: 30px;
     transform-origin: left;
@@ -60,7 +66,7 @@
     transform: rotateY(90deg) translateY(-30px);
 }
 .dpad-vertical {
-    background-color: #434343;
+    background-color: var(--dpad-face);
     width: 30px;
     height: 110px;
     transform-origin: center;
@@ -69,7 +75,7 @@
     top: 15px;
 }
 .dpad-vertical-left {
-    background-color: #343434;
+    background-color: var(--dpad-side);
     width: 30px;
     height: 110px;
     transform-origin: left;
@@ -79,7 +85,7 @@
     transform: translateZ(-30px) rotateY(-90deg);
 }
 .dpad-vertical-right {
-    background-color: #343434;
+    background-color: var(--dpad-side);
     width: 30px;
     height: 110px;
     transform-origin: left;
@@ -89,7 +95,7 @@
     transform: translateZ(-30px) rotateY(-90deg);
 }
 .dpad-vertical-bottom {
-    background-color: #343434;
+    background-color: var(--dpad-side);
     width: 30px;
     height: 30px;
     transform-origin: top;

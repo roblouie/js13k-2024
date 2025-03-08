@@ -48,9 +48,9 @@ export class MoldableCubeGeometry {
     let vertexCount = 0;
 
     const buildPlane = (
-      u: keyof EnhancedDOMPoint,
-      v: keyof EnhancedDOMPoint,
-      w: keyof EnhancedDOMPoint,
+      u: 'x' | 'y' | 'z',
+      v: 'x' | 'y' | 'z',
+      w: 'x' | 'y' | 'z',
       uDir: number,
       vDir: number,
       width: number,

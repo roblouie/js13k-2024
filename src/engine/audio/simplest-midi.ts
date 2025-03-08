@@ -10,7 +10,7 @@ compressor.knee.value = 40;
 compressor.ratio.value = 12;
 compressor.connect(audioContext.destination);
 
-type InstrumentData = {
+export type InstrumentData = {
   output: number; // Output destination, 0= output, n = fm to specified oscillator
   w: 'sawtooth' | 'square' | 'triangle' | 'sine' | 'n0' | 'n1'; // waveform
   v: number; // volume
@@ -27,18 +27,19 @@ type InstrumentData = {
 }
 
 const blen = audioContext.sampleRate * 0.5;
-const noiseBuf={};
-noiseBuf['n0'] = audioContext.createBuffer(1,blen,audioContext.sampleRate);
-noiseBuf['n1'] = audioContext.createBuffer(1,blen,audioContext.sampleRate);
+const noiseBuf={
+  n0: audioContext.createBuffer(1,blen,audioContext.sampleRate),
+  n1: audioContext.createBuffer(1,blen,audioContext.sampleRate)
+};
 for(let i=0;i<blen;++i){
-  noiseBuf['n0'].getChannelData(0)[i]=Math.random()*2-1;
+  noiseBuf.n0.getChannelData(0)[i]=Math.random()*2-1;
 }
 for(let jj=0;jj<64;++jj){
   const r1=Math.random()*10+1;
   const r2=Math.random()*10+1;
   for(let i=0;i<blen;++i){
     const dd=Math.sin((i/blen)*2*Math.PI*440*r1)*Math.sin((i/blen)*2*Math.PI*440*r2);
-    noiseBuf['n1'].getChannelData(0)[i]+=dd/8;
+    noiseBuf.n1.getChannelData(0)[i]+=dd/8;
   }
 }
 
@@ -55,7 +56,7 @@ export class SimplestMidiRev2 {
     const o: any[] =[]; // Oscillator or audiobuffersourcenode
     const g: GainNode[] = [];
     const vp=[];
-    const fp=[];
+    const fp: any=[];
     const releases=[];
     const frequency=440*2**((note-69)/12);
     for(let i=0;i<instrumentDatas.length;++i) {
@@ -82,7 +83,7 @@ export class SimplestMidiRev2 {
       switch(instrumentInfo.w[0]){
         case "n":
           o[i]=audioContext.createBufferSource();
-          o[i].buffer=noiseBuf[instrumentInfo.w];
+          o[i].buffer=noiseBuf[instrumentInfo.w as 'n0' |'n1'];
           o[i].loop=true;
           o[i].playbackRate.value=fp[i]/440;
           if(instrumentInfo.p!=1)
@@ -138,7 +139,7 @@ export class SimplestMidiRev2 {
     }
   }
 
-  private _setParamTarget(p,v,t,duration: number) {
+  private _setParamTarget(p: AudioParam,v: number, t: number, duration: number) {
     if(duration!=0) // If there's a duration
       p.setTargetAtTime(v,t,duration); // use setTargetAtTime to gradually adjust to new value
     else

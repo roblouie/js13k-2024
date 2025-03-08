@@ -70,7 +70,7 @@ document.onclick = async () => {
     draw(0);
 
     document.onclick = () => {
-      document.querySelector('body').requestFullscreen()
+      document.querySelector('body')!.requestFullscreen()
     };
 
   function draw(currentTime: number) {

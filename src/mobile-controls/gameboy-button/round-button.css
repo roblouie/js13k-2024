@@ -5,8 +5,11 @@
 
     --button-middle-top: 38px;
 
-    --button-label-top-offset: 5px;
-    --button-label-left-offset: -20px;
+    --button-label-top-offset: 20px;
+    --button-label-left-offset: 25px;
+
+    --button-color: #3d3d3d;
+    --button-side-color: #2b2b2d;
 }
 
 .button-wrapper {
@@ -14,6 +17,7 @@
     width: 80px;
     height: 110px;
     user-select: none;
+    filter: opacity(0.7);
 }
 
 .button{
@@ -23,46 +27,49 @@
 
 .label {
     position: absolute;
-    top: calc(var(--button-height) + var(--button-label-top-offset));
-    left: calc(var(--button-width) + var(--button-label-left-offset));
-    font-size: 20px;
+    top: var(--button-label-top-offset);
+    left: var(--button-label-left-offset);
+    font-size: 25px;
     font-weight: 800;
-    transform: rotateZ(-30deg);
+    font-variant-emoji: text;
+    filter: saturate(0) brightness(0.4);
+    text-shadow: 0px 0px 0px #000000;
     user-select: none;
+    -webkit-background-clip: text;
 }
 
 .button .middle{
-    width: var(--button-width);
-    height: var(--button-depth);
-    top: var(--button-middle-top);
-    background-color: #a90f52;
-    position:absolute;
+width: var(--button-width);
+height: var(--button-depth);
+top: var(--button-middle-top);
+background-color: var(--button-side-color);
+position:absolute;
 }
 
 
 .button .top{
-    width: var(--button-width);
-    height: var(--button-height);
-    background-color: #ca0e60;
-    border-radius: 100% 100%;
-    position:absolute;
+width: var(--button-width);
+height: var(--button-height);
+background-color: var(--button-color);
+border-radius: 100% 100%;
+position:absolute;
 }
 
 .button .bottom{
-    width: var(--button-width);
-    height: var(--button-height);
-    background-color:#a90f52;
-    border-radius: 100% 100%;
-    position:absolute;
-    top: var(--button-depth);
-    box-shadow:0px 0px 15px rgba(0,0,0,0.75)
+width: var(--button-width);
+height: var(--button-height);
+background-color: var(--button-side-color);
+border-radius: 100% 100%;
+position:absolute;
+top: var(--button-depth);
+/*box-shadow:0px 0px 15px rgba(0,0,0,0.75)*/
 }
 
 .button.pressed .top {
-    top: 10px;
-    box-shadow: inset 0 3px 7px #0000003b;
+top: 10px;
+box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.88);
 }
 
 .button.pressed .bottom {
-    box-shadow:0 0 7px rgba(0,0,0,0.75)
+box-shadow:0 0 7px rgba(0,0,0,0.75)
 }

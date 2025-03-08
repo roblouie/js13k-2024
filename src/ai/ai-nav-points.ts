@@ -46,15 +46,15 @@ export function makeNavPoints(doors: LeverDoorObject3d[]) {
     createRoomNodes(new EnhancedDOMPoint(44, 2.5, 36), 1301, doors[0]),
     createRoomNodes(new EnhancedDOMPoint(44, 2.5, 71), 1302, doors[1]),
     createRoomNodes(new EnhancedDOMPoint(44, 2.5, 106), 1303, doors[2]),
-    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 24), 1304, doors[3], true),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 24), 1304, doors[3]),
     createRoomNodes(new EnhancedDOMPoint(0, 2.5, 36), 1305,  doors[4]),
-    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5], true),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 59), 1306, doors[5]),
     createRoomNodes(new EnhancedDOMPoint(0, 2.5, 71), 1307, doors[6]),
-    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 94), 1308, doors[7], true),
+    createRoomNodes(new EnhancedDOMPoint(0, 2.5, 94), 1308, doors[7]),
     createRoomNodes(new EnhancedDOMPoint(0, 2.5, 106), 1309, doors[8]),
-    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 24), 1310, doors[9], true),
-    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 59), 1311, doors[10], true),
-    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 94), 1312, doors[11], true),
+    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 24), 1310, doors[9]),
+    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 59), 1311, doors[10]),
+    createRoomNodes(new EnhancedDOMPoint(-44, 2.5, 94), 1312, doors[11]),
   ];
 
   let roomsWorkingCopy = [...roomEntrances];

@@ -30,7 +30,7 @@ export class Enemy {
   model_: Mesh;
   pathCache: PathNode[] = [];
   positionInPathCache = 0;
-  lastPlayerNode: PathNode;
+  lastPlayerNode?: PathNode;
   travelingDirection = new EnhancedDOMPoint();
   nextNodeDifference = new EnhancedDOMPoint();
   nextNodeDistance = 0;
@@ -217,7 +217,7 @@ export class Enemy {
       this.position.y = enemyFeetPos + Math.sin(this.position.x + this.position.z) * 0.1;
       if (this.position.y < 2.402) {
         clearTimeout(this.footstepDebounce);
-        this.footstepDebounce = setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 4, 60, footstep, audioContext.currentTime + 1), 40);
+        this.footstepDebounce = window.setTimeout(() => this.footstepPlayer.playNote(audioContext.currentTime, 38 + Math.random() * 4, 60, footstep, audioContext.currentTime + 1), 40);
       }
       this.currentInterval++;
       this.pannerNode.positionX.value = this.position.x;

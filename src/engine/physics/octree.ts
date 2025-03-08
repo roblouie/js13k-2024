@@ -49,29 +49,6 @@ import {Sphere} from "@/core/first-person-player";
 //   })
 // }
 
-function subdivide(node: OctreeNode) {
-  const { min, max } = node.bounds;
-  const center = new EnhancedDOMPoint(
-    (min.x + max.x) / 2,
-    (min.y + max.y) / 2,
-    (min.z + max.z) / 2,
-  );
-  node.children = [];
-  for (let i = 0; i < 8; i++) {
-    const childMin = new EnhancedDOMPoint(
-      (i & 1) ? center.x : min.x,
-      (i & 2) ? center.y : min.y,
-      (i & 4) ? center.z : min.z,
-    );
-    const childMax = new EnhancedDOMPoint(
-      (i & 1) ? max.x : center.x,
-      (i & 2) ? max.y : center.y,
-      (i & 4) ? max.z : center.z,
-    );
-    node.children.push(new OctreeNode(node.depth + 1, { min: childMin, max: childMax }));
-  }
-}
-
 // TODO: In full js13k release, precomupte this and just put in the hard bounds in the base
 // octree, and delete th is function
 export function computeSceneBounds(triangles: Face[]): AABB {

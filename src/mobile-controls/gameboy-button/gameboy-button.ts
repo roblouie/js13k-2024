@@ -35,11 +35,12 @@ export class GameboyButton extends HTMLElement {
     top.setAttribute('class', 'top');
     button.appendChild(top);
 
+
     // Take attribute content and put it inside the info span
     const label = document.createElement('div');
     label.setAttribute('class', 'label');
     label.textContent = this.getAttribute('label');
-    wrapper.appendChild(label);
+    top.appendChild(label);
 
     const style = document.createElement('style');
 

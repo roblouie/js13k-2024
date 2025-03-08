@@ -8,7 +8,15 @@ export const WallHeight = 12;
 export const DoorHeight = 9;
 export const DoorTopSegment = WallHeight - DoorHeight;
 
-export function buildSegmentedWall(segmentWidths: number[], segmentHeight: number, topSegments: number[], bottomSegments: number[], depth = 1, textureScale = 12, texturesPerSide?: Material[]): [MoldableCubeGeometry, number] {
+export function buildSegmentedWall(
+  segmentWidths: number[],
+  segmentHeight: number,
+  topSegments: number[],
+  bottomSegments: number[],
+  depth = 1,
+  textureScale = 12,
+  texturesPerSide?: (Material | undefined)[]
+): [MoldableCubeGeometry, number] {
   let geo: MoldableCubeGeometry;
   let totalWidth = 0;
   let runningSide = 0;
@@ -73,7 +81,7 @@ export function createHallway(frontWall: MoldableCubeGeometry | undefined, backW
   }
 }
 
-export function createBox(frontWall: [MoldableCubeGeometry, number], backWall: [MoldableCubeGeometry, number], leftWall: [MoldableCubeGeometry, number], rightWall: [MoldableCubeGeometry, number]) {
+export function createBox(frontWall: [MoldableCubeGeometry | undefined, number], backWall: [MoldableCubeGeometry | undefined, number], leftWall: [MoldableCubeGeometry, number], rightWall: [MoldableCubeGeometry, number]) {
   return createHallway(frontWall[0], backWall[0], (leftWall[1] + 1) / 2)
     .merge(createHallway(leftWall[0], rightWall[0], (frontWall[1] - 1) / 2).rotate_(0, Math.PI / 2)).computeNormals().done_();
 }
